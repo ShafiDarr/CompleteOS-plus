@@ -203,7 +203,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                             highlightColor: Colors.transparent,
                             onTap: () async {
                               FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'area';
+                              FFAppState().activeSystemTab = 'goal';
                               FFAppState().update(() {});
                             },
                             child: wrapWithModel(
@@ -212,7 +212,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                               child: SystemTabWidget(
                                 label: 'Goals',
                                 isSelected:
-                                    FFAppState().activeSystemTab == 'area'
+                                    FFAppState().activeSystemTab == 'goal'
                                         ? true
                                         : false,
                               ),
@@ -225,7 +225,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                             highlightColor: Colors.transparent,
                             onTap: () async {
                               FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'area';
+                              FFAppState().activeSystemTab = 'project';
                               FFAppState().update(() {});
                             },
                             child: wrapWithModel(
@@ -234,7 +234,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                               child: SystemTabWidget(
                                 label: 'Projects',
                                 isSelected:
-                                    FFAppState().activeSystemTab == 'area'
+                                    FFAppState().activeSystemTab == 'project'
                                         ? true
                                         : false,
                               ),
@@ -247,7 +247,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                             highlightColor: Colors.transparent,
                             onTap: () async {
                               FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'activity';
+                              FFAppState().activeSystemTab = 'task';
                               FFAppState().update(() {});
                             },
                             child: wrapWithModel(
@@ -256,7 +256,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                               child: SystemTabWidget(
                                 label: 'Tasks',
                                 isSelected:
-                                    FFAppState().activeSystemTab == 'activity'
+                                    FFAppState().activeSystemTab == 'task'
                                         ? true
                                         : false,
                               ),

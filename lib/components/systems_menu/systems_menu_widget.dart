@@ -139,7 +139,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                 highlightColor: Colors.transparent,
                 onTap: () async {
                   FFAppState().activePanel = 'system';
-                  FFAppState().activeSystemTab = 'area';
+                  FFAppState().activeSystemTab = 'goal';
                   FFAppState().update(() {});
                 },
                 child: Row(
@@ -213,7 +213,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                 highlightColor: Colors.transparent,
                 onTap: () async {
                   FFAppState().activePanel = 'system';
-                  FFAppState().activeSystemTab = 'area';
+                  FFAppState().activeSystemTab = 'project';
                   FFAppState().update(() {});
                 },
                 child: Row(
@@ -271,15 +271,37 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
             decoration: BoxDecoration(
               color: FlutterFlowTheme.of(context).primaryBackground,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    'Tasks',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.interTight(
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'task';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Tasks',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                            color: _model.isHovered == 'activities'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
                             fontWeight: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .fontWeight,
@@ -287,19 +309,10 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                 .bodyMedium
                                 .fontStyle,
                           ),
-                          color: _model.isHovered == 'activities'
-                              ? FlutterFlowTheme.of(context).primaryText
-                              : FlutterFlowTheme.of(context).secondaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           onEnter: ((event) async {
@@ -322,15 +335,37 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
             decoration: BoxDecoration(
               color: FlutterFlowTheme.of(context).primaryBackground,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    'Schedules',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.interTight(
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'schedule';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Schedules',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                            color: _model.isHovered == 'schedules'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
                             fontWeight: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .fontWeight,
@@ -338,19 +373,10 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                 .bodyMedium
                                 .fontStyle,
                           ),
-                          color: _model.isHovered == 'schedules'
-                              ? FlutterFlowTheme.of(context).primaryText
-                              : FlutterFlowTheme.of(context).secondaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           onEnter: ((event) async {
