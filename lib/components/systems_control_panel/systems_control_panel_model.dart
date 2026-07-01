@@ -1,0 +1,48 @@
+import '/components/system_tab/system_tab_widget.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'systems_control_panel_widget.dart' show SystemsControlPanelWidget;
+import 'package:flutter/material.dart';
+
+class SystemsControlPanelModel
+    extends FlutterFlowModel<SystemsControlPanelWidget> {
+  ///  State fields for stateful widgets in this component.
+
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel1;
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel2;
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel3;
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel4;
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel5;
+  // Model for SystemTab component.
+  late SystemTabModel systemTabModel6;
+  // State field(s) for TextField widget.
+  FocusNode? textFieldFocusNode;
+  TextEditingController? textController;
+  String? Function(BuildContext, String?)? textControllerValidator;
+
+  @override
+  void initState(BuildContext context) {
+    systemTabModel1 = createModel(context, () => SystemTabModel());
+    systemTabModel2 = createModel(context, () => SystemTabModel());
+    systemTabModel3 = createModel(context, () => SystemTabModel());
+    systemTabModel4 = createModel(context, () => SystemTabModel());
+    systemTabModel5 = createModel(context, () => SystemTabModel());
+    systemTabModel6 = createModel(context, () => SystemTabModel());
+  }
+
+  @override
+  void dispose() {
+    systemTabModel1.dispose();
+    systemTabModel2.dispose();
+    systemTabModel3.dispose();
+    systemTabModel4.dispose();
+    systemTabModel5.dispose();
+    systemTabModel6.dispose();
+    textFieldFocusNode?.dispose();
+    textController?.dispose();
+  }
+}

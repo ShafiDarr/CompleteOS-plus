@@ -1,0 +1,653 @@
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart';
+import '/components/system_tab/system_tab_widget.dart';
+import '/components/systems_card/systems_card_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'systems_control_panel_model.dart';
+export 'systems_control_panel_model.dart';
+
+class SystemsControlPanelWidget extends StatefulWidget {
+  const SystemsControlPanelWidget({
+    super.key,
+    this.openEndDrawer,
+    this.onEdit,
+  });
+
+  final Future Function()? openEndDrawer;
+  final Future Function(String areaID, String areaName, String areaDescription,
+      bool areaActive)? onEdit;
+
+  @override
+  State<SystemsControlPanelWidget> createState() =>
+      _SystemsControlPanelWidgetState();
+}
+
+class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
+  late SystemsControlPanelModel _model;
+
+  @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    _model.onUpdate();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => SystemsControlPanelModel());
+
+    _model.textController ??= TextEditingController();
+    _model.textFieldFocusNode ??= FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _model.maybeDispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    context.watch<FFAppState>();
+
+    return Visibility(
+      visible: responsiveVisibility(
+        context: context,
+        phone: false,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (responsiveVisibility(
+            context: context,
+            phone: false,
+          ))
+            Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Container(
+                width: 720.0,
+                height: 540.0,
+                decoration: BoxDecoration(
+                  color: FlutterFlowTheme.of(context).primaryBackground,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 16.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'System',
+                                  style: FlutterFlowTheme.of(context)
+                                      .headlineMedium
+                                      .override(
+                                        font: GoogleFonts.interTight(
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .headlineMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .headlineMedium
+                                                  .fontStyle,
+                                        ),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .headlineMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .headlineMedium
+                                            .fontStyle,
+                                      ),
+                                ),
+                                Text(
+                                  'Configure your personal operating system.',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.interTight(
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                ),
+                              ].divide(SizedBox(height: 4.0)),
+                            ),
+                            FlutterFlowIconButton(
+                              borderRadius: 99.0,
+                              icon: Icon(
+                                Icons.add_circle_rounded,
+                                color: FlutterFlowTheme.of(context).primary,
+                                size: 39.0,
+                              ),
+                              onPressed: () async {
+                                FFAppState().editorType =
+                                    FFAppState().activeSystemTab;
+                                FFAppState().update(() {});
+                                FFAppState().editorMode = 'new';
+                                FFAppState().update(() {});
+                                unawaited(
+                                  () async {
+                                    await widget.openEndDrawer?.call();
+                                  }(),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'area';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel1,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Areas',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'area'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'area';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel2,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Goals',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'area'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'area';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel3,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Projects',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'area'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'activity';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel4,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Tasks',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'activity'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'schedule';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel5,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Schedules',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'schedule'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              FFAppState().activePanel = 'system';
+                              FFAppState().activeSystemTab = 'automation';
+                              FFAppState().update(() {});
+                            },
+                            child: wrapWithModel(
+                              model: _model.systemTabModel6,
+                              updateCallback: () => safeSetState(() {}),
+                              child: SystemTabWidget(
+                                label: 'Automation',
+                                isSelected:
+                                    FFAppState().activeSystemTab == 'automation'
+                                        ? true
+                                        : false,
+                              ),
+                            ),
+                          ),
+                        ].divide(SizedBox(width: 40.0)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                width: 200.0,
+                                child: TextFormField(
+                                  controller: _model.textController,
+                                  focusNode: _model.textFieldFocusNode,
+                                  autofocus: false,
+                                  enabled: true,
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    labelStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          font: GoogleFonts.inter(
+                                            fontWeight:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium
+                                                    .fontWeight,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium
+                                                    .fontStyle,
+                                          ),
+                                          letterSpacing: 0.0,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .labelMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .labelMedium
+                                                  .fontStyle,
+                                        ),
+                                    hintText: () {
+                                      if (FFAppState().activeSystemTab ==
+                                          'area') {
+                                        return 'Search areas . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'activity') {
+                                        return 'Search activities . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'schedule') {
+                                        return 'Search schedules . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'automation') {
+                                        return 'Search automations . . .';
+                                      } else {
+                                        return 'Search . . .';
+                                      }
+                                    }(),
+                                    hintStyle: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          font: GoogleFonts.inter(
+                                            fontWeight:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium
+                                                    .fontWeight,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelMedium
+                                                    .fontStyle,
+                                          ),
+                                          letterSpacing: 0.0,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .labelMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .labelMedium
+                                                  .fontStyle,
+                                        ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0x00000000),
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Color(0x00000000),
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color:
+                                            FlutterFlowTheme.of(context).error,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    filled: true,
+                                    fillColor: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                  ),
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.interTight(
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .fontStyle,
+                                      ),
+                                  cursorColor:
+                                      FlutterFlowTheme.of(context).primaryText,
+                                  enableInteractiveSelection: true,
+                                  validator: _model.textControllerValidator
+                                      .asValidator(context),
+                                ),
+                              ),
+                            ),
+                          ].divide(SizedBox(width: 16.0)),
+                        ),
+                      ),
+                      if (responsiveVisibility(
+                        context: context,
+                        phone: false,
+                      ))
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    if ((FFAppState().activeSystemTab ==
+                                            'area') &&
+                                        responsiveVisibility(
+                                          context: context,
+                                          phone: false,
+                                        ))
+                                      Container(
+                                        decoration: BoxDecoration(),
+                                        child: Visibility(
+                                          visible: responsiveVisibility(
+                                            context: context,
+                                            phone: false,
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(24.0),
+                                            child:
+                                                FutureBuilder<List<AreasRow>>(
+                                              future: AreasTable().queryRows(
+                                                queryFn: (q) => q
+                                                    .eqOrNull(
+                                                      'user_id',
+                                                      currentUserUid,
+                                                    )
+                                                    .order('created_at',
+                                                        ascending: true),
+                                              ),
+                                              builder: (context, snapshot) {
+                                                // Customize what your widget looks like when it's loading.
+                                                if (!snapshot.hasData) {
+                                                  return Center(
+                                                    child: SizedBox(
+                                                      width: 50.0,
+                                                      height: 50.0,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        valueColor:
+                                                            AlwaysStoppedAnimation<
+                                                                Color>(
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                                List<AreasRow>
+                                                    wrapAreasRowList =
+                                                    snapshot.data!;
+
+                                                return Wrap(
+                                                  spacing: 24.0,
+                                                  runSpacing: 24.0,
+                                                  alignment:
+                                                      WrapAlignment.start,
+                                                  crossAxisAlignment:
+                                                      WrapCrossAlignment.start,
+                                                  direction: Axis.horizontal,
+                                                  runAlignment:
+                                                      WrapAlignment.start,
+                                                  verticalDirection:
+                                                      VerticalDirection.down,
+                                                  clipBehavior: Clip.none,
+                                                  children: List.generate(
+                                                      wrapAreasRowList.length,
+                                                      (wrapIndex) {
+                                                    final wrapAreasRow =
+                                                        wrapAreasRowList[
+                                                            wrapIndex];
+                                                    return InkWell(
+                                                      splashColor:
+                                                          Colors.transparent,
+                                                      focusColor:
+                                                          Colors.transparent,
+                                                      hoverColor:
+                                                          Colors.transparent,
+                                                      highlightColor:
+                                                          Colors.transparent,
+                                                      onTap: () async {
+                                                        FFAppState()
+                                                                .selectedRecordID =
+                                                            wrapAreasRow.id!;
+                                                        FFAppState()
+                                                            .update(() {});
+                                                        FFAppState()
+                                                                .editorType =
+                                                            FFAppState()
+                                                                .activeSystemTab;
+                                                        FFAppState()
+                                                            .update(() {});
+                                                        FFAppState()
+                                                                .editorMode =
+                                                            'edit';
+                                                        FFAppState()
+                                                            .update(() {});
+                                                        unawaited(
+                                                          () async {
+                                                            await widget.onEdit
+                                                                ?.call(
+                                                              wrapAreasRow.id!,
+                                                              wrapAreasRow.name,
+                                                              wrapAreasRow
+                                                                  .description!,
+                                                              wrapAreasRow
+                                                                  .active!,
+                                                            );
+                                                          }(),
+                                                        );
+                                                      },
+                                                      child: SystemsCardWidget(
+                                                        key: Key(
+                                                            'Keytv3_${wrapIndex}_of_${wrapAreasRowList.length}'),
+                                                        areaName:
+                                                            wrapAreasRow.name,
+                                                        activityCount: 0,
+                                                        isActive: wrapAreasRow
+                                                            .active!,
+                                                      ),
+                                                    );
+                                                  }),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    if ((FFAppState().activeSystemTab ==
+                                            'activity') &&
+                                        responsiveVisibility(
+                                          context: context,
+                                          phone: false,
+                                        ))
+                                      Container(
+                                        decoration: BoxDecoration(),
+                                      ),
+                                    if ((FFAppState().activeSystemTab ==
+                                            'schedule') &&
+                                        responsiveVisibility(
+                                          context: context,
+                                          phone: false,
+                                        ))
+                                      Container(
+                                        decoration: BoxDecoration(),
+                                      ),
+                                    if ((FFAppState().activeSystemTab ==
+                                            'automation') &&
+                                        responsiveVisibility(
+                                          context: context,
+                                          phone: false,
+                                        ))
+                                      Container(
+                                        decoration: BoxDecoration(),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ].divide(SizedBox(height: 16.0)),
+                  ),
+                ),
+              ),
+            ),
+          if (responsiveVisibility(
+            context: context,
+            tablet: false,
+            tabletLandscape: false,
+            desktop: false,
+          ))
+            Container(
+              width: 100.0,
+              height: 100.0,
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).secondaryBackground,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
