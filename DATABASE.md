@@ -1,244 +1,451 @@
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
+# DATABASE.md
 
-CREATE TABLE public.areas (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  name text NOT NULL,
-  description text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  active boolean NOT NULL DEFAULT true,
-  CONSTRAINT areas_pkey PRIMARY KEY (id),
-  CONSTRAINT areas_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.projects (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  area_id uuid,
-  name text NOT NULL UNIQUE,
-  status text,
-  priority text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  started_at timestamp with time zone,
-  target_date timestamp with time zone,
-  completed_at timestamp with time zone,
-  CONSTRAINT projects_pkey PRIMARY KEY (id),
-  CONSTRAINT projects_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT projects_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.tasks (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  user_id uuid,
-  project_id uuid,
-  name text,
-  status text,
-  priority text,
-  due_at timestamp with time zone,
-  completed_at timestamp with time zone,
-  calendar_sync boolean DEFAULT false,
-  area_id uuid,
-  template_id uuid,
-  task_type text,
-  reminder_level text,
-  requires_verification boolean NOT NULL DEFAULT false,
-  acknowledged_at timestamp with time zone,
-  verification_status text DEFAULT 'Unverified'::text,
-  completion_synced boolean DEFAULT false,
-  calendar_event_id text,
-  calendar_synced_at timestamp with time zone,
-  completed boolean DEFAULT false,
-  CONSTRAINT tasks_pkey PRIMARY KEY (id),
-  CONSTRAINT tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id),
-  CONSTRAINT tasks_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT tasks_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.recurring_templates(id),
-  CONSTRAINT tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.recurring_templates (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  name text NOT NULL UNIQUE,
-  default_task_type text,
-  active boolean NOT NULL DEFAULT true,
-  default_status text DEFAULT 'In Progress'::text,
-  default_priority text,
-  schedule_type text,
-  pattern_week text,
-  frequency text,
-  interval numeric,
-  days_of_week text,
-  time_of_day time without time zone,
-  day_of_month numeric,
-  area_id uuid,
-  project_id uuid,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  last_completed_at timestamp with time zone,
-  next_run_at timestamp with time zone,
-  calendar_sync boolean,
-  recurrence_type text,
-  default_reminder_level text DEFAULT 'Standard'::text,
-  last_generated_at timestamp with time zone,
-  CONSTRAINT recurring_templates_pkey PRIMARY KEY (id),
-  CONSTRAINT recurring_templates_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT recurring_templates_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id),
-  CONSTRAINT recurring_templates_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.routines (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  name text NOT NULL UNIQUE,
-  status text,
-  area_id uuid,
-  project_id uuid,
-  template_id uuid,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT routines_pkey PRIMARY KEY (id),
-  CONSTRAINT routines_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT routines_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id),
-  CONSTRAINT routines_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT routines_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.recurring_templates(id)
-);
-CREATE TABLE public.habit_logs (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  status text,
-  log_date timestamp with time zone,
-  completed_at timestamp with time zone,
-  notes text,
-  CONSTRAINT habit_logs_pkey PRIMARY KEY (id),
-  CONSTRAINT habit_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.day_blocks (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid,
-  name text NOT NULL UNIQUE,
-  is_active boolean NOT NULL DEFAULT true,
-  start_time time without time zone,
-  end_time time without time zone,
-  sort_order smallint NOT NULL UNIQUE,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT day_blocks_pkey PRIMARY KEY (id),
-  CONSTRAINT day_blocks_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.block_items (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  day_block_id uuid,
-  item_type text NOT NULL,
-  routine_id uuid,
-  habit_id uuid,
-  task_id uuid,
-  title text NOT NULL UNIQUE,
-  target_amount numeric,
-  unit text,
-  target_time time without time zone,
-  deadline_time time without time zone,
-  grace_minutes smallint DEFAULT '0'::smallint,
-  sort_order smallint NOT NULL UNIQUE,
-  is_required boolean NOT NULL DEFAULT true,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  target_offset_minutes integer,
-  deadline_offset_minutes integer,
-  CONSTRAINT block_items_pkey PRIMARY KEY (id),
-  CONSTRAINT block_items_day_block_id_fkey FOREIGN KEY (day_block_id) REFERENCES public.day_blocks(id),
-  CONSTRAINT block_items_routine_id_fkey FOREIGN KEY (routine_id) REFERENCES public.routines(id),
-  CONSTRAINT block_items_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id),
-  CONSTRAINT block_items_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT block_items_habit_id_fkey FOREIGN KEY (habit_id) REFERENCES public.habits(id)
-);
-CREATE TABLE public.daily_status (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  status_date date NOT NULL,
-  day_state text,
-  check_in_time timestamp with time zone,
-  check_out_time timestamp with time zone,
-  wake_status text,
-  wake_message text,
-  sleep_status text,
-  sleep_message text,
-  alignment_score numeric DEFAULT '0'::numeric,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT daily_status_pkey PRIMARY KEY (id),
-  CONSTRAINT daily_status_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.habits (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  name text NOT NULL UNIQUE,
-  target_value numeric,
-  unit text,
-  frequency text NOT NULL DEFAULT 'Daily'::text,
-  is_active boolean NOT NULL DEFAULT true,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  template_id uuid,
-  area_id uuid,
-  project_id uuid,
-  tracking_type text NOT NULL DEFAULT 'boolean'::text,
-  CONSTRAINT habits_pkey PRIMARY KEY (id),
-  CONSTRAINT habits_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT habits_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.recurring_templates(id),
-  CONSTRAINT habits_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT habits_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id)
-);
-CREATE TABLE public.routine_step_logs (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  routine_step_id uuid NOT NULL,
-  log_date date NOT NULL,
-  completed_at timestamp with time zone,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT routine_step_logs_pkey PRIMARY KEY (id),
-  CONSTRAINT routine_step_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT routine_step_logs_routine_step_id_fkey FOREIGN KEY (routine_step_id) REFERENCES public.routine_steps(id)
-);
-CREATE TABLE public.routine_steps (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  routine_id uuid,
-  name text NOT NULL UNIQUE,
-  step_order integer NOT NULL,
-  is_required boolean NOT NULL DEFAULT true,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT routine_steps_pkey PRIMARY KEY (id),
-  CONSTRAINT routine_steps_routine_id_fkey FOREIGN KEY (routine_id) REFERENCES public.routines(id)
-);
-CREATE TABLE public.profiles (
-  id uuid NOT NULL,
-  display_name text,
-  timezone text NOT NULL DEFAULT 'America/Chicago'::text,
-  wake_time time without time zone NOT NULL DEFAULT '06:00:00'::time without time zone,
-  sleep_time time without time zone NOT NULL DEFAULT '22:00:00'::time without time zone,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT profiles_pkey PRIMARY KEY (id),
-  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
-);
-CREATE TABLE public.daily_plans (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  plan_date date NOT NULL,
-  template_id uuid,
-  plan_type text NOT NULL DEFAULT 'template'::text,
-  status text NOT NULL DEFAULT 'planned'::text,
-  source text NOT NULL DEFAULT 'manual'::text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT daily_plans_pkey PRIMARY KEY (id)
-);
-CREATE TABLE public.daily_plan_blocks (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  daily_plan_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  area_id uuid,
-  block_name text NOT NULL,
-  start_time time without time zone NOT NULL,
-  end_time time without time zone NOT NULL,
-  sort_order smallint NOT NULL DEFAULT '0'::smallint,
-  status text NOT NULL DEFAULT 'pending'::text,
-  source_day_block_id uuid,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_atupdated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT daily_plan_blocks_pkey PRIMARY KEY (id),
-  CONSTRAINT daily_plan_blocks_source_day_block_id_fkey FOREIGN KEY (source_day_block_id) REFERENCES public.day_blocks(id)
-);
+# CompleteOS+ Database Architecture
+
+This document describes the database architecture for CompleteOS+.
+
+The database is built on Supabase (PostgreSQL) and is designed around user-owned data with Row Level Security.
+
+Every user-owned record belongs to a single authenticated user.
+
+---
+
+# Database Philosophy
+
+The database supports the CompleteOS+ architecture.
+
+The Repository layer is the application's source of truth.
+
+Business logic should consume data through the Repository rather than accessing tables directly.
+
+Relationships should be preserved through foreign keys.
+
+Data integrity is preferred over convenience.
+
+---
+
+# Authentication
+
+Authentication is handled by Supabase Auth.
+
+Primary user table:
+
+- auth.users
+
+User profile information is stored in:
+
+- profiles
+
+Every user-owned table references:
+
+```text
+user_id → auth.users.id
+```
+
+---
+
+# Core Tables
+
+## profiles
+
+Purpose
+
+Stores user profile and application preferences.
+
+Contains
+
+- display_name
+- timezone
+- wake_time
+- sleep_time
+
+---
+
+## areas
+
+Purpose
+
+High-level life categories.
+
+Examples
+
+- Health
+- Career
+- Finance
+- Family
+
+Relationships
+
+- Projects
+- Tasks
+- Habits
+- Routines
+- Daily Plan Blocks
+
+---
+
+## projects
+
+Purpose
+
+Large outcomes that belong to an Area.
+
+Relationships
+
+Belongs to
+
+- User
+- Area
+
+Contains
+
+- Tasks
+- Habits
+- Routines
+- Templates
+
+---
+
+## tasks
+
+Purpose
+
+Individual actionable work.
+
+Relationships
+
+Belongs to
+
+- User
+- Area
+- Project
+- Recurring Template
+
+Supports
+
+- Calendar Sync
+- Due Dates
+- Completion
+- Verification
+- Priorities
+
+---
+
+## recurring_templates
+
+Purpose
+
+Blueprints for automatically generating recurring work.
+
+Supports
+
+- Daily
+- Weekly
+- Monthly
+- Pattern
+- After Completion
+
+Can generate
+
+- Tasks
+- Habits
+- Routines
+
+---
+
+## routines
+
+Purpose
+
+Multi-step workflows.
+
+Examples
+
+Morning Routine
+
+Shutdown Routine
+
+Weekly Review
+
+Relationships
+
+Belongs to
+
+- Area
+- Project
+- Template
+
+Contains
+
+- Routine Steps
+
+---
+
+## routine_steps
+
+Purpose
+
+Individual steps within a Routine.
+
+Relationships
+
+Belongs to
+
+- Routine
+
+Produces
+
+- Routine Step Logs
+
+---
+
+## routine_step_logs
+
+Purpose
+
+Historical completion records for Routine Steps.
+
+Used for
+
+Progress
+
+Analytics
+
+History
+
+---
+
+## habits
+
+Purpose
+
+Repeated behaviors tracked over time.
+
+Supports
+
+Boolean tracking
+
+Numeric tracking
+
+Relationships
+
+Belongs to
+
+- User
+- Area
+- Project
+- Template
+
+Produces
+
+Habit Logs
+
+---
+
+## habit_logs
+
+Purpose
+
+Stores completion history for Habits.
+
+Contains
+
+Completion status
+
+Notes
+
+Completion timestamps
+
+---
+
+## day_blocks
+
+Purpose
+
+Reusable schedule blocks.
+
+Examples
+
+Morning
+
+Work
+
+Recovery
+
+Growth
+
+Evening
+
+Relationships
+
+Contains
+
+Block Items
+
+---
+
+## block_items
+
+Purpose
+
+Individual items assigned to Day Blocks.
+
+May reference
+
+- Habit
+- Task
+- Routine
+
+Supports
+
+Ordering
+
+Target times
+
+Deadlines
+
+Offsets
+
+Requirements
+
+---
+
+## daily_status
+
+Purpose
+
+Stores the user's daily operating status.
+
+Contains
+
+Wake status
+
+Sleep status
+
+Alignment score
+
+Daily state
+
+---
+
+## daily_plans
+
+Purpose
+
+Generated execution plan for a specific day.
+
+Contains
+
+Planning metadata
+
+Status
+
+Template information
+
+Relationships
+
+Contains
+
+Daily Plan Blocks
+
+---
+
+## daily_plan_blocks
+
+Purpose
+
+Runtime schedule for a day's execution.
+
+Generated from
+
+Day Blocks
+
+Contains
+
+Area
+
+Start time
+
+End time
+
+Execution status
+
+---
+
+# Relationship Overview
+
+```text
+User
+│
+├── Profile
+├── Areas
+│      │
+│      ├── Projects
+│      │      │
+│      │      ├── Tasks
+│      │      ├── Habits
+│      │      ├── Routines
+│      │      └── Templates
+│      │
+│      ├── Habits
+│      ├── Tasks
+│      └── Routines
+│
+├── Day Blocks
+│      │
+│      └── Block Items
+│
+├── Daily Plans
+│      │
+│      └── Daily Plan Blocks
+│
+└── Daily Status
+```
+
+---
+
+# Design Principles
+
+Every user-owned table contains user_id.
+
+Foreign keys maintain relational integrity.
+
+Soft state should be represented with status fields.
+
+Generated data should reference its originating template whenever possible.
+
+Historical logs should never overwrite source records.
+
+---
+
+# Current Database Status
+
+## Implemented
+
+- Authentication
+- Profiles
+- Areas
+- Projects
+- Tasks
+- Habits
+- Habit Logs
+- Routines
+- Routine Steps
+- Routine Step Logs
+- Templates
+- Day Blocks
+- Block Items
+- Daily Plans
+- Daily Plan Blocks
+- Daily Status
+
+---
+
+# Future Database Goals
+
+- Strengthen Row Level Security across every table.
+- Replace global UNIQUE constraints with composite uniqueness where appropriate (for example, `(user_id, name)`).
+- Add indexes for high-frequency queries.
+- Document all RLS policies.
+- Add migration history.
+- Add database functions and triggers where appropriate.
