@@ -50,8 +50,6 @@ class DailyPlanBlocksRow extends SupabaseDataRow {
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);
 
-  DateTime? get updatedAtupdatedAt =>
-      getField<DateTime>('updated_atupdated_at');
-  set updatedAtupdatedAt(DateTime? value) =>
-      setField<DateTime>('updated_atupdated_at', value);
+  DateTime? get updatedAt => getField<DateTime>('updated_at');
+  set updatedAt(DateTime? value) => setField<DateTime>('updated_at', value);
 }
