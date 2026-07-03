@@ -1,123 +1,171 @@
-Purpose
+# VISION.md
 
-CompleteOS+ is a universal operating system designed to help individuals, teams, and organizations consistently execute what matters most.
+# CompleteOS+ Vision
 
-Rather than functioning as a traditional productivity application, CompleteOS+ serves as a centralized operating system that organizes information, prioritizes action, automates workflows, measures execution, and continuously improves how work gets done.
+## Purpose
+
+CompleteOS+ is a universal operating system designed to help individuals, families, teams, and organizations consistently execute what matters most.
+
+Rather than functioning as another productivity application, CompleteOS+ serves as a centralized operating system that captures information, organizes work, prioritizes execution, automates repetitive processes, measures performance, and continuously improves how work gets done.
+
+The platform exists to reduce the complexity of managing life and business by replacing disconnected tools with one cohesive system.
 
 ---
 
-Mission
+# Mission
 
-Reduce operational friction by providing one trusted system that captures, organizes, prioritizes, automates, and executes every aspect of work and life.
+Reduce operational friction by providing one trusted system that captures, organizes, prioritizes, automates, executes, and improves every aspect of work and life.
 
 ---
 
-Vision
+# Vision
 
 Create the world's most complete operating system for execution.
 
-Whether used by an individual managing daily life, a startup building products, or an enterprise coordinating thousands of employees, CompleteOS+ should become the central operating system that answers one question:
+Whether used by an individual managing daily responsibilities, a family coordinating life together, a startup building products, or an enterprise operating thousands of employees, CompleteOS+ should become the single operating system that answers one question:
 
-"What should happen next?"
+> **What should happen next?**
 
 CompleteOS+ should always know.
 
 ---
 
-Core Objectives
+# Core Objectives
 
-• Capture everything.
+CompleteOS+ exists to:
 
-• Organize everything.
-
-• Prioritize intelligently.
-
-• Execute consistently.
-
-• Automate repetitive work.
-
-• Measure progress.
-
-• Continuously improve.
+- Capture everything.
+- Organize everything.
+- Prioritize intelligently.
+- Execute consistently.
+- Automate repetitive work.
+- Measure meaningful progress.
+- Continuously improve people, systems, and organizations.
 
 ---
 
-Core Pillars
+# Core Pillars
 
-Execution
+Every feature within CompleteOS+ should strengthen one or more of these pillars.
 
-Organization
+## Execution
 
-Planning
+Help users consistently complete meaningful work.
 
-Automation
+## Organization
 
-Measurement
+Provide a clear structure for every responsibility, project, and resource.
 
-Knowledge
+## Planning
 
-Communication
+Transform long-term goals into executable daily actions.
 
-Improvement
+## Automation
 
----
+Reduce manual work through intelligent workflows and automation.
 
-Who CompleteOS+ Serves
+## Measurement
 
-• Individuals
+Track progress using objective metrics and performance indicators.
 
-• Families
+## Knowledge
 
-• Freelancers
+Preserve information, documentation, and institutional knowledge.
 
-• Creators
+## Communication
 
-• Small Businesses
+Improve coordination between people, systems, and organizations.
 
-• Startups
+## Improvement
 
-• Enterprises
-
-• Teams
+Continuously optimize execution through data, feedback, and automation.
 
 ---
 
-Long-Term Vision
+# Who CompleteOS+ Serves
 
-CompleteOS+ evolves into a universal operating platform capable of managing personal life, business operations, and organizational execution from a single system.
+CompleteOS+ is designed to scale across every level of operation.
 
-Future capabilities include:
+- Individuals
+- Families
+- Freelancers
+- Creators
+- Small Businesses
+- Startups
+- Teams
+- Enterprises
 
-• AI decision support
-
-• Workflow automation
-
-• Predictive planning
-
-• Financial management
-
-• Knowledge management
-
-• CRM
-
-• HR
-
-• Project Management
-
-• Inventory
-
-• Manufacturing
-
-• Customer Support
-
-• Team Collaboration
-
-• Analytics
-
-• Custom operating systems for any organization.
+The underlying architecture should remain consistent regardless of scale.
 
 ---
 
-Success Statement
+# Long-Term Vision
 
-CompleteOS+ succeeds when people and organizations stop managing disconnected tools and instead operate from one intelligent system that knows what matters, what should happen next, and how to get it done.
+CompleteOS+ evolves into a universal operating platform capable of managing every aspect of personal life, business operations, and organizational execution from one integrated system.
+
+Future capabilities may include:
+
+- AI Decision Support
+- Workflow Automation
+- Predictive Planning
+- Financial Management
+- Knowledge Management
+- Customer Relationship Management (CRM)
+- Human Resources (HR)
+- Project Management
+- Inventory Management
+- Manufacturing Operations
+- Customer Support
+- Team Collaboration
+- Analytics
+- Custom Operating Systems for Organizations
+
+These capabilities should extend the existing architecture rather than create independent systems.
+
+---
+
+# Version 1 Scope
+
+The long-term vision of CompleteOS+ is intentionally ambitious.
+
+Version 1 is intentionally focused.
+
+The objective of V1 is to prove the core execution engine for individuals.
+
+Version 1 succeeds when a user can reliably:
+
+- Capture work
+- Organize work
+- Prioritize work
+- Execute work
+- Measure progress
+- Build consistent habits
+- Complete routines
+- Operate daily from one trusted system
+
+Enterprise functionality, advanced AI, CRM, HR, manufacturing, inventory, and large-scale organizational capabilities remain outside the scope of V1.
+
+Every V1 decision should strengthen the execution engine rather than expand feature count.
+
+---
+
+# Success Statement
+
+CompleteOS+ succeeds when people and organizations stop managing disconnected applications and instead operate from one intelligent system that understands:
+
+- what matters,
+- what should happen next,
+- why it matters,
+- and how to help users consistently execute.
+
+The platform should continuously increase the capability, efficiency, discipline, and value of every person, team, and organization that uses it.
+
+---
+
+# Guiding Principle
+
+CompleteOS+ is not a collection of productivity tools.
+
+It is an operating system for execution.
+
+Every feature should move the user from intention to execution with the least possible friction while continuously improving both the operator and the work being performed.
