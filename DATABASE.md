@@ -922,10 +922,8 @@ auth.uid() = id
 
 # Raw Schema Reference
 
-The raw SQL schema used to create this documentation should be stored separately as:
+Future versions of this repository may include a raw `schema.sql` export from Supabase.
 
-```text
-schema.sql
-```
+Until then, this document serves as the authoritative reference for the current database architecture.
 
 This document is the human-readable database architecture guide.
