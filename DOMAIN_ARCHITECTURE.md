@@ -6,31 +6,35 @@
 
 This document defines the domain model of CompleteOS+.
 
-It establishes the core business objects, ownership hierarchy, relationships, and architectural rules that govern the platform.
+It establishes the core business objects, ownership hierarchy, relationships, and rules that govern the platform.
 
-This document is the authoritative source for understanding **what** CompleteOS+ manages.
+This document is the authoritative source for understanding **what CompleteOS+ manages**.
 
-The software architecture, database, UI, and automation systems should all implement this domain model.
+Software architecture, database design, APIs, automation, AI, and user interfaces should all implement this domain model.
 
 ---
 
 # Domain Philosophy
 
-CompleteOS+ is an operating system for organizing and executing work.
+CompleteOS+ is an operating system for execution.
 
-Its purpose is to help individuals, families, teams, and organizations become more organized, disciplined, efficient, and valuable over time.
+The platform exists to organize work, guide execution, automate repetitive processes, preserve knowledge, measure progress, and continuously improve the people and organizations using it.
 
-The platform manages real-world entities rather than isolated features.
+Rather than managing isolated features, CompleteOS+ manages real-world entities and the relationships between them.
 
-Every domain object exists to support execution, measurement, automation, knowledge, or value creation.
+Everything inside the platform should ultimately help answer one question:
+
+> **What should happen next?**
 
 ---
 
 # Ownership Hierarchy
 
-Ownership determines where an object permanently belongs.
+Ownership defines where an object permanently belongs.
 
-Ownership is hierarchical and should remain stable over time.
+Ownership is hierarchical.
+
+References are flexible.
 
 ```
 Workspace
@@ -48,9 +52,17 @@ Workspace
             └── Metric
 ```
 
-## Workspace
+Ownership should remain stable.
 
-The highest-level container.
+Objects should collaborate through references rather than ownership whenever possible.
+
+---
+
+# Workspace
+
+## Purpose
+
+A Workspace represents an operating environment.
 
 A Workspace defines:
 
@@ -59,23 +71,29 @@ A Workspace defines:
 - configuration
 - members
 - Areas
+- system settings
 
 Examples
 
-- Personal
-- Family
-- Business
-- Team
+Personal
+
+Family
+
+Business
+
+Enterprise
+
+Every object within CompleteOS+ ultimately belongs to a Workspace.
 
 ---
 
-## Area
+# Area
 
-Areas organize responsibility.
+## Purpose
 
-Every operational object should belong to an Area.
+Areas represent permanent responsibility domains.
 
-Areas represent long-term domains rather than short-term projects.
+Areas organize everything that belongs to a particular responsibility.
 
 Examples
 
@@ -85,85 +103,134 @@ Personal
 - Finance
 - Family
 - Growth
+- Recovery
 
 Business
 
 - Operations
-- Sales
 - Engineering
+- Sales
+- Marketing
 - Human Resources
+
+Objects should belong to an Area whenever possible.
 
 Objects created without an Area should initially exist in an Inbox until categorized.
 
 ---
 
-# Core Domain Objects
+# Goal
 
-## Goal
+## Purpose
 
-Represents a desired outcome.
+Goals define desired outcomes.
 
-Goals define direction.
+Goals answer:
+
+> Where are we trying to go?
+
+Goals provide direction.
 
 Goals do not own work.
 
-Projects and Metrics may reference Goals.
+Goals are achieved through Projects and Tasks.
 
 ---
 
-## Project
+# Project
 
-Represents structured work.
+## Purpose
 
-Projects organize related Tasks.
+Projects organize related work.
 
-Projects may support one or more Goals.
+Projects answer:
+
+> What initiative are we working on?
+
+Projects contain or reference Tasks.
+
+Projects may contribute toward one or more Goals.
+
+Projects may span multiple schedules.
 
 ---
 
-## Task
+# Task
 
-Represents executable work.
+## Purpose
+
+Tasks represent executable work.
+
+Tasks answer:
+
+> What should happen next?
 
 Tasks are the universal execution object.
 
-Whenever possible, actionable work should begin life as a Task.
+Whenever possible, actionable work should begin as a Task.
 
-Specialized behaviors may extend Tasks but should not replace them without strong architectural justification.
+Bills
+
+Appointments
+
+Habits
+
+Routines
+
+Reminders
+
+Activities
+
+should extend or specialize Tasks rather than replace them unless fundamentally different behavior is required.
 
 ---
 
-## Schedule
+# Schedule
 
-Represents planned time.
+## Purpose
+
+Schedules define time.
 
 Schedules answer:
 
-"When should this happen?"
+> When should work occur?
 
-Schedules organize execution without owning the work itself.
+Schedules organize execution.
+
+Schedules never own work.
 
 ---
 
-## Automation
+# Automation
 
-Represents autonomous system behavior.
+## Purpose
+
+Automations perform work.
+
+Automations answer:
+
+> What can the system do automatically?
 
 Automations may:
 
 - create work
-- modify work
+- update work
 - complete work
 - notify users
-- trigger workflows
+- synchronize systems
+- execute workflows
 
-Automations operate on domain objects rather than owning them.
+Automations operate on domain objects.
+
+They do not own them.
 
 ---
 
-## Document
+# Document
 
-Represents stored knowledge.
+## Purpose
+
+Documents preserve knowledge.
 
 Examples
 
@@ -172,14 +239,17 @@ Examples
 - Specifications
 - Policies
 - Meeting Notes
+- Reference Material
 
-Documents preserve information and support execution.
+Documents support execution by preserving information.
 
 ---
 
-## Person
+# Person
 
-Represents an individual participating within a Workspace.
+## Purpose
+
+People participate in work.
 
 Examples
 
@@ -195,11 +265,19 @@ Business
 - Vendor
 - Contractor
 
+People interact with work rather than owning it.
+
 ---
 
-## Asset
+# Asset
 
-Represents something of value that should be managed or improved.
+## Purpose
+
+Assets represent value.
+
+Assets answer:
+
+> What should become more valuable over time?
 
 Examples
 
@@ -208,21 +286,28 @@ Personal
 - Home
 - Vehicle
 - Investment
+- Equipment
 
 Business
 
-- Equipment
-- Inventory
 - Machinery
-- Software License
+- Inventory
+- Software
+- Intellectual Property
+
+CompleteOS+ should continuously improve asset utilization and value.
 
 ---
 
-## Metric
+# Metric
 
-Represents measurable performance.
+## Purpose
 
-Metrics provide objective feedback.
+Metrics measure performance.
+
+Metrics answer:
+
+> Are we improving?
 
 Examples
 
@@ -232,36 +317,37 @@ Examples
 - Downtime
 - Completion Rate
 - Alignment Score
+- Response Time
+
+Metrics should guide decision making rather than simply reporting history.
 
 ---
 
-# Relationship Model
+# Ownership Model
 
-Ownership and references are intentionally separated.
+Ownership determines permanence.
 
-## Ownership
-
-Ownership determines where an object permanently belongs.
-
-Example
+Examples
 
 ```
 Workspace
+    │
     └── Area
+            │
             └── Project
+                    │
+                    └── Task
 ```
 
-Ownership rarely changes.
+Ownership should remain stable.
+
+Changing ownership should be uncommon.
 
 ---
 
-## References
+# Reference Model
 
-References allow objects to collaborate.
-
-References are optional.
-
-References should never redefine ownership.
+References create relationships without changing ownership.
 
 Examples
 
@@ -283,7 +369,48 @@ Document ─────────► Project
 Metric ───────────► Goal
 ```
 
-This model keeps the system flexible while preserving a stable ownership hierarchy.
+References allow the platform to evolve without restructuring ownership.
+
+---
+
+# Domain Categories
+
+To maintain consistency, every domain object belongs to one of four categories.
+
+## Execution
+
+Responsible for getting work done.
+
+- Goal
+- Project
+- Task
+- Schedule
+- Automation
+
+---
+
+## Knowledge
+
+Responsible for preserving information.
+
+- Document
+
+---
+
+## Resources
+
+Responsible for the people and things required to perform work.
+
+- Person
+- Asset
+
+---
+
+## Measurement
+
+Responsible for evaluating progress.
+
+- Metric
 
 ---
 
@@ -293,6 +420,7 @@ The following rules apply throughout CompleteOS+.
 
 - Every Workspace owns Areas.
 - Every operational object should belong to an Area.
+- Objects without an Area should remain in an Inbox until categorized.
 - Ownership should remain stable.
 - Objects collaborate through references.
 - Goals define outcomes.
@@ -319,7 +447,7 @@ CompleteOS+ continuously optimizes:
 - Improvement
 - Value Creation
 
-Every feature should strengthen one or more of these areas.
+Every feature should strengthen one or more of these capabilities.
 
 ---
 
@@ -329,6 +457,6 @@ CompleteOS+ is not a collection of productivity tools.
 
 It is an operating system.
 
-The purpose of the platform is to continuously improve both the operator and the work being performed.
+Its purpose is to continuously improve both the operator and the work being performed.
 
-Every system should help transform intention into consistent execution while increasing the long-term value of the people, projects, businesses, and assets it manages.
+Every system should move users from intention to execution while increasing the long-term capability, efficiency, discipline, and value of the people, teams, organizations, and assets it manages.
