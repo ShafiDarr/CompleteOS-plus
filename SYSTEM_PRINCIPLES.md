@@ -1,20 +1,26 @@
 # SYSTEM_PRINCIPLES.md
 
-# Purpose
+# CompleteOS+ System Principles
 
-Defines the engineering principles that guide every architectural, design, and implementation decision in CompleteOS+.
+## Purpose
+
+This document defines the engineering principles that guide every architectural, design, and implementation decision within CompleteOS+.
 
 When multiple valid solutions exist, these principles take precedence.
+
+These principles are intended to keep the platform consistent as it grows.
 
 ---
 
 # P001 — Build Systems, Not Features
 
-Every feature must belong to a larger system.
+CompleteOS+ is built from systems.
 
-Avoid isolated functionality.
+Features exist as capabilities within systems.
 
-Design systems that can grow rather than individual screens.
+Avoid creating isolated functionality.
+
+Design reusable systems that can evolve over time.
 
 ---
 
@@ -24,183 +30,284 @@ Every system owns one responsibility.
 
 Examples:
 
-- Repository owns data.
+- Repository owns data access.
 - EditorHost owns editing.
 - Navigation owns navigation.
-- Execution owns daily execution.
+- Execution owns execution.
 - Authentication owns identity.
 
-Do not duplicate responsibilities across systems.
+Responsibilities should never overlap.
 
 ---
 
-# P003 — Controllers Own Logic
+# P003 — Separation of Concerns
 
-Controllers coordinate behavior.
+Separate:
 
-Controllers manage:
+- Business Logic
+- Presentation
+- Persistence
+- Navigation
+- State
 
+Each layer should have a clearly defined responsibility.
+
+Avoid mixing responsibilities within the same component.
+
+---
+
+# P004 — Controllers Coordinate Behavior
+
+Controllers manage application behavior.
+
+Controllers may coordinate:
+
+- validation
 - orchestration
-- state changes
 - save flows
 - delete flows
 - lifecycle
-- validation
 - business rules
+- state transitions
 
-Controllers should not render UI.
+Controllers should never exist simply to display UI.
 
 Examples:
 
 - EditorHost
-- System Control Panel
+- Systems Control Panel
 
 ---
 
-# P004 — Components Own UI
+# P005 — Components Own Presentation
 
 Components display information.
 
 Components collect user input.
 
-Components should not contain significant business logic.
+Components should contain minimal business logic.
 
-Examples:
-
-- Sidebar
-- Area Form
-- Activity Form
-- Current Action
+Components should remain reusable.
 
 ---
 
-# P005 — One Source of Truth
+# P006 — Repository Is The Data Access Layer
 
-Important state should exist in exactly one place.
+The Repository provides a unified interface for accessing application data.
 
-Avoid duplicate data.
+Responsibilities include:
 
-Avoid duplicate state.
+- querying
+- creating
+- updating
+- deleting
+- synchronizing
 
-Avoid duplicate business logic.
+Business systems should communicate through the Repository rather than directly with Supabase.
 
 ---
 
-# P006 — Reuse Before Rebuild
+# P007 — One Source of Truth
 
-Search the existing implementation before creating something new.
+Every important piece of information should exist in exactly one authoritative location.
 
-Prefer extending an existing system over creating another.
+Avoid:
+
+- duplicated data
+- duplicated state
+- duplicated business logic
+
+If two systems contain the same information, the architecture should be reconsidered.
+
+---
+
+# P008 — Reuse Before Rebuild
+
+Before creating something new:
+
+1. Search the existing implementation.
+2. Determine whether it already exists.
+3. Extend existing systems whenever practical.
 
 Consistency is more valuable than novelty.
 
 ---
 
-# P007 — Tasks Are The Universal Action Object
+# P009 — Tasks Are The Universal Execution Object
 
-Tasks are the application's fundamental execution object.
+Tasks are the fundamental execution object within CompleteOS+.
 
-Bills
+Whenever possible:
 
-Appointments
+- Bills
+- Appointments
+- Habits
+- Routines
+- Reminders
+- Activities
 
-Habits
+should begin as specialized task types rather than completely separate systems.
 
-Routines
-
-Reminders
-
-Activities
-
-should all begin as specialized task types unless there is a strong architectural reason to separate them.
-
----
-
-# P008 — Execution Over Organization
-
-CompleteOS+ exists to improve execution.
-
-Organization only exists to support execution.
-
-Every feature should help the user complete meaningful work.
+Separate entities should exist only when their behavior fundamentally differs from Tasks.
 
 ---
 
-# P009 — Apple-Level UX
+# P010 — Execution Over Organization
 
-The interface should feel:
+Organization exists to support execution.
 
-- calm
-- intentional
-- clean
-- obvious
+CompleteOS+ should never become a database of forgotten information.
 
-Reduce cognitive load.
-
-Avoid unnecessary options.
-
----
-
-# P010 — Document Decisions, Not Widgets
-
-Document architecture.
-
-Document systems.
-
-Document reasoning.
-
-Do not waste time documenting individual containers, rows, icons, or layout widgets.
+Every feature should increase the user's ability to execute meaningful work.
 
 ---
 
 # P011 — Data Drives The Interface
 
-The UI should reflect application state.
+The interface should react to application state.
 
-Avoid manually synchronizing UI whenever data can determine the presentation automatically.
+Avoid manually synchronizing the UI whenever it can be derived directly from the underlying data.
+
+The UI should always reflect reality.
 
 ---
 
-# P012 — FlutterFlow Is The Source Of Truth
+# P012 — Progressive Disclosure
 
-FlutterFlow owns the application.
+Do not overwhelm users.
+
+Display only the information required for the current decision.
+
+Reveal additional complexity only when necessary.
+
+Simple interactions should remain simple.
+
+---
+
+# P013 — Apple-Level User Experience
+
+Every interaction should feel:
+
+- obvious
+- intentional
+- calm
+- responsive
+- polished
+
+Reduce cognitive load.
+
+Reduce unnecessary decisions.
+
+Reduce visual clutter.
+
+---
+
+# P014 — Components Before Duplication
+
+Whenever similar interfaces exist:
+
+Create reusable components.
+
+Avoid copying layouts across pages.
+
+Maintain visual consistency throughout the application.
+
+---
+
+# P015 — FlutterFlow Is The Source of Truth
+
+FlutterFlow is the authoritative application project.
 
 Generated Flutter code supports deployment.
 
-Avoid modifying generated code unless absolutely necessary.
+Avoid modifying generated Flutter code unless absolutely necessary.
+
+Prefer FlutterFlow-native implementations whenever possible.
 
 ---
 
-# P013 — Increase Value
+# P016 — Maintainability Is A Feature
 
-Every system should increase the long-term value of the entity it manages.
+Readable architecture is more valuable than clever implementation.
 
-Whether the entity is:
+Future development should become easier with every feature that is added.
 
-- a person
-- a project
-- a business
-- an asset
-- a team
+Technical debt should be reduced rather than accumulated.
 
-CompleteOS+ should continuously make it more organized, more capable, and more effective.
+---
+
+# P017 — Build Incrementally
+
+Large systems should be delivered in small, complete increments.
+
+Finish one end-to-end workflow before beginning another.
+
+Avoid partially implementing multiple systems simultaneously.
+
+Examples:
+
+✔ Tasks CRUD
+
+↓
+
+✔ Current Action
+
+↓
+
+✔ Execution Dashboard
+
+↓
+
+✔ Daily Planning
+
+Not:
+
+Tasks 40%
+
+Projects 30%
+
+Habits 25%
+
+Routines 15%
+
+---
+
+# P018 — Long-Term Thinking
+
+Every implementation should improve the platform's ability to evolve.
+
+Choose solutions that remain understandable six months from now.
+
+Avoid shortcuts that create unnecessary architectural debt.
 
 ---
 
 # Engineering Decision Framework
 
-Before implementing anything, ask:
+Before implementing any change, ask:
 
-Does it belong to an existing system?
+1. Does this belong to an existing system?
 
-Does it duplicate responsibility?
+2. Does it duplicate an existing responsibility?
 
-Can an existing component be reused?
+3. Can an existing component be reused?
 
-Does it improve execution?
+4. Does it improve execution?
 
-Does it reduce complexity?
+5. Does it reduce complexity?
 
-Does it follow the architecture?
+6. Does it strengthen the architecture?
 
-If not, redesign the implementation before writing code.
+7. Will future development become easier?
+
+If the answer to any of these questions is "No," reconsider the implementation before writing code.
+
+---
+
+# Final Principle
+
+CompleteOS+ is not being built as another productivity application.
+
+It is being built as a long-term operating system for execution.
+
+Every engineering decision should move the platform closer to becoming the single trusted system that helps people and organizations consistently know what matters, what should happen next, and how to execute it.
