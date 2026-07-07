@@ -22,12 +22,10 @@ CREATE TABLE public.projects (
   started_at timestamp with time zone,
   target_date timestamp with time zone,
   completed_at timestamp with time zone,
-  task_id uuid,
   is_active boolean DEFAULT true,
   CONSTRAINT projects_pkey PRIMARY KEY (id),
   CONSTRAINT projects_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
-  CONSTRAINT projects_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT projects_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id)
+  CONSTRAINT projects_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.tasks (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -60,6 +58,7 @@ CREATE TABLE public.tasks (
   amount numeric,
   payee text,
   is_active boolean DEFAULT true,
+  login_url text,
   CONSTRAINT tasks_pkey PRIMARY KEY (id),
   CONSTRAINT tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id),
   CONSTRAINT tasks_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
