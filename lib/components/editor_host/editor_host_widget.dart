@@ -189,6 +189,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   'description':
                                       _model.areaFormModel.textController2.text,
                                   'active': _model.areaFormModel.switchValue,
+                                  'user_id': currentUserUid,
                                 },
                                 matchingRows: (rows) => rows
                                     .eqOrNull(
@@ -281,6 +282,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                       'area_id': _model.taskFormModel.areaValue,
                                       'project_id':
                                           _model.taskFormModel.projectValue,
+                                      'user_id': currentUserUid,
                                     },
                                     matchingRows: (rows) => rows,
                                   );
