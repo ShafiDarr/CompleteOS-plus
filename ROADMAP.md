@@ -115,12 +115,13 @@ A user can:
 
 Transform individual tasks into structured execution systems.
 
+Habits and Routines are not separate systems to build — they are `task_type` variants of the Universal Task Model (see DATABASE.md). The database migration for this is already complete; what remains is the FlutterFlow UI (dynamic Task form sections, Routine Steps flow) and the Recurring Templates/Daily Status systems.
+
 ### Systems
 
 - Projects
-- Habits
-- Routines
-- Routine Steps
+- Habit task_type (dynamic form section + habit_logs display)
+- Routine task_type (dynamic form section + Routine Steps flow)
 - Recurring Templates
 - Daily Status
 

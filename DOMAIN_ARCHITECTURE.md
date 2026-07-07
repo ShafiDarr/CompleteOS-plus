@@ -183,6 +183,10 @@ Activities
 
 should extend or specialize Tasks rather than replace them unless fundamentally different behavior is required.
 
+## Implementation Note
+
+This is implemented directly in the database: Habits and Routines are not separate tables. They are rows in the `tasks` table, differentiated by a `task_type` column. See DATABASE.md's "Universal Task Model" section for the schema-level detail.
+
 ---
 
 # Schedule

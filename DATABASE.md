@@ -4,7 +4,7 @@
 
 This document describes the current Supabase/PostgreSQL database for CompleteOS+.
 
-The database currently contains **15 public tables**.
+The database currently contains **13 public tables**.
 
 CompleteOS+ uses Supabase Auth for identity. Most application tables are user-owned and should be protected by Row Level Security.
 
@@ -19,9 +19,7 @@ The database should support:
 - Personal execution
 - Areas of life
 - Projects
-- Tasks
-- Habits
-- Routines
+- Tasks (including Habits, Routines, Bills, and Appointments as specialized task types)
 - Day blocks
 - Daily plans
 - Daily status
@@ -30,6 +28,28 @@ The database should support:
 Core rule:
 
 Every user-owned table should reference the authenticated user through `user_id`.
+
+---
+
+# Universal Task Model
+
+Habits and Routines are **not** separate tables. They are represented as rows in `tasks`, differentiated by `task_type`.
+
+This directly implements SYSTEM_PRINCIPLES.md's P009 ("Tasks Are The Universal Execution Object") and DOMAIN_ARCHITECTURE.md's Task section.
+
+`task_type` values in use or planned:
+
+- `Task` — default, ordinary actionable work
+- `Habit` — repeated behavior, uses `target_value`, `unit`, `frequency`, `tracking_type`
+- `Routine` — multi-step workflow, whose steps live in `routine_steps` referencing `tasks.id`
+- `Bill` — uses `amount`, `payee`, `login_url`
+- `Appointment`/`Event` — uses `start_at`, `end_at`, `location`
+
+Fields not relevant to a given `task_type` are simply left null on that row.
+
+`status` is universal across all task types: `Pending` / `In Progress` / `Completed` / `Skipped` / `Postponed`.
+
+`is_active` is a separate, universal boolean (not part of `status`) — for Habits/Routines it represents whether the recurring definition is still enabled; for other task types it defaults `true` and is largely unused.
 
 ---
 
@@ -61,23 +81,21 @@ For `profiles`, the primary key `id` also references `auth.users.id`.
 
 # Table Index
 
-The current schema contains these 15 tables:
+The current schema contains these 13 tables:
 
 1. `areas`
 2. `projects`
 3. `tasks`
 4. `recurring_templates`
-5. `routines`
-6. `habit_logs`
-7. `day_blocks`
-8. `block_items`
-9. `daily_status`
-10. `habits`
-11. `routine_step_logs`
-12. `routine_steps`
-13. `profiles`
-14. `daily_plans`
-15. `daily_plan_blocks`
+5. `habit_logs`
+6. `day_blocks`
+7. `block_items`
+8. `daily_status`
+9. `routine_step_logs`
+10. `routine_steps`
+11. `profiles`
+12. `daily_plans`
+13. `daily_plan_blocks`
 
 ---
 
@@ -117,8 +135,6 @@ Referenced by:
 - `projects.area_id`
 - `tasks.area_id`
 - `recurring_templates.area_id`
-- `routines.area_id`
-- `habits.area_id`
 
 ## V1 Rule
 
@@ -138,7 +154,7 @@ UNIQUE (user_id, lower(name))
 
 ## Purpose
 
-Represents larger outcomes or goals that may contain tasks, habits, routines, and templates.
+Represents larger outcomes or goals that may contain tasks.
 
 ## Key Columns
 
@@ -153,6 +169,7 @@ Represents larger outcomes or goals that may contain tasks, habits, routines, an
 | `started_at` | timestamptz | Start date |
 | `target_date` | timestamptz | Target date |
 | `completed_at` | timestamptz | Completion timestamp |
+| `is_active` | boolean | Whether project is active |
 
 ## Relationships
 
@@ -165,8 +182,6 @@ Referenced by:
 
 - `tasks.project_id`
 - `recurring_templates.project_id`
-- `routines.project_id`
-- `habits.project_id`
 
 ## Current Risk
 
@@ -188,27 +203,61 @@ UNIQUE (user_id, lower(name))
 
 Represents actionable work.
 
-Tasks are the core execution unit of CompleteOS+.
+Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, and Appointment/Event is a row in this table, differentiated by `task_type`.
 
 ## Key Columns
+
+### Universal (apply to every task_type)
 
 | Column | Type | Purpose |
 |---|---|---|
 | `id` | uuid | Primary key |
+| `created_at` | timestamptz | Created timestamp |
 | `user_id` | uuid | Owner user |
 | `project_id` | uuid | Optional parent project |
 | `area_id` | uuid | Optional parent area |
 | `template_id` | uuid | Optional recurring template |
-| `name` | text | Task title |
-| `status` | text | Task status |
-| `priority` | text | Task priority |
+| `name` | text | Title |
+| `status` | text | Pending / In Progress / Completed / Skipped / Postponed |
+| `priority` | text | Critical / High / Medium / Low |
 | `due_at` | timestamptz | Due date/time |
 | `completed_at` | timestamptz | Completion timestamp |
 | `completed` | boolean | Completion flag |
-| `task_type` | text | Task/Bill/Appointment/etc. |
+| `task_type` | text | Task / Habit / Routine / Bill / Appointment / Event |
+| `is_active` | boolean | Whether this record is enabled (mainly meaningful for Habit/Routine) |
 | `calendar_sync` | boolean | Whether to sync to calendar |
 | `requires_verification` | boolean | Whether completion needs confirmation |
 | `verification_status` | text | Verification state |
+| `reminder_level` | text | Reminder intensity |
+| `acknowledged_at` | timestamptz | When a reminder/verification was acknowledged |
+| `completion_synced` | boolean | Whether completion has synced externally |
+| `calendar_event_id` | text | External calendar event reference |
+| `calendar_synced_at` | timestamptz | Last calendar sync timestamp |
+
+### Habit-specific (`task_type = 'Habit'`)
+
+| Column | Type | Purpose |
+|---|---|---|
+| `target_value` | numeric | Target amount |
+| `unit` | text | Unit of measure |
+| `frequency` | text | How often the habit repeats |
+| `tracking_type` | text | Boolean or numeric tracking |
+
+### Appointment/Event-specific (`task_type = 'Appointment'`/`'Event'`)
+
+| Column | Type | Purpose |
+|---|---|---|
+| `start_at` | timestamptz | Start time |
+| `end_at` | timestamptz | End time |
+| `location` | text | Location |
+
+### Bill-specific (`task_type = 'Bill'`)
+
+| Column | Type | Purpose |
+|---|---|---|
+| `amount` | numeric | Bill amount |
+| `payee` | text | Who the bill is paid to |
+| `login_url` | text | Payment portal URL |
 
 ## Relationships
 
@@ -222,12 +271,16 @@ tasks.template_id → recurring_templates.id
 Referenced by:
 
 - `block_items.task_id`
+- `habit_logs.task_id`
+- `routine_steps.task_id`
 
 ## V1 Notes
 
 Tasks should always insert the authenticated user's `user_id`.
 
 Execution dashboard queries should filter tasks by current user.
+
+For Habit/Routine rows, `status` and `is_active` are independent: `status` still tracks per-instance progress where meaningful, while `is_active` tracks whether the recurring definition itself is still enabled.
 
 ---
 
@@ -274,8 +327,6 @@ recurring_templates.project_id → projects.id
 Referenced by:
 
 - `tasks.template_id`
-- `routines.template_id`
-- `habits.template_id`
 
 ## Current Risk
 
@@ -289,57 +340,7 @@ UNIQUE (user_id, lower(name))
 
 ---
 
-# 5. routines
-
-## Purpose
-
-Represents multi-step workflows.
-
-Examples:
-
-- Morning Routine
-- Shutdown Routine
-- Weekly Review
-
-## Key Columns
-
-| Column | Type | Purpose |
-|---|---|---|
-| `id` | uuid | Primary key |
-| `user_id` | uuid | Owner user |
-| `name` | text | Routine name |
-| `status` | text | Routine status |
-| `area_id` | uuid | Related area |
-| `project_id` | uuid | Related project |
-| `template_id` | uuid | Related recurring template |
-
-## Relationships
-
-```text
-routines.user_id → auth.users.id
-routines.area_id → areas.id
-routines.project_id → projects.id
-routines.template_id → recurring_templates.id
-```
-
-Referenced by:
-
-- `routine_steps.routine_id`
-- `block_items.routine_id`
-
-## Current Risk
-
-`name` is globally unique.
-
-Recommended future constraint:
-
-```sql
-UNIQUE (user_id, lower(name))
-```
-
----
-
-# 6. habit_logs
+# 5. habit_logs
 
 ## Purpose
 
@@ -355,28 +356,22 @@ Stores habit completion history.
 | `log_date` | timestamptz | Logged date |
 | `completed_at` | timestamptz | Completion timestamp |
 | `notes` | text | Optional notes |
+| `task_id` | uuid | Related task (task_type = 'Habit') |
 
 ## Relationships
 
 ```text
 habit_logs.user_id → auth.users.id
+habit_logs.task_id → tasks.id
 ```
 
-## Current Gap
+## Historical Data Note
 
-There is currently no `habit_id` foreign key in `habit_logs`.
-
-Recommended future relationship:
-
-```text
-habit_logs.habit_id → habits.id
-```
-
-Without `habit_id`, logs cannot be reliably tied to a specific habit.
+`task_id` was added as part of the Universal Task Model migration. Pre-migration log rows have no way to be tied back to a specific habit — that linkage was never captured before this column existed, and could not be backfilled. Historical rows may have `task_id = NULL`; all logs going forward populate it.
 
 ---
 
-# 7. day_blocks
+# 6. day_blocks
 
 ## Purpose
 
@@ -426,13 +421,13 @@ UNIQUE (user_id, sort_order)
 
 ---
 
-# 8. block_items
+# 7. block_items
 
 ## Purpose
 
 Represents items assigned inside a day block.
 
-A block item can reference a task, habit, or routine.
+A block item references a task — since Habits and Routines are task types, this single reference now covers what previously required three separate optional columns.
 
 ## Key Columns
 
@@ -442,9 +437,7 @@ A block item can reference a task, habit, or routine.
 | `user_id` | uuid | Owner user |
 | `day_block_id` | uuid | Parent day block |
 | `item_type` | text | Task / Habit / Routine |
-| `routine_id` | uuid | Optional routine |
-| `habit_id` | uuid | Optional habit |
-| `task_id` | uuid | Optional task |
+| `task_id` | uuid | Referenced task (of any task_type) |
 | `title` | text | Display title |
 | `target_amount` | numeric | Optional target amount |
 | `unit` | text | Unit of measure |
@@ -461,8 +454,6 @@ A block item can reference a task, habit, or routine.
 ```text
 block_items.user_id → auth.users.id
 block_items.day_block_id → day_blocks.id
-block_items.routine_id → routines.id
-block_items.habit_id → habits.id
 block_items.task_id → tasks.id
 ```
 
@@ -479,7 +470,7 @@ UNIQUE (user_id, day_block_id, sort_order)
 
 ---
 
-# 9. daily_status
+# 8. daily_status
 
 ## Purpose
 
@@ -519,54 +510,7 @@ UNIQUE (user_id, status_date)
 
 ---
 
-# 10. habits
-
-## Purpose
-
-Represents repeated behaviors tracked over time.
-
-## Key Columns
-
-| Column | Type | Purpose |
-|---|---|---|
-| `id` | uuid | Primary key |
-| `user_id` | uuid | Owner user |
-| `name` | text | Habit name |
-| `target_value` | numeric | Target amount |
-| `unit` | text | Unit |
-| `frequency` | text | Frequency |
-| `is_active` | boolean | Active flag |
-| `template_id` | uuid | Related recurring template |
-| `area_id` | uuid | Related area |
-| `project_id` | uuid | Related project |
-| `tracking_type` | text | Boolean/numeric tracking |
-
-## Relationships
-
-```text
-habits.user_id → auth.users.id
-habits.template_id → recurring_templates.id
-habits.area_id → areas.id
-habits.project_id → projects.id
-```
-
-Referenced by:
-
-- `block_items.habit_id`
-
-## Current Risk
-
-`name` is globally unique.
-
-Recommended future constraint:
-
-```sql
-UNIQUE (user_id, lower(name))
-```
-
----
-
-# 11. routine_step_logs
+# 9. routine_step_logs
 
 ## Purpose
 
@@ -600,18 +544,20 @@ UNIQUE (user_id, routine_step_id, log_date)
 
 ---
 
-# 12. routine_steps
+# 10. routine_steps
 
 ## Purpose
 
-Represents individual steps inside a routine.
+Represents individual steps inside a Routine.
+
+Since Routines are now `tasks` rows (`task_type = 'Routine'`), a routine step's parent is a task, not a separate `routines` table.
 
 ## Key Columns
 
 | Column | Type | Purpose |
 |---|---|---|
 | `id` | uuid | Primary key |
-| `routine_id` | uuid | Parent routine |
+| `task_id` | uuid | Parent task (task_type = 'Routine') |
 | `name` | text | Step name |
 | `step_order` | integer | Step order |
 | `is_required` | boolean | Required flag |
@@ -620,7 +566,7 @@ Represents individual steps inside a routine.
 ## Relationships
 
 ```text
-routine_steps.routine_id → routines.id
+routine_steps.task_id → tasks.id
 ```
 
 Referenced by:
@@ -634,18 +580,18 @@ Referenced by:
 Recommended future constraint:
 
 ```sql
-UNIQUE (routine_id, step_order)
+UNIQUE (task_id, step_order)
 ```
 
 Optional:
 
 ```sql
-UNIQUE (routine_id, lower(name))
+UNIQUE (task_id, lower(name))
 ```
 
 ---
 
-# 13. profiles
+# 11. profiles
 
 ## Purpose
 
@@ -671,7 +617,7 @@ profiles.id → auth.users.id
 
 ---
 
-# 14. daily_plans
+# 12. daily_plans
 
 ## Purpose
 
@@ -711,7 +657,7 @@ UNIQUE (user_id, plan_date)
 
 ---
 
-# 15. daily_plan_blocks
+# 13. daily_plan_blocks
 
 ## Purpose
 
@@ -768,32 +714,21 @@ auth.users
 ├── profiles
 ├── areas
 │   ├── projects
-│   │   ├── tasks
-│   │   ├── habits
-│   │   ├── routines
-│   │   └── recurring_templates
-│   │
+│   │   └── tasks
 │   ├── tasks
-│   ├── habits
-│   ├── routines
 │   └── recurring_templates
 │
-├── tasks
-│   └── block_items
+├── projects
+│   └── tasks
+│
+├── tasks (task_type: Task / Habit / Routine / Bill / Appointment / Event)
+│   ├── block_items
+│   ├── habit_logs        (task_type = 'Habit')
+│   └── routine_steps     (task_type = 'Routine')
+│           └── routine_step_logs
 │
 ├── recurring_templates
-│   ├── tasks
-│   ├── habits
-│   └── routines
-│
-├── routines
-│   ├── routine_steps
-│   │   └── routine_step_logs
-│   └── block_items
-│
-├── habits
-│   ├── habit_logs
-│   └── block_items
+│   └── tasks
 │
 ├── day_blocks
 │   ├── block_items
@@ -819,13 +754,11 @@ These should be reviewed before V1.
 |---|---|---|
 | `projects` | `name` | Different users may not be able to use the same project name |
 | `recurring_templates` | `name` | Different users may not be able to use the same template name |
-| `routines` | `name` | Different users may not be able to use the same routine name |
 | `day_blocks` | `name` | Different users may not be able to use the same block name |
 | `day_blocks` | `sort_order` | Different users may not be able to use the same block order |
 | `block_items` | `title` | Different users may not be able to use the same item title |
 | `block_items` | `sort_order` | Different users may not be able to use the same item order |
-| `habits` | `name` | Different users may not be able to use the same habit name |
-| `routine_steps` | `name` | Different routines may not be able to use the same step name |
+| `routine_steps` | `name` | Different tasks may not be able to use the same step name |
 
 ---
 
@@ -875,11 +808,9 @@ UNIQUE (user_id, parent_id, sort_order)
 
 Logs should reference the entity they are logging.
 
-Examples:
-
 ```text
-habit_logs.habit_id → habits.id
-routine_step_logs.routine_step_id → routine_steps.id
+habit_logs.task_id → tasks.id            (implemented)
+routine_step_logs.routine_step_id → routine_steps.id   (implemented)
 ```
 
 ## Daily Records
@@ -922,8 +853,6 @@ auth.uid() = id
 
 # Raw Schema Reference
 
-Future versions of this repository may include a raw `schema.sql` export from Supabase.
+The raw SQL schema exported from Supabase is stored at `schema.sql` in the repository root.
 
-Until then, this document serves as the authoritative reference for the current database architecture.
-
-This document is the human-readable database architecture guide.
+This document is the human-readable database architecture guide; `schema.sql` is the authoritative structural reference.
