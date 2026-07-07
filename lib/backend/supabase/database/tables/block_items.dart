@@ -26,12 +26,6 @@ class BlockItemsRow extends SupabaseDataRow {
   String get itemType => getField<String>('item_type')!;
   set itemType(String value) => setField<String>('item_type', value);
 
-  String? get routineId => getField<String>('routine_id');
-  set routineId(String? value) => setField<String>('routine_id', value);
-
-  String? get habitId => getField<String>('habit_id');
-  set habitId(String? value) => setField<String>('habit_id', value);
-
   String? get taskId => getField<String>('task_id');
   set taskId(String? value) => setField<String>('task_id', value);
 

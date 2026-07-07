@@ -17,8 +17,8 @@ class ProfilesRow extends SupabaseDataRow {
   String get id => getField<String>('id')!;
   set id(String value) => setField<String>('id', value);
 
-  String? get displayName => getField<String>('display_name');
-  set displayName(String? value) => setField<String>('display_name', value);
+  String? get email => getField<String>('email');
+  set email(String? value) => setField<String>('email', value);
 
   String? get timezone => getField<String>('timezone');
   set timezone(String? value) => setField<String>('timezone', value);
@@ -36,4 +36,7 @@ class ProfilesRow extends SupabaseDataRow {
 
   DateTime? get updatedAt => getField<DateTime>('updated_at');
   set updatedAt(DateTime? value) => setField<DateTime>('updated_at', value);
+
+  String? get displayName => getField<String>('display_name');
+  set displayName(String? value) => setField<String>('display_name', value);
 }

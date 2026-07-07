@@ -10,6 +10,9 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   FocusNode? nameFieldFocusNode;
   TextEditingController? nameFieldTextController;
   String? Function(BuildContext, String?)? nameFieldTextControllerValidator;
+  // State field(s) for DropDown widget.
+  String? dropDownValue1;
+  FormFieldController<String>? dropDownValueController1;
   DateTime? datePicked;
   // State field(s) for NameField widget.
   String? nameFieldValue1;
@@ -17,9 +20,14 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   // State field(s) for NameField widget.
   String? nameFieldValue2;
   FormFieldController<String>? nameFieldValueController2;
+  // State field(s) for NameField widget.
+  String? nameFieldValue3;
+  FormFieldController<String>? nameFieldValueController3;
   // State field(s) for DropDown widget.
-  String? dropDownValue;
-  FormFieldController<String>? dropDownValueController;
+  String? dropDownValue2;
+  FormFieldController<String>? dropDownValueController2;
+  // State field(s) for Switch widget.
+  bool? switchValue;
 
   @override
   void initState(BuildContext context) {}

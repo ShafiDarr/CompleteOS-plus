@@ -43,4 +43,7 @@ class ProjectsRow extends SupabaseDataRow {
 
   DateTime? get completedAt => getField<DateTime>('completed_at');
   set completedAt(DateTime? value) => setField<DateTime>('completed_at', value);
+
+  bool? get isActive => getField<bool>('is_active');
+  set isActive(bool? value) => setField<bool>('is_active', value);
 }

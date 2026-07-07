@@ -44,6 +44,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
 
     _model.nameFieldTextController ??= TextEditingController();
     _model.nameFieldFocusNode ??= FocusNode();
+
+    _model.switchValue = false;
   }
 
   @override
@@ -185,6 +187,56 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                     enableInteractiveSelection: true,
                     validator: _model.nameFieldTextControllerValidator
                         .asValidator(context),
+                  ),
+                  FlutterFlowDropDown<String>(
+                    controller: _model.dropDownValueController1 ??=
+                        FormFieldController<String>(null),
+                    options: [
+                      'Task',
+                      'Habit',
+                      'Routine',
+                      'Appointment',
+                      'Bill',
+                      'Reminder',
+                      'Event'
+                    ],
+                    onChanged: (val) =>
+                        safeSetState(() => _model.dropDownValue1 = val),
+                    width: double.infinity,
+                    height: 40.0,
+                    textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                          font: GoogleFonts.interTight(
+                            fontWeight: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontWeight,
+                            fontStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontStyle,
+                          ),
+                          letterSpacing: 0.0,
+                          fontWeight: FlutterFlowTheme.of(context)
+                              .bodyMedium
+                              .fontWeight,
+                          fontStyle:
+                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                        ),
+                    hintText: 'Task Type',
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: FlutterFlowTheme.of(context).secondaryText,
+                      size: 24.0,
+                    ),
+                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                    elevation: 2.0,
+                    borderColor: FlutterFlowTheme.of(context).primaryBackground,
+                    borderWidth: 1.0,
+                    borderRadius: 0.0,
+                    margin:
+                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                    hidesUnderline: true,
+                    isOverButton: false,
+                    isSearchable: false,
+                    isMultiSelect: false,
                   ),
                   InkWell(
                     splashColor: Colors.transparent,
@@ -370,7 +422,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 0.0, 0.0),
               child: Text(
-                'Orginization',
+                'Organization',
                 style: FlutterFlowTheme.of(context).bodyMedium.override(
                       font: GoogleFonts.inter(
                         fontWeight:
@@ -512,6 +564,86 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       );
                     },
                   ),
+                  FutureBuilder<List<ProjectsRow>>(
+                    future: ProjectsTable().queryRows(
+                      queryFn: (q) => q
+                          .eqOrNull(
+                            'user_id',
+                            currentUserUid,
+                          )
+                          .eqOrNull(
+                            'is_active',
+                            true,
+                          )
+                          .order('name', ascending: true),
+                    ),
+                    builder: (context, snapshot) {
+                      // Customize what your widget looks like when it's loading.
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: SizedBox(
+                            width: 50.0,
+                            height: 50.0,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                FlutterFlowTheme.of(context).primary,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      List<ProjectsRow> nameFieldProjectsRowList =
+                          snapshot.data!;
+
+                      return FlutterFlowDropDown<String>(
+                        controller: _model.nameFieldValueController3 ??=
+                            FormFieldController<String>(null),
+                        options: nameFieldProjectsRowList
+                            .map((e) => e.name)
+                            .toList(),
+                        onChanged: (val) =>
+                            safeSetState(() => _model.nameFieldValue3 = val),
+                        height: 40.0,
+                        textStyle:
+                            FlutterFlowTheme.of(context).bodyMedium.override(
+                                  font: GoogleFonts.interTight(
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                        hintText: 'Project',
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                          size: 24.0,
+                        ),
+                        fillColor:
+                            FlutterFlowTheme.of(context).secondaryBackground,
+                        elevation: 6.0,
+                        borderColor:
+                            FlutterFlowTheme.of(context).primaryBackground,
+                        borderWidth: 1.0,
+                        borderRadius: 16.0,
+                        margin: EdgeInsetsDirectional.fromSTEB(
+                            12.0, 0.0, 12.0, 0.0),
+                        hidesUnderline: true,
+                        isOverButton: false,
+                        isSearchable: false,
+                        isMultiSelect: false,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -536,25 +668,23 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
             ),
             Container(
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).secondaryBackground,
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   FlutterFlowDropDown<String>(
-                    controller: _model.dropDownValueController ??=
+                    controller: _model.dropDownValueController2 ??=
                         FormFieldController<String>(null),
                     options: [
                       'Pending',
                       'In Progress',
                       'Completed',
                       'Skipped',
-                      'Postponed',
-                      'Archived'
+                      'Postponed'
                     ],
                     onChanged: (val) =>
-                        safeSetState(() => _model.dropDownValue = val),
+                        safeSetState(() => _model.dropDownValue2 = val),
                     width: double.infinity,
                     height: 40.0,
                     textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -581,8 +711,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                     ),
                     fillColor: FlutterFlowTheme.of(context).secondaryBackground,
                     elevation: 2.0,
-                    borderColor: Colors.transparent,
-                    borderWidth: 0.0,
+                    borderColor: FlutterFlowTheme.of(context).primaryBackground,
+                    borderWidth: 1.0,
                     borderRadius: 16.0,
                     margin:
                         EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
@@ -590,6 +720,67 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                     isOverButton: false,
                     isSearchable: false,
                     isMultiSelect: false,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              16.0, 0.0, 0.0, 0.0),
+                          child: Text(
+                            'Active',
+                            style: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .override(
+                                  font: GoogleFonts.interTight(
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                                  letterSpacing: 0.0,
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .fontStyle,
+                                ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 0.0, 12.0, 0.0),
+                          child: Switch.adaptive(
+                            value: _model.switchValue!,
+                            onChanged: (newValue) async {
+                              safeSetState(
+                                  () => _model.switchValue = newValue);
+                            },
+                            activeColor:
+                                FlutterFlowTheme.of(context).primaryText,
+                            activeTrackColor:
+                                FlutterFlowTheme.of(context).primary,
+                            inactiveTrackColor:
+                                FlutterFlowTheme.of(context).secondary,
+                            inactiveThumbColor:
+                                FlutterFlowTheme.of(context).accent2,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -31,4 +31,7 @@ class HabitLogsRow extends SupabaseDataRow {
 
   String? get notes => getField<String>('notes');
   set notes(String? value) => setField<String>('notes', value);
+
+  String? get taskId => getField<String>('task_id');
+  set taskId(String? value) => setField<String>('task_id', value);
 }

@@ -253,8 +253,6 @@ dynamic deserializeParam<T>(
             return DayBlocksRow(data);
           case HabitLogsRow:
             return HabitLogsRow(data);
-          case HabitsRow:
-            return HabitsRow(data);
           case ProfilesRow:
             return ProfilesRow(data);
           case ProjectsRow:
@@ -265,8 +263,6 @@ dynamic deserializeParam<T>(
             return RoutineStepLogsRow(data);
           case RoutineStepsRow:
             return RoutineStepsRow(data);
-          case RoutinesRow:
-            return RoutinesRow(data);
           case TasksRow:
             return TasksRow(data);
           default:
