@@ -227,6 +227,10 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   'priority':
                                       _model.taskFormModel.priorityValue,
                                   'status': _model.taskFormModel.statusValue,
+                                  'is_active': _model.taskFormModel.switchValue,
+                                  'area_id': _model.taskFormModel.areaValue,
+                                  'project_id':
+                                      _model.taskFormModel.projectValue,
                                 });
                               }
                             }

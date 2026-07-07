@@ -519,7 +519,12 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       return FlutterFlowDropDown<String>(
                         controller: _model.areaValueController ??=
                             FormFieldController<String>(null),
-                        options: areaAreasRowList.map((e) => e.name).toList(),
+                        options: List<String>.from(areaAreasRowList
+                            .map((e) => e.id)
+                            .withoutNulls
+                            .toList()),
+                        optionLabels:
+                            areaAreasRowList.map((e) => e.name).toList(),
                         onChanged: (val) =>
                             safeSetState(() => _model.areaValue = val),
                         height: 40.0,
@@ -596,7 +601,11 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       return FlutterFlowDropDown<String>(
                         controller: _model.projectValueController ??=
                             FormFieldController<String>(null),
-                        options:
+                        options: List<String>.from(projectProjectsRowList
+                            .map((e) => e.id)
+                            .withoutNulls
+                            .toList()),
+                        optionLabels:
                             projectProjectsRowList.map((e) => e.name).toList(),
                         onChanged: (val) =>
                             safeSetState(() => _model.projectValue = val),
