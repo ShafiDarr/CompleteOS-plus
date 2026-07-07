@@ -105,6 +105,12 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           } else if ((FFAppState().editorMode == 'edit') &&
                               (FFAppState().editorType == 'area')) {
                             return 'Edit Area';
+                          } else if ((FFAppState().editorMode == 'new') &&
+                              (FFAppState().editorType == 'task')) {
+                            return 'New Task';
+                          } else if ((FFAppState().editorMode == 'edit') &&
+                              (FFAppState().editorType == 'task')) {
+                            return 'Edit Task';
                           } else {
                             return '';
                           }
@@ -136,7 +142,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           highlightColor: Colors.transparent,
                           onTap: () async {
                             FFAppState().editorMode = 'action';
-                            safeSetState(() {});
+                            FFAppState().update(() {});
                           },
                           child: Icon(
                             Icons.more_vert_rounded,
@@ -207,6 +213,22 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                               FFAppState().editorMode = 'new';
                               FFAppState().update(() {});
                               Navigator.pop(context);
+                            } else {
+                              if ((FFAppState().editorMode == 'new') &&
+                                  (FFAppState().editorType == 'task')) {
+                                await TasksTable().insert({
+                                  'name': _model.taskFormModel
+                                      .taskNameTextController.text,
+                                  'task_type':
+                                      _model.taskFormModel.taskTypeValue,
+                                  'due_at': supaSerialize<DateTime>(
+                                      _model.taskFormModel.datePicked),
+                                  'user_id': currentUserUid,
+                                  'priority':
+                                      _model.taskFormModel.priorityValue,
+                                  'status': _model.taskFormModel.statusValue,
+                                });
+                              }
                             }
                           }
                         },

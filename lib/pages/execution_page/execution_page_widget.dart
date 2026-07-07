@@ -80,7 +80,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                         _model.editorHostModel.areaFormModel.textController2
                             ?.clear();
                         _model.editorHostModel.taskFormModel
-                            .nameFieldTextController
+                            .taskNameTextController
                             ?.clear();
                         _model.systemsControlPanelModel.textController?.clear();
                       });

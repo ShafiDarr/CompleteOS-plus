@@ -42,8 +42,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
     super.initState();
     _model = createModel(context, () => TaskFormModel());
 
-    _model.nameFieldTextController ??= TextEditingController();
-    _model.nameFieldFocusNode ??= FocusNode();
+    _model.taskNameTextController ??= TextEditingController();
+    _model.taskNameFocusNode ??= FocusNode();
 
     _model.switchValue = false;
   }
@@ -79,8 +79,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   TextFormField(
-                    controller: _model.nameFieldTextController,
-                    focusNode: _model.nameFieldFocusNode,
+                    controller: _model.taskNameTextController,
+                    focusNode: _model.taskNameFocusNode,
                     autofocus: false,
                     enabled: true,
                     obscureText: false,
@@ -185,11 +185,11 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         ),
                     cursorColor: FlutterFlowTheme.of(context).primaryText,
                     enableInteractiveSelection: true,
-                    validator: _model.nameFieldTextControllerValidator
+                    validator: _model.taskNameTextControllerValidator
                         .asValidator(context),
                   ),
                   FlutterFlowDropDown<String>(
-                    controller: _model.dropDownValueController1 ??=
+                    controller: _model.taskTypeValueController ??=
                         FormFieldController<String>(null),
                     options: [
                       'Task',
@@ -201,7 +201,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       'Event'
                     ],
                     onChanged: (val) =>
-                        safeSetState(() => _model.dropDownValue1 = val),
+                        safeSetState(() => _model.taskTypeValue = val),
                     width: double.infinity,
                     height: 40.0,
                     textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -446,11 +446,11 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   FlutterFlowDropDown<String>(
-                    controller: _model.nameFieldValueController1 ??=
+                    controller: _model.priorityValueController ??=
                         FormFieldController<String>(null),
                     options: ['Critical', 'High', 'Medium', 'Low'],
                     onChanged: (val) =>
-                        safeSetState(() => _model.nameFieldValue1 = val),
+                        safeSetState(() => _model.priorityValue = val),
                     height: 40.0,
                     textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.interTight(
@@ -514,15 +514,14 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                           ),
                         );
                       }
-                      List<AreasRow> nameFieldAreasRowList = snapshot.data!;
+                      List<AreasRow> areaAreasRowList = snapshot.data!;
 
                       return FlutterFlowDropDown<String>(
-                        controller: _model.nameFieldValueController2 ??=
+                        controller: _model.areaValueController ??=
                             FormFieldController<String>(null),
-                        options:
-                            nameFieldAreasRowList.map((e) => e.name).toList(),
+                        options: areaAreasRowList.map((e) => e.name).toList(),
                         onChanged: (val) =>
-                            safeSetState(() => _model.nameFieldValue2 = val),
+                            safeSetState(() => _model.areaValue = val),
                         height: 40.0,
                         textStyle:
                             FlutterFlowTheme.of(context).bodyMedium.override(
@@ -592,17 +591,15 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                           ),
                         );
                       }
-                      List<ProjectsRow> nameFieldProjectsRowList =
-                          snapshot.data!;
+                      List<ProjectsRow> projectProjectsRowList = snapshot.data!;
 
                       return FlutterFlowDropDown<String>(
-                        controller: _model.nameFieldValueController3 ??=
+                        controller: _model.projectValueController ??=
                             FormFieldController<String>(null),
-                        options: nameFieldProjectsRowList
-                            .map((e) => e.name)
-                            .toList(),
+                        options:
+                            projectProjectsRowList.map((e) => e.name).toList(),
                         onChanged: (val) =>
-                            safeSetState(() => _model.nameFieldValue3 = val),
+                            safeSetState(() => _model.projectValue = val),
                         height: 40.0,
                         textStyle:
                             FlutterFlowTheme.of(context).bodyMedium.override(
@@ -674,7 +671,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   FlutterFlowDropDown<String>(
-                    controller: _model.dropDownValueController2 ??=
+                    controller: _model.statusValueController ??=
                         FormFieldController<String>(null),
                     options: [
                       'Pending',
@@ -684,7 +681,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       'Postponed'
                     ],
                     onChanged: (val) =>
-                        safeSetState(() => _model.dropDownValue2 = val),
+                        safeSetState(() => _model.statusValue = val),
                     width: double.infinity,
                     height: 40.0,
                     textStyle: FlutterFlowTheme.of(context).bodyMedium.override(

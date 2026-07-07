@@ -6,26 +6,26 @@ import 'package:flutter/material.dart';
 class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   ///  State fields for stateful widgets in this component.
 
-  // State field(s) for NameField widget.
-  FocusNode? nameFieldFocusNode;
-  TextEditingController? nameFieldTextController;
-  String? Function(BuildContext, String?)? nameFieldTextControllerValidator;
-  // State field(s) for DropDown widget.
-  String? dropDownValue1;
-  FormFieldController<String>? dropDownValueController1;
+  // State field(s) for TaskName widget.
+  FocusNode? taskNameFocusNode;
+  TextEditingController? taskNameTextController;
+  String? Function(BuildContext, String?)? taskNameTextControllerValidator;
+  // State field(s) for TaskType widget.
+  String? taskTypeValue;
+  FormFieldController<String>? taskTypeValueController;
   DateTime? datePicked;
-  // State field(s) for NameField widget.
-  String? nameFieldValue1;
-  FormFieldController<String>? nameFieldValueController1;
-  // State field(s) for NameField widget.
-  String? nameFieldValue2;
-  FormFieldController<String>? nameFieldValueController2;
-  // State field(s) for NameField widget.
-  String? nameFieldValue3;
-  FormFieldController<String>? nameFieldValueController3;
-  // State field(s) for DropDown widget.
-  String? dropDownValue2;
-  FormFieldController<String>? dropDownValueController2;
+  // State field(s) for Priority widget.
+  String? priorityValue;
+  FormFieldController<String>? priorityValueController;
+  // State field(s) for Area widget.
+  String? areaValue;
+  FormFieldController<String>? areaValueController;
+  // State field(s) for Project widget.
+  String? projectValue;
+  FormFieldController<String>? projectValueController;
+  // State field(s) for Status widget.
+  String? statusValue;
+  FormFieldController<String>? statusValueController;
   // State field(s) for Switch widget.
   bool? switchValue;
 
@@ -34,7 +34,7 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
 
   @override
   void dispose() {
-    nameFieldFocusNode?.dispose();
-    nameFieldTextController?.dispose();
+    taskNameFocusNode?.dispose();
+    taskNameTextController?.dispose();
   }
 }
