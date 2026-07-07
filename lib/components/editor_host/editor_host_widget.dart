@@ -239,6 +239,23 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                 safeSetState(() {
                                   _model.taskFormModel.switchValue = false;
                                 });
+                                safeSetState(() {
+                                  _model.taskFormModel.taskTypeValueController
+                                      ?.reset();
+                                  _model.taskFormModel.taskTypeValue = null;
+                                  _model.taskFormModel.priorityValueController
+                                      ?.reset();
+                                  _model.taskFormModel.priorityValue = null;
+                                  _model.taskFormModel.areaValueController
+                                      ?.reset();
+                                  _model.taskFormModel.areaValue = null;
+                                  _model.taskFormModel.projectValueController
+                                      ?.reset();
+                                  _model.taskFormModel.projectValue = null;
+                                  _model.taskFormModel.statusValueController
+                                      ?.reset();
+                                  _model.taskFormModel.statusValue = null;
+                                });
                                 FFAppState().selectedRecordID = '';
                                 FFAppState().editorType = 'none';
                                 FFAppState().editorMode = 'new';
@@ -273,6 +290,23 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   });
                                   safeSetState(() {
                                     _model.taskFormModel.switchValue = false;
+                                  });
+                                  safeSetState(() {
+                                    _model.taskFormModel.taskTypeValueController
+                                        ?.reset();
+                                    _model.taskFormModel.taskTypeValue = null;
+                                    _model.taskFormModel.priorityValueController
+                                        ?.reset();
+                                    _model.taskFormModel.priorityValue = null;
+                                    _model.taskFormModel.areaValueController
+                                        ?.reset();
+                                    _model.taskFormModel.areaValue = null;
+                                    _model.taskFormModel.projectValueController
+                                        ?.reset();
+                                    _model.taskFormModel.projectValue = null;
+                                    _model.taskFormModel.statusValueController
+                                        ?.reset();
+                                    _model.taskFormModel.statusValue = null;
                                   });
                                   FFAppState().selectedRecordID = '';
                                   FFAppState().editorType = 'none';
