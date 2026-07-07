@@ -59,6 +59,7 @@ CREATE TABLE public.tasks (
   payee text,
   is_active boolean DEFAULT true,
   login_url text,
+  tracking_type text DEFAULT 'Boolean'::text,
   CONSTRAINT tasks_pkey PRIMARY KEY (id),
   CONSTRAINT tasks_project_id_fkey FOREIGN KEY (project_id) REFERENCES public.projects(id),
   CONSTRAINT tasks_area_id_fkey FOREIGN KEY (area_id) REFERENCES public.areas(id),
