@@ -3,6 +3,7 @@ import '/backend/supabase/supabase.dart';
 import '/components/area_form/area_form_widget.dart';
 import '/components/confirm_delete_dialog/confirm_delete_dialog_widget.dart';
 import '/components/editor_actions_menu/editor_actions_menu_widget.dart';
+import '/components/task_form/task_form_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'dart:async';
@@ -223,6 +224,14 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         model: _model.areaFormModel,
                         updateCallback: () => safeSetState(() {}),
                         child: AreaFormWidget(),
+                      ),
+                    ),
+                  if (FFAppState().editorType == 'task')
+                    Expanded(
+                      child: wrapWithModel(
+                        model: _model.taskFormModel,
+                        updateCallback: () => safeSetState(() {}),
+                        child: TaskFormWidget(),
                       ),
                     ),
                 ].divide(SizedBox(height: 20.0)),

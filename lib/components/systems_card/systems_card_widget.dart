@@ -111,7 +111,7 @@ class _SystemsCardWidgetState extends State<SystemsCardWidget> {
                         ),
                   ),
                   TextSpan(
-                    text: ' Activities',
+                    text: ' Tasks',
                     style: GoogleFonts.interTight(
                       color: FlutterFlowTheme.of(context).secondaryText,
                       fontSize: 12.0,

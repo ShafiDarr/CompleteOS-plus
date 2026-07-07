@@ -353,14 +353,20 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                           'area') {
                                         return 'Search areas . . .';
                                       } else if (FFAppState().activeSystemTab ==
-                                          'activity') {
-                                        return 'Search activities . . .';
+                                          'task') {
+                                        return 'Search tasks . . .';
                                       } else if (FFAppState().activeSystemTab ==
                                           'schedule') {
                                         return 'Search schedules . . .';
                                       } else if (FFAppState().activeSystemTab ==
                                           'automation') {
                                         return 'Search automations . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'goal') {
+                                        return 'Search goals . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'project') {
+                                        return 'Search projects . . .';
                                       } else {
                                         return 'Search . . .';
                                       }

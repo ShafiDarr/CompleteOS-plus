@@ -91,7 +91,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                                     .labelMedium
                                     .fontStyle,
                               ),
-                      hintText: 'Name',
+                      hintText: 'Area Name',
                       hintStyle:
                           FlutterFlowTheme.of(context).labelMedium.override(
                                 font: GoogleFonts.interTight(
@@ -112,7 +112,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                               ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color(0x00000000),
+                          color: FlutterFlowTheme.of(context).primaryBackground,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.only(
@@ -222,7 +222,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                               ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Color(0x00000000),
+                          color: FlutterFlowTheme.of(context).primaryBackground,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.only(
@@ -352,8 +352,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                       activeTrackColor: FlutterFlowTheme.of(context).primary,
                       inactiveTrackColor:
                           FlutterFlowTheme.of(context).secondary,
-                      inactiveThumbColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                      inactiveThumbColor: FlutterFlowTheme.of(context).accent2,
                     ),
                   ),
                 ],

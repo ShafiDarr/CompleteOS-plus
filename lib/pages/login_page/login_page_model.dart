@@ -1,4 +1,4 @@
-import '/components/login_content/login_content_widget.dart';
+import '/components/login_content_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'login_page_widget.dart' show LoginPageWidget;
 import 'package:flutter/material.dart';

@@ -79,6 +79,10 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                             ?.clear();
                         _model.editorHostModel.areaFormModel.textController2
                             ?.clear();
+                        _model.editorHostModel.taskFormModel
+                            .nameFieldTextController
+                            ?.clear();
+                        _model.systemsControlPanelModel.textController?.clear();
                       });
                       safeSetState(() {
                         _model.editorHostModel.areaFormModel.switchValue =
@@ -218,7 +222,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        color: Color(0x0FFFFFFF),
                       ),
                       alignment: AlignmentDirectional(0.0, 0.0),
                     ),
