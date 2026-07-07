@@ -232,6 +232,54 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   'project_id':
                                       _model.taskFormModel.projectValue,
                                 });
+                                safeSetState(() {
+                                  _model.taskFormModel.taskNameTextController
+                                      ?.clear();
+                                });
+                                safeSetState(() {
+                                  _model.taskFormModel.switchValue = false;
+                                });
+                                FFAppState().selectedRecordID = '';
+                                FFAppState().editorType = 'none';
+                                FFAppState().editorMode = 'new';
+                                FFAppState().update(() {});
+                                Navigator.pop(context);
+                              } else {
+                                if ((FFAppState().editorMode == 'edit') &&
+                                    (FFAppState().editorType == 'task')) {
+                                  await TasksTable().update(
+                                    data: {
+                                      'name': _model.taskFormModel
+                                          .taskNameTextController.text,
+                                      'task_type':
+                                          _model.taskFormModel.taskTypeValue,
+                                      'due_at': supaSerialize<DateTime>(
+                                          _model.taskFormModel.datePicked),
+                                      'priority':
+                                          _model.taskFormModel.priorityValue,
+                                      'status':
+                                          _model.taskFormModel.statusValue,
+                                      'is_active':
+                                          _model.taskFormModel.switchValue,
+                                      'area_id': _model.taskFormModel.areaValue,
+                                      'project_id':
+                                          _model.taskFormModel.projectValue,
+                                    },
+                                    matchingRows: (rows) => rows,
+                                  );
+                                  safeSetState(() {
+                                    _model.taskFormModel.taskNameTextController
+                                        ?.clear();
+                                  });
+                                  safeSetState(() {
+                                    _model.taskFormModel.switchValue = false;
+                                  });
+                                  FFAppState().selectedRecordID = '';
+                                  FFAppState().editorType = 'none';
+                                  FFAppState().editorMode = 'new';
+                                  FFAppState().update(() {});
+                                  Navigator.pop(context);
+                                }
                               }
                             }
                           }
