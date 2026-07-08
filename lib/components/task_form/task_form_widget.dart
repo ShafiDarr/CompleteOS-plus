@@ -5,24 +5,13 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/form_field_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'task_form_model.dart';
 export 'task_form_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
-  const TaskFormWidget({
-    super.key,
-    this.selectedDueAt,
-    String? selectedPriority,
-    this.selectedAreaName,
-    String? selectedStatus,
-  })  : this.selectedPriority = selectedPriority ?? 'Medium',
-        this.selectedStatus = selectedStatus ?? 'Pending';
-
-  final DateTime? selectedDueAt;
-  final String selectedPriority;
-  final String? selectedAreaName;
-  final String selectedStatus;
+  const TaskFormWidget({super.key});
 
   @override
   State<TaskFormWidget> createState() => _TaskFormWidgetState();
@@ -42,10 +31,16 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
     super.initState();
     _model = createModel(context, () => TaskFormModel());
 
+    // On component load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.selectedDueAt = null;
+      safeSetState(() {});
+    });
+
     _model.taskNameTextController ??= TextEditingController();
     _model.taskNameFocusNode ??= FocusNode();
 
-    _model.switchValue = false;
+    _model.switchValue = true;
   }
 
   @override
@@ -72,7 +67,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).secondaryBackground,
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Column(
@@ -352,6 +346,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                           _model.datePicked = getCurrentTimestamp;
                         });
                       }
+                      _model.selectedDueAt = _model.datePicked;
+                      safeSetState(() {});
                     },
                     child: Container(
                       width: double.infinity,
@@ -375,11 +371,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                             padding: EdgeInsetsDirectional.fromSTEB(
                                 12.0, 0.0, 0.0, 0.0),
                             child: Text(
-                              valueOrDefault<String>(
-                                dateTimeFormat(
-                                    "MMM d h:mm a", _model.datePicked),
-                                'Due Date',
-                              ),
+                              _model.selectedDueAt != null
+                                  ? dateTimeFormat("EEEE, MMMM d, yyyy  h:mm a",
+                                      _model.selectedDueAt)
+                                  : 'Due Date',
                               style: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(

@@ -6,7 +6,6 @@ import '/components/editor_actions_menu/editor_actions_menu_widget.dart';
 import '/components/task_form/task_form_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -84,11 +83,33 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          unawaited(
-                            () async {
-                              await widget.closeEndDrawer?.call();
-                            }(),
-                          );
+                          safeSetState(() {
+                            _model.taskFormModel.taskTypeValueController
+                                ?.reset();
+                            _model.taskFormModel.taskTypeValue = null;
+                            _model.taskFormModel.priorityValueController
+                                ?.reset();
+                            _model.taskFormModel.priorityValue = null;
+                            _model.taskFormModel.areaValueController?.reset();
+                            _model.taskFormModel.areaValue = null;
+                            _model.taskFormModel.projectValueController
+                                ?.reset();
+                            _model.taskFormModel.projectValue = null;
+                            _model.taskFormModel.statusValueController?.reset();
+                            _model.taskFormModel.statusValue = null;
+                          });
+                          safeSetState(() {
+                            _model.areaFormModel.nameFieldTextController
+                                ?.clear();
+                            _model.areaFormModel.textController2?.clear();
+                            _model.taskFormModel.taskNameTextController
+                                ?.clear();
+                          });
+                          safeSetState(() {
+                            _model.areaFormModel.switchValue = true;
+                            _model.taskFormModel.switchValue = true;
+                          });
+                          await widget.closeEndDrawer?.call();
                         },
                         child: Icon(
                           Icons.close,
@@ -172,7 +193,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   ?.clear();
                             });
                             safeSetState(() {
-                              _model.areaFormModel.switchValue = false;
+                              _model.areaFormModel.switchValue = true;
                             });
                             FFAppState().selectedRecordID = '';
                             FFAppState().editorType = 'none';
@@ -206,7 +227,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                     ?.clear();
                               });
                               safeSetState(() {
-                                _model.areaFormModel.switchValue = false;
+                                _model.areaFormModel.switchValue = true;
                               });
                               FFAppState().selectedRecordID = '';
                               FFAppState().editorType = 'none';
@@ -237,7 +258,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                       ?.clear();
                                 });
                                 safeSetState(() {
-                                  _model.taskFormModel.switchValue = false;
+                                  _model.taskFormModel.switchValue = true;
                                 });
                                 safeSetState(() {
                                   _model.taskFormModel.taskTypeValueController
@@ -261,6 +282,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                 FFAppState().editorMode = 'new';
                                 FFAppState().update(() {});
                                 Navigator.pop(context);
+                                safeSetState(() {});
                               } else {
                                 if ((FFAppState().editorMode == 'edit') &&
                                     (FFAppState().editorType == 'task')) {
@@ -297,7 +319,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                         ?.clear();
                                   });
                                   safeSetState(() {
-                                    _model.taskFormModel.switchValue = false;
+                                    _model.taskFormModel.switchValue = true;
                                   });
                                   safeSetState(() {
                                     _model.taskFormModel.taskTypeValueController
@@ -321,6 +343,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   FFAppState().editorMode = 'new';
                                   FFAppState().update(() {});
                                   Navigator.pop(context);
+                                  safeSetState(() {});
                                 }
                               }
                             }

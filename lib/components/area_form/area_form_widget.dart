@@ -32,7 +32,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
     _model.textController2 ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
 
-    _model.switchValue = false;
+    _model.switchValue = true;
   }
 
   @override

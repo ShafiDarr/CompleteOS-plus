@@ -7,10 +7,6 @@ import 'editor_host_widget.dart' show EditorHostWidget;
 import 'package:flutter/material.dart';
 
 class EditorHostModel extends FlutterFlowModel<EditorHostWidget> {
-  ///  Local state fields for this component.
-
-  String? isHovered;
-
   ///  State fields for stateful widgets in this component.
 
   // Model for AreaForm component.

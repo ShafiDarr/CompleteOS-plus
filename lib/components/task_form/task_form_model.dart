@@ -4,6 +4,10 @@ import 'task_form_widget.dart' show TaskFormWidget;
 import 'package:flutter/material.dart';
 
 class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
+  ///  Local state fields for this component.
+
+  DateTime? selectedDueAt;
+
   ///  State fields for stateful widgets in this component.
 
   // State field(s) for TaskName widget.

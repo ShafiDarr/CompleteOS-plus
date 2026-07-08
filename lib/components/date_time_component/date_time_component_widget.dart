@@ -64,7 +64,7 @@ class _DateTimeComponentWidgetState extends State<DateTimeComponentWidget> {
                               FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                         ),
                         color: FlutterFlowTheme.of(context).secondaryText,
-                        fontSize: 15.0,
+                        fontSize: 12.0,
                         letterSpacing: 3.0,
                         fontWeight: FontWeight.w500,
                         fontStyle:

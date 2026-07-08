@@ -85,8 +85,8 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                         _model.systemsControlPanelModel.textController?.clear();
                       });
                       safeSetState(() {
-                        _model.editorHostModel.areaFormModel.switchValue =
-                            false;
+                        _model.editorHostModel.areaFormModel.switchValue = true;
+                        _model.editorHostModel.taskFormModel.switchValue = true;
                       });
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
@@ -295,12 +295,12 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   .nameFieldTextController?.text = areaName;
                             });
                             safeSetState(() {
-                              _model.editorHostModel.areaFormModel
-                                  .textController2?.text = areaDescription;
-                            });
-                            safeSetState(() {
                               _model.editorHostModel.areaFormModel.switchValue =
                                   areaActive;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.areaFormModel
+                                  .textController2?.text = areaDescription;
                             });
                           },
                         ),

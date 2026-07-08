@@ -570,18 +570,13 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                             'edit';
                                                         FFAppState()
                                                             .update(() {});
-                                                        unawaited(
-                                                          () async {
-                                                            await widget.onEdit
-                                                                ?.call(
-                                                              wrapAreasRow.id!,
-                                                              wrapAreasRow.name,
-                                                              wrapAreasRow
-                                                                  .description!,
-                                                              wrapAreasRow
-                                                                  .active!,
-                                                            );
-                                                          }(),
+                                                        await widget.onEdit
+                                                            ?.call(
+                                                          wrapAreasRow.id!,
+                                                          wrapAreasRow.name,
+                                                          wrapAreasRow
+                                                              .description!,
+                                                          wrapAreasRow.active!,
                                                         );
                                                       },
                                                       child: SystemsCardWidget(
