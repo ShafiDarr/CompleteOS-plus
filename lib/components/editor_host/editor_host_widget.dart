@@ -240,18 +240,18 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                 await TasksTable().insert({
                                   'name': _model.taskFormModel
                                       .taskNameTextController.text,
-                                  'task_type':
-                                      _model.taskFormModel.taskTypeValue,
-                                  'due_at': supaSerialize<DateTime>(
-                                      _model.taskFormModel.datePicked),
                                   'user_id': currentUserUid,
+                                  'status': _model.taskFormModel.statusValue,
                                   'priority':
                                       _model.taskFormModel.priorityValue,
-                                  'status': _model.taskFormModel.statusValue,
+                                  'due_at': supaSerialize<DateTime>(
+                                      _model.taskFormModel.datePicked),
                                   'is_active': _model.taskFormModel.switchValue,
                                   'area_id': _model.taskFormModel.areaValue,
                                   'project_id':
                                       _model.taskFormModel.projectValue,
+                                  'task_type':
+                                      _model.taskFormModel.taskTypeValue,
                                 });
                                 safeSetState(() {
                                   _model.taskFormModel.taskNameTextController
@@ -282,7 +282,6 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                 FFAppState().editorMode = 'new';
                                 FFAppState().update(() {});
                                 Navigator.pop(context);
-                                safeSetState(() {});
                               } else {
                                 if ((FFAppState().editorMode == 'edit') &&
                                     (FFAppState().editorType == 'task')) {
@@ -343,7 +342,6 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   FFAppState().editorMode = 'new';
                                   FFAppState().update(() {});
                                   Navigator.pop(context);
-                                  safeSetState(() {});
                                 }
                               }
                             }

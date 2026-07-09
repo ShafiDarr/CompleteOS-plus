@@ -372,7 +372,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                                 12.0, 0.0, 0.0, 0.0),
                             child: Text(
                               _model.selectedDueAt != null
-                                  ? dateTimeFormat("EEEE, MMMM d, yyyy  h:mm a",
+                                  ? dateTimeFormat("MMMM d, yyyy  h:mm a",
                                       _model.selectedDueAt)
                                   : 'Due Date',
                               style: FlutterFlowTheme.of(context)

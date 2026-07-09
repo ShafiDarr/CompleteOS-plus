@@ -88,10 +88,30 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                         _model.editorHostModel.areaFormModel.switchValue = true;
                         _model.editorHostModel.taskFormModel.switchValue = true;
                       });
-                      FFAppState().selectedRecordID = '';
-                      FFAppState().update(() {});
-                      FFAppState().selectedRecordID = '';
-                      FFAppState().update(() {});
+                      safeSetState(() {
+                        _model.editorHostModel.taskFormModel
+                            .priorityValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.priorityValue =
+                            null;
+                        _model.editorHostModel.taskFormModel
+                            .taskTypeValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.taskTypeValue =
+                            null;
+                        _model.editorHostModel.taskFormModel.areaValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.areaValue = null;
+                        _model
+                            .editorHostModel.taskFormModel.statusValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.statusValue = null;
+                        _model.editorHostModel.taskFormModel
+                            .projectValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.projectValue =
+                            null;
+                      });
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
                       if (scaffoldKey.currentState!.isDrawerOpen ||
