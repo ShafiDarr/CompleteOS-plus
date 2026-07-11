@@ -1,7 +1,10 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'systems_menu_model.dart';
 export 'systems_menu_model.dart';
 
@@ -46,9 +49,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -110,9 +111,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -174,9 +173,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -238,9 +235,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -302,9 +297,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -366,9 +359,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,

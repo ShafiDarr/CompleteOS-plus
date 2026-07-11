@@ -3,10 +3,14 @@ import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
+import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'task_form_model.dart';
 export 'task_form_model.dart';
 
@@ -56,7 +60,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).primaryBackground,
+        color: FlutterFlowTheme.of(context).secondaryBackground,
       ),
       child: Padding(
         padding: EdgeInsets.all(24.0),
@@ -119,7 +123,8 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                               ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.only(
@@ -158,8 +163,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         ),
                       ),
                       filled: true,
-                      fillColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                      fillColor: FlutterFlowTheme.of(context).alternate,
                     ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.interTight(
@@ -220,9 +224,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       color: FlutterFlowTheme.of(context).secondaryText,
                       size: 24.0,
                     ),
-                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                    fillColor: FlutterFlowTheme.of(context).alternate,
                     elevation: 2.0,
-                    borderColor: FlutterFlowTheme.of(context).primaryBackground,
+                    borderColor:
+                        FlutterFlowTheme.of(context).secondaryBackground,
                     borderWidth: 1.0,
                     borderRadius: 0.0,
                     margin:
@@ -353,13 +358,14 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       width: double.infinity,
                       height: 40.0,
                       decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        color: FlutterFlowTheme.of(context).alternate,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(16.0),
                           bottomRight: Radius.circular(16.0),
                         ),
                         border: Border.all(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
                           width: 1.0,
                         ),
                       ),
@@ -469,9 +475,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       color: FlutterFlowTheme.of(context).secondaryText,
                       size: 24.0,
                     ),
-                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                    fillColor: FlutterFlowTheme.of(context).alternate,
                     elevation: 2.0,
-                    borderColor: FlutterFlowTheme.of(context).primaryBackground,
+                    borderColor:
+                        FlutterFlowTheme.of(context).secondaryBackground,
                     borderWidth: 1.0,
                     borderRadius: 16.0,
                     margin:
@@ -547,11 +554,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                           color: FlutterFlowTheme.of(context).secondaryText,
                           size: 24.0,
                         ),
-                        fillColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
+                        fillColor: FlutterFlowTheme.of(context).alternate,
                         elevation: 6.0,
                         borderColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
+                            FlutterFlowTheme.of(context).secondaryBackground,
                         borderWidth: 1.0,
                         borderRadius: 16.0,
                         margin: EdgeInsetsDirectional.fromSTEB(
@@ -629,11 +635,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                           color: FlutterFlowTheme.of(context).secondaryText,
                           size: 24.0,
                         ),
-                        fillColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
+                        fillColor: FlutterFlowTheme.of(context).alternate,
                         elevation: 6.0,
                         borderColor:
-                            FlutterFlowTheme.of(context).primaryBackground,
+                            FlutterFlowTheme.of(context).secondaryBackground,
                         borderWidth: 1.0,
                         borderRadius: 16.0,
                         margin: EdgeInsetsDirectional.fromSTEB(
@@ -710,9 +715,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       color: FlutterFlowTheme.of(context).secondaryText,
                       size: 24.0,
                     ),
-                    fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                    fillColor: FlutterFlowTheme.of(context).alternate,
                     elevation: 2.0,
-                    borderColor: FlutterFlowTheme.of(context).primaryBackground,
+                    borderColor:
+                        FlutterFlowTheme.of(context).secondaryBackground,
                     borderWidth: 1.0,
                     borderRadius: 16.0,
                     margin:
@@ -724,10 +730,10 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      color: FlutterFlowTheme.of(context).alternate,
                       borderRadius: BorderRadius.circular(16.0),
                       border: Border.all(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
                         width: 1.0,
                       ),
                     ),
@@ -768,7 +774,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                             value: _model.switchValue!,
                             onChanged: (newValue) async {
                               safeSetState(
-                                  () => _model.switchValue = newValue);
+                                  () => _model.switchValue = newValue!);
                             },
                             activeColor:
                                 FlutterFlowTheme.of(context).primaryText,

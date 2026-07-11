@@ -1,7 +1,10 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'area_form_model.dart';
 export 'area_form_model.dart';
 
@@ -48,7 +51,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).primaryBackground,
+        color: FlutterFlowTheme.of(context).secondaryBackground,
       ),
       child: Padding(
         padding: EdgeInsets.all(24.0),
@@ -112,7 +115,8 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                               ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.only(
@@ -151,8 +155,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                         ),
                       ),
                       filled: true,
-                      fillColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                      fillColor: FlutterFlowTheme.of(context).alternate,
                     ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.interTight(
@@ -222,7 +225,8 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                               ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.only(
@@ -261,8 +265,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                         ),
                       ),
                       filled: true,
-                      fillColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                      fillColor: FlutterFlowTheme.of(context).alternate,
                     ),
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: GoogleFonts.interTight(
@@ -309,7 +312,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
             ),
             Container(
               decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).secondaryBackground,
+                color: FlutterFlowTheme.of(context).alternate,
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Row(
@@ -346,7 +349,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                     child: Switch.adaptive(
                       value: _model.switchValue!,
                       onChanged: (newValue) async {
-                        safeSetState(() => _model.switchValue = newValue);
+                        safeSetState(() => _model.switchValue = newValue!);
                       },
                       activeColor: FlutterFlowTheme.of(context).primaryText,
                       activeTrackColor: FlutterFlowTheme.of(context).primary,

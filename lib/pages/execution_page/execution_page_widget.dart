@@ -9,7 +9,10 @@ import '/components/score/score_widget.dart';
 import '/components/systems_control_panel/systems_control_panel_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'execution_page_model.dart';
 export 'execution_page_model.dart';
@@ -228,23 +231,27 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                     context: context,
                     phone: false,
                   ))
-                Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
-                  child: InkWell(
-                    splashColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      FFAppState().activePanel = 'none';
-                      FFAppState().activeSystemTab = 'none';
-                      safeSetState(() {});
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0x0FFFFFFF),
+                Opacity(
+                  opacity: 0.8,
+                  child: Align(
+                    alignment: AlignmentDirectional(0.0, 0.0),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        FFAppState().activePanel = 'none';
+                        FFAppState().activeSystemTab = 'none';
+                        safeSetState(() {});
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                        ),
+                        alignment: AlignmentDirectional(0.0, 0.0),
                       ),
-                      alignment: AlignmentDirectional(0.0, 0.0),
                     ),
                   ),
                 ),
@@ -256,9 +263,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                 Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                    ),
+                    decoration: BoxDecoration(),
                     child: Visibility(
                       visible: (FFAppState().activePanel == 'system') &&
                           responsiveVisibility(
@@ -296,7 +301,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   true;
                             });
                           },
-                          onEdit: (areaID, areaName, areaDescription,
+                          onAreaEdit: (areaID, areaName, areaDescription,
                               areaActive) async {
                             FFAppState().selectedRecordID = areaID;
                             FFAppState().update(() {});

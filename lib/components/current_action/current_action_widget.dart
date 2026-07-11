@@ -1,8 +1,11 @@
 import '/components/action_option_sheet/action_option_sheet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'current_action_model.dart';
 export 'current_action_model.dart';
 
@@ -70,89 +73,145 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
     return Align(
       alignment: AlignmentDirectional(0.0, 0.0),
       child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(12.0, 10.0, 12.0, 10.0),
+        padding: EdgeInsets.all(12.0),
         child: Container(
+          width: 270.0,
           decoration: BoxDecoration(
-            color: FlutterFlowTheme.of(context).secondaryBackground,
+            color: FlutterFlowTheme.of(context).alternate,
             borderRadius: BorderRadius.circular(16.0),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                child: Row(
+          child: Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          await showModalBottomSheet(
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            enableDrag: false,
-                            context: context,
-                            builder: (context) {
-                              return Padding(
-                                padding: MediaQuery.viewInsetsOf(context),
-                                child: ActionOptionSheetWidget(
-                                  actionTitle: widget.actionTitle!,
-                                  actionId: widget.actionId!,
-                                  actionType: widget.actionType,
-                                ),
-                              );
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 8.0, 0.0, 0.0),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              await showModalBottomSheet(
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                enableDrag: false,
+                                context: context,
+                                builder: (context) {
+                                  return Padding(
+                                    padding: MediaQuery.viewInsetsOf(context),
+                                    child: ActionOptionSheetWidget(
+                                      actionTitle: widget!.actionTitle!,
+                                      actionId: widget!.actionId!,
+                                      actionType: widget!.actionType,
+                                    ),
+                                  );
+                                },
+                              ).then((value) => safeSetState(() {}));
                             },
-                          ).then((value) => safeSetState(() {}));
-                        },
-                        child: Text(
-                          valueOrDefault<String>(
-                            widget.actionTitle,
-                            'Current Task',
-                          ),
-                          textAlign: TextAlign.start,
-                          maxLines: 1,
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .override(
-                                font: GoogleFonts.interTight(
-                                  fontWeight: FontWeight.normal,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                                color: FlutterFlowTheme.of(context).primaryText,
-                                fontSize: 15.0,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.normal,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
+                            child: Text(
+                              valueOrDefault<String>(
+                                widget!.actionTitle,
+                                'Current Task',
                               ),
-                          overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.start,
+                              maxLines: 1,
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    font: GoogleFonts.interTight(
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodyMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    fontSize: 15.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FontWeight.normal,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .fontStyle,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
-                      ),
+                        if (widget!.showMetadata == true)
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget!.showMetadata == true)
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 8.0),
+                                  child: Text(
+                                    valueOrDefault<String>(
+                                      widget!.metadataText,
+                                      'Block',
+                                    ),
+                                    textAlign: TextAlign.start,
+                                    maxLines: 1,
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyMedium
+                                        .override(
+                                          font: GoogleFonts.inter(
+                                            fontWeight:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontWeight,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                          ),
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryText,
+                                          fontSize: 12.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                            ],
+                          ),
+                      ].divide(SizedBox(height: 6.0)),
                     ),
                     Container(
                       width: 24.0,
                       decoration: BoxDecoration(),
                     ),
-                    if (widget.isExpandable == true)
+                    if (widget!.isExpandable == true)
                       Padding(
                         padding:
                             EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                         child: Text(
                           valueOrDefault<String>(
-                            widget.stepCountText,
+                            widget!.stepCountText,
                             '0/5',
                           ),
                           textAlign: TextAlign.start,
@@ -176,12 +235,12 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                                   ),
                         ),
                       ),
-                    if (widget.isExpandable == true)
+                    if (widget!.isExpandable == true)
                       Container(
                         width: 12.0,
                         decoration: BoxDecoration(),
                       ),
-                    if ((widget.isExpandable == true) &&
+                    if ((widget!.isExpandable == true) &&
                         (_model.localExpanded == false))
                       Padding(
                         padding:
@@ -202,7 +261,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                           ),
                         ),
                       ),
-                    if ((widget.isExpandable == true) &&
+                    if ((widget!.isExpandable == true) &&
                         (_model.localExpanded == true))
                       Padding(
                         padding:
@@ -223,7 +282,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                           ),
                         ),
                       ),
-                    if (widget.isExpandable == false)
+                    if (widget!.isExpandable == false)
                       Theme(
                         data: ThemeData(
                           checkboxTheme: CheckboxThemeData(
@@ -245,7 +304,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                               ? BorderSide(
                                   width: 2,
                                   color:
-                                      FlutterFlowTheme.of(context).secondary,
+                                      FlutterFlowTheme.of(context).secondary!,
                                 )
                               : null,
                           activeColor: FlutterFlowTheme.of(context).primary,
@@ -255,62 +314,11 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                       ),
                   ],
                 ),
-              ),
-              if (widget.showMetadata == true)
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                if (widget!.isExpandable == true)
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (widget.showMetadata == true)
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 8.0),
-                          child: Text(
-                            valueOrDefault<String>(
-                              widget.metadataText,
-                              'Block',
-                            ),
-                            textAlign: TextAlign.start,
-                            maxLines: 1,
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.inter(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryText,
-                                  fontSize: 12.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              if (widget.isExpandable == true)
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                      child: Row(
+                      Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -366,7 +374,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                                     ? BorderSide(
                                         width: 2,
                                         color: FlutterFlowTheme.of(context)
-                                            .secondary,
+                                            .secondary!,
                                       )
                                     : null,
                                 activeColor:
@@ -377,10 +385,10 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                             ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-            ],
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),

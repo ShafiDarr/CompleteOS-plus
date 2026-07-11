@@ -1,6 +1,10 @@
+import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'mobile_collapsed_sidebar_widget.dart' show MobileCollapsedSidebarWidget;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class MobileCollapsedSidebarModel
     extends FlutterFlowModel<MobileCollapsedSidebarWidget> {

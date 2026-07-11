@@ -6,6 +6,8 @@ import '/components/editor_actions_menu/editor_actions_menu_widget.dart';
 import '/components/task_form/task_form_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +61,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
         width: 420.0,
         height: double.infinity,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).primaryBackground,
+          color: FlutterFlowTheme.of(context).secondaryBackground,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.0),
             bottomLeft: Radius.circular(20.0),
@@ -378,7 +380,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                 (FFAppState().editorMode == 'delete'))
               Container(
                 decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                  color: Color(0x0FFFFFFF),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(24.0),

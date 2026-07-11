@@ -2,9 +2,12 @@ import '/auth/supabase_auth/auth_util.dart';
 import '/components/systems_menu/systems_menu_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'mobile_drawer_model.dart';
 export 'mobile_drawer_model.dart';
 
@@ -45,7 +48,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).primaryBackground,
+        color: FlutterFlowTheme.of(context).secondaryBackground,
         borderRadius: BorderRadius.only(),
       ),
       child: Column(
@@ -55,9 +58,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
           Container(
             width: double.infinity,
             height: 80.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
               child: Row(
@@ -138,9 +139,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
             child: Container(
               width: double.infinity,
               height: 44.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
+              decoration: BoxDecoration(),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -193,9 +192,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
             child: Container(
               width: double.infinity,
               height: 44.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
+              decoration: BoxDecoration(),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -249,9 +246,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
             child: Container(
               width: double.infinity,
               height: 44.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
+              decoration: BoxDecoration(),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -304,9 +299,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
             child: Container(
               width: double.infinity,
               height: 44.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
+              decoration: BoxDecoration(),
               child: InkWell(
                 splashColor: Colors.transparent,
                 focusColor: Colors.transparent,
@@ -383,9 +376,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
             child: Container(
               width: double.infinity,
               height: 44.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
+              decoration: BoxDecoration(),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
