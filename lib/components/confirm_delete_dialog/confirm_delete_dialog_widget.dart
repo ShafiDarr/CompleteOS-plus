@@ -165,10 +165,25 @@ class _ConfirmDeleteDialogWidgetState extends State<ConfirmDeleteDialogWidget> {
                               ),
                         );
                         Navigator.pop(context);
-                        FFAppState().selectedRecordID = '';
-                        FFAppState().editorType = 'none';
-                        FFAppState().editorMode = 'new';
-                        FFAppState().update(() {});
+                      } else {
+                        if (FFAppState().editorType == 'task') {
+                          await TasksTable().delete(
+                            matchingRows: (rows) => rows
+                                .eqOrNull(
+                                  'user_id',
+                                  currentUserUid,
+                                )
+                                .eqOrNull(
+                                  'id',
+                                  FFAppState().selectedRecordID,
+                                ),
+                          );
+                          Navigator.pop(context);
+                          FFAppState().selectedRecordID = '';
+                          FFAppState().editorType = 'none';
+                          FFAppState().editorMode = 'new';
+                          FFAppState().update(() {});
+                        }
                       }
                     },
                     child: Row(
