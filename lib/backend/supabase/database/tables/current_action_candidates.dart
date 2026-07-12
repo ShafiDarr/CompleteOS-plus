@@ -1,18 +1,20 @@
 import '../database.dart';
 
-class TasksTable extends SupabaseTable<TasksRow> {
+class CurrentActionCandidatesTable
+    extends SupabaseTable<CurrentActionCandidatesRow> {
   @override
-  String get tableName => 'tasks';
+  String get tableName => 'current_action_candidates';
 
   @override
-  TasksRow createRow(Map<String, dynamic> data) => TasksRow(data);
+  CurrentActionCandidatesRow createRow(Map<String, dynamic> data) =>
+      CurrentActionCandidatesRow(data);
 }
 
-class TasksRow extends SupabaseDataRow {
-  TasksRow(Map<String, dynamic> data) : super(data);
+class CurrentActionCandidatesRow extends SupabaseDataRow {
+  CurrentActionCandidatesRow(Map<String, dynamic> data) : super(data);
 
   @override
-  SupabaseTable get table => TasksTable();
+  SupabaseTable get table => CurrentActionCandidatesTable();
 
   String? get id => getField<String>('id');
   set id(String? value) => setField<String>('id', value);
@@ -26,8 +28,8 @@ class TasksRow extends SupabaseDataRow {
   String? get projectId => getField<String>('project_id');
   set projectId(String? value) => setField<String>('project_id', value);
 
-  String get name => getField<String>('name')!;
-  set name(String value) => setField<String>('name', value);
+  String? get name => getField<String>('name');
+  set name(String? value) => setField<String>('name', value);
 
   String? get status => getField<String>('status');
   set status(String? value) => setField<String>('status', value);

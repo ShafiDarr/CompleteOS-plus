@@ -244,6 +244,8 @@ dynamic deserializeParam<T>(
             return AreasRow(data);
           case BlockItemsRow:
             return BlockItemsRow(data);
+          case CurrentActionCandidatesRow:
+            return CurrentActionCandidatesRow(data);
           case DailyPlanBlocksRow:
             return DailyPlanBlocksRow(data);
           case DailyPlansRow:
