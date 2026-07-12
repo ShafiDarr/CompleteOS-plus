@@ -1,7 +1,10 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'date_time_component_model.dart';
 export 'date_time_component_model.dart';
 
@@ -59,14 +62,14 @@ class _DateTimeComponentWidgetState extends State<DateTimeComponentWidget> {
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.interTight(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                           fontStyle:
                               FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                         ),
                         color: FlutterFlowTheme.of(context).secondaryText,
                         fontSize: 15.0,
                         letterSpacing: 3.0,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.bold,
                         fontStyle:
                             FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                       ),
@@ -86,14 +89,14 @@ class _DateTimeComponentWidgetState extends State<DateTimeComponentWidget> {
                   textAlign: TextAlign.center,
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.interTight(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           fontStyle:
                               FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                         ),
                         color: FlutterFlowTheme.of(context).secondaryText,
                         fontSize: 12.0,
                         letterSpacing: 3.0,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         fontStyle:
                             FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                       ),

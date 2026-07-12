@@ -3,9 +3,11 @@ import '/backend/supabase/supabase.dart';
 import '/components/area_form/area_form_widget.dart';
 import '/components/confirm_delete_dialog/confirm_delete_dialog_widget.dart';
 import '/components/editor_actions_menu/editor_actions_menu_widget.dart';
+import '/components/task_form/task_form_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:async';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +61,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
         width: 420.0,
         height: double.infinity,
         decoration: BoxDecoration(
-          color: FlutterFlowTheme.of(context).primaryBackground,
+          color: FlutterFlowTheme.of(context).secondaryBackground,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20.0),
             bottomLeft: Radius.circular(20.0),
@@ -83,11 +85,33 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          unawaited(
-                            () async {
-                              await widget.closeEndDrawer?.call();
-                            }(),
-                          );
+                          safeSetState(() {
+                            _model.taskFormModel.taskTypeValueController
+                                ?.reset();
+                            _model.taskFormModel.taskTypeValue = null;
+                            _model.taskFormModel.priorityValueController
+                                ?.reset();
+                            _model.taskFormModel.priorityValue = null;
+                            _model.taskFormModel.areaValueController?.reset();
+                            _model.taskFormModel.areaValue = null;
+                            _model.taskFormModel.projectValueController
+                                ?.reset();
+                            _model.taskFormModel.projectValue = null;
+                            _model.taskFormModel.statusValueController?.reset();
+                            _model.taskFormModel.statusValue = null;
+                          });
+                          safeSetState(() {
+                            _model.areaFormModel.nameFieldTextController
+                                ?.clear();
+                            _model.areaFormModel.textController2?.clear();
+                            _model.taskFormModel.taskNameTextController
+                                ?.clear();
+                          });
+                          safeSetState(() {
+                            _model.areaFormModel.switchValue = true;
+                            _model.taskFormModel.switchValue = true;
+                          });
+                          await widget.closeEndDrawer?.call();
                         },
                         child: Icon(
                           Icons.close,
@@ -104,6 +128,12 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           } else if ((FFAppState().editorMode == 'edit') &&
                               (FFAppState().editorType == 'area')) {
                             return 'Edit Area';
+                          } else if ((FFAppState().editorMode == 'new') &&
+                              (FFAppState().editorType == 'task')) {
+                            return 'New Task';
+                          } else if ((FFAppState().editorMode == 'edit') &&
+                              (FFAppState().editorType == 'task')) {
+                            return 'Edit Task';
                           } else {
                             return '';
                           }
@@ -135,7 +165,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           highlightColor: Colors.transparent,
                           onTap: () async {
                             FFAppState().editorMode = 'action';
-                            safeSetState(() {});
+                            FFAppState().update(() {});
                           },
                           child: Icon(
                             Icons.more_vert_rounded,
@@ -165,7 +195,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                   ?.clear();
                             });
                             safeSetState(() {
-                              _model.areaFormModel.switchValue = false;
+                              _model.areaFormModel.switchValue = true;
                             });
                             FFAppState().selectedRecordID = '';
                             FFAppState().editorType = 'none';
@@ -199,13 +229,123 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                     ?.clear();
                               });
                               safeSetState(() {
-                                _model.areaFormModel.switchValue = false;
+                                _model.areaFormModel.switchValue = true;
                               });
                               FFAppState().selectedRecordID = '';
                               FFAppState().editorType = 'none';
                               FFAppState().editorMode = 'new';
                               FFAppState().update(() {});
                               Navigator.pop(context);
+                            } else {
+                              if ((FFAppState().editorMode == 'new') &&
+                                  (FFAppState().editorType == 'task')) {
+                                await TasksTable().insert({
+                                  'name': _model.taskFormModel
+                                      .taskNameTextController.text,
+                                  'user_id': currentUserUid,
+                                  'status': _model.taskFormModel.statusValue,
+                                  'priority':
+                                      _model.taskFormModel.priorityValue,
+                                  'due_at': supaSerialize<DateTime>(
+                                      _model.taskFormModel.selectedDueAt),
+                                  'is_active': _model.taskFormModel.switchValue,
+                                  'area_id': _model.taskFormModel.areaValue,
+                                  'project_id':
+                                      _model.taskFormModel.projectValue,
+                                  'task_type':
+                                      _model.taskFormModel.taskTypeValue,
+                                });
+                                safeSetState(() {
+                                  _model.taskFormModel.taskNameTextController
+                                      ?.clear();
+                                });
+                                safeSetState(() {
+                                  _model.taskFormModel.switchValue = true;
+                                });
+                                safeSetState(() {
+                                  _model.taskFormModel.taskTypeValueController
+                                      ?.reset();
+                                  _model.taskFormModel.taskTypeValue = null;
+                                  _model.taskFormModel.priorityValueController
+                                      ?.reset();
+                                  _model.taskFormModel.priorityValue = null;
+                                  _model.taskFormModel.areaValueController
+                                      ?.reset();
+                                  _model.taskFormModel.areaValue = null;
+                                  _model.taskFormModel.projectValueController
+                                      ?.reset();
+                                  _model.taskFormModel.projectValue = null;
+                                  _model.taskFormModel.statusValueController
+                                      ?.reset();
+                                  _model.taskFormModel.statusValue = null;
+                                });
+                                FFAppState().selectedRecordID = '';
+                                FFAppState().editorType = 'none';
+                                FFAppState().editorMode = 'new';
+                                FFAppState().update(() {});
+                                Navigator.pop(context);
+                              } else {
+                                if ((FFAppState().editorMode == 'edit') &&
+                                    (FFAppState().editorType == 'task')) {
+                                  await TasksTable().update(
+                                    data: {
+                                      'name': _model.taskFormModel
+                                          .taskNameTextController.text,
+                                      'task_type':
+                                          _model.taskFormModel.taskTypeValue,
+                                      'due_at': supaSerialize<DateTime>(
+                                          _model.taskFormModel.selectedDueAt),
+                                      'priority':
+                                          _model.taskFormModel.priorityValue,
+                                      'status':
+                                          _model.taskFormModel.statusValue,
+                                      'is_active':
+                                          _model.taskFormModel.switchValue,
+                                      'area_id': _model.taskFormModel.areaValue,
+                                      'project_id':
+                                          _model.taskFormModel.projectValue,
+                                    },
+                                    matchingRows: (rows) => rows
+                                        .eqOrNull(
+                                          'id',
+                                          FFAppState().selectedRecordID,
+                                        )
+                                        .eqOrNull(
+                                          'user_id',
+                                          currentUserUid,
+                                        ),
+                                  );
+                                  safeSetState(() {
+                                    _model.taskFormModel.taskNameTextController
+                                        ?.clear();
+                                  });
+                                  safeSetState(() {
+                                    _model.taskFormModel.switchValue = true;
+                                  });
+                                  safeSetState(() {
+                                    _model.taskFormModel.taskTypeValueController
+                                        ?.reset();
+                                    _model.taskFormModel.taskTypeValue = null;
+                                    _model.taskFormModel.priorityValueController
+                                        ?.reset();
+                                    _model.taskFormModel.priorityValue = null;
+                                    _model.taskFormModel.areaValueController
+                                        ?.reset();
+                                    _model.taskFormModel.areaValue = null;
+                                    _model.taskFormModel.projectValueController
+                                        ?.reset();
+                                    _model.taskFormModel.projectValue = null;
+                                    _model.taskFormModel.statusValueController
+                                        ?.reset();
+                                    _model.taskFormModel.statusValue = null;
+                                  });
+                                  FFAppState().selectedRecordID = '';
+                                  FFAppState().editorType = 'none';
+                                  FFAppState().editorMode = 'new';
+                                  FFAppState().update(() {});
+                                  Navigator.pop(context);
+                                }
+                              }
                             }
                           }
                         },
@@ -225,6 +365,53 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         child: AreaFormWidget(),
                       ),
                     ),
+                  if (FFAppState().editorType == 'task')
+                    Expanded(
+                      child: FutureBuilder<List<TasksRow>>(
+                        future: TasksTable().querySingleRow(
+                          queryFn: (q) => q
+                              .eqOrNull(
+                                'id',
+                                FFAppState().selectedRecordID,
+                              )
+                              .eqOrNull(
+                                'user_id',
+                                currentUserUid,
+                              ),
+                        ),
+                        builder: (context, snapshot) {
+                          // Customize what your widget looks like when it's loading.
+                          if (!snapshot.hasData) {
+                            return Center(
+                              child: SizedBox(
+                                width: 50.0,
+                                height: 50.0,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    FlutterFlowTheme.of(context).primary,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          List<TasksRow> taskFormTasksRowList = snapshot.data!;
+
+                          final taskFormTasksRow =
+                              taskFormTasksRowList.isNotEmpty
+                                  ? taskFormTasksRowList.first
+                                  : null;
+
+                          return wrapWithModel(
+                            model: _model.taskFormModel,
+                            updateCallback: () => safeSetState(() {}),
+                            updateOnChange: true,
+                            child: TaskFormWidget(
+                              initialDueAt: taskFormTasksRow?.dueAt,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                 ].divide(SizedBox(height: 20.0)),
               ),
             ),
@@ -232,7 +419,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                 (FFAppState().editorMode == 'delete'))
               Container(
                 decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                  color: Color(0x0FFFFFFF),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(24.0),

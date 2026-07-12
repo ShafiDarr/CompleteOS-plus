@@ -1,7 +1,10 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'systems_menu_model.dart';
 export 'systems_menu_model.dart';
 
@@ -43,52 +46,30 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
         MouseRegion(
           opaque: false,
           cursor: MouseCursor.defer ?? MouseCursor.defer,
-          child: InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              FFAppState().activePanel = 'areas';
-              safeSetState(() {});
-            },
-            child: Container(
-              width: double.infinity,
-              height: 36.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
-              child: InkWell(
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {
-                  FFAppState().activePanel = 'system';
-                  FFAppState().activeSystemTab = 'area';
-                  FFAppState().update(() {});
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                      child: Text(
-                        'Areas',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.interTight(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: _model.isHovered == 'areas'
-                                  ? FlutterFlowTheme.of(context).primaryText
-                                  : FlutterFlowTheme.of(context).secondaryText,
-                              letterSpacing: 0.0,
+          child: Container(
+            width: double.infinity,
+            height: 36.0,
+            decoration: BoxDecoration(),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'area';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Areas',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
                               fontWeight: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .fontWeight,
@@ -96,10 +77,20 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                   .bodyMedium
                                   .fontStyle,
                             ),
-                      ),
+                            color: _model.isHovered == 'areas'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
+                            fontWeight: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontWeight,
+                            fontStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontStyle,
+                          ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -117,52 +108,30 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
         MouseRegion(
           opaque: false,
           cursor: MouseCursor.defer ?? MouseCursor.defer,
-          child: InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              FFAppState().activePanel = 'areas';
-              safeSetState(() {});
-            },
-            child: Container(
-              width: double.infinity,
-              height: 36.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
-              child: InkWell(
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {
-                  FFAppState().activePanel = 'system';
-                  FFAppState().activeSystemTab = 'goal';
-                  FFAppState().update(() {});
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                      child: Text(
-                        'Goals',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.interTight(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: _model.isHovered == 'areas'
-                                  ? FlutterFlowTheme.of(context).primaryText
-                                  : FlutterFlowTheme.of(context).secondaryText,
-                              letterSpacing: 0.0,
+          child: Container(
+            width: double.infinity,
+            height: 36.0,
+            decoration: BoxDecoration(),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'goal';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Goals',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
                               fontWeight: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .fontWeight,
@@ -170,16 +139,26 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                   .bodyMedium
                                   .fontStyle,
                             ),
-                      ),
+                            color: _model.isHovered == 'goals'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
+                            fontWeight: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontWeight,
+                            fontStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontStyle,
+                          ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
           onEnter: ((event) async {
             safeSetState(() => _model.mouseRegionHovered2 = true);
-            _model.isHovered = 'areas';
+            _model.isHovered = 'goals';
             safeSetState(() {});
           }),
           onExit: ((event) async {
@@ -191,52 +170,30 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
         MouseRegion(
           opaque: false,
           cursor: MouseCursor.defer ?? MouseCursor.defer,
-          child: InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              FFAppState().activePanel = 'areas';
-              safeSetState(() {});
-            },
-            child: Container(
-              width: double.infinity,
-              height: 36.0,
-              decoration: BoxDecoration(
-                color: FlutterFlowTheme.of(context).primaryBackground,
-              ),
-              child: InkWell(
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {
-                  FFAppState().activePanel = 'system';
-                  FFAppState().activeSystemTab = 'project';
-                  FFAppState().update(() {});
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                      child: Text(
-                        'Projects',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.interTight(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: _model.isHovered == 'areas'
-                                  ? FlutterFlowTheme.of(context).primaryText
-                                  : FlutterFlowTheme.of(context).secondaryText,
-                              letterSpacing: 0.0,
+          child: Container(
+            width: double.infinity,
+            height: 36.0,
+            decoration: BoxDecoration(),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'project';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Projects',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
                               fontWeight: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .fontWeight,
@@ -244,16 +201,26 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                   .bodyMedium
                                   .fontStyle,
                             ),
-                      ),
+                            color: _model.isHovered == 'projects'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
+                            fontWeight: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontWeight,
+                            fontStyle: FlutterFlowTheme.of(context)
+                                .bodyMedium
+                                .fontStyle,
+                          ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
           onEnter: ((event) async {
             safeSetState(() => _model.mouseRegionHovered3 = true);
-            _model.isHovered = 'areas';
+            _model.isHovered = 'projects';
             safeSetState(() {});
           }),
           onExit: ((event) async {
@@ -268,9 +235,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -298,7 +263,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                   .bodyMedium
                                   .fontStyle,
                             ),
-                            color: _model.isHovered == 'activities'
+                            color: _model.isHovered == 'tasks'
                                 ? FlutterFlowTheme.of(context).primaryText
                                 : FlutterFlowTheme.of(context).secondaryText,
                             letterSpacing: 0.0,
@@ -317,7 +282,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           ),
           onEnter: ((event) async {
             safeSetState(() => _model.mouseRegionHovered4 = true);
-            _model.isHovered = 'activities';
+            _model.isHovered = 'tasks';
             safeSetState(() {});
           }),
           onExit: ((event) async {
@@ -332,9 +297,7 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
+            decoration: BoxDecoration(),
             child: InkWell(
               splashColor: Colors.transparent,
               focusColor: Colors.transparent,
@@ -396,18 +359,38 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
           child: Container(
             width: double.infinity,
             height: 36.0,
-            decoration: BoxDecoration(
-              color: FlutterFlowTheme.of(context).primaryBackground,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
-                  child: Text(
-                    'Automation',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.interTight(
+            decoration: BoxDecoration(),
+            child: InkWell(
+              splashColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              hoverColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              onTap: () async {
+                FFAppState().activePanel = 'system';
+                FFAppState().activeSystemTab = 'automation';
+                FFAppState().update(() {});
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(64.0, 0.0, 0.0, 0.0),
+                    child: Text(
+                      'Automation',
+                      style: FlutterFlowTheme.of(context).bodyMedium.override(
+                            font: GoogleFonts.interTight(
+                              fontWeight: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontWeight,
+                              fontStyle: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .fontStyle,
+                            ),
+                            color: _model.isHovered == 'automation'
+                                ? FlutterFlowTheme.of(context).primaryText
+                                : FlutterFlowTheme.of(context).secondaryText,
+                            letterSpacing: 0.0,
                             fontWeight: FlutterFlowTheme.of(context)
                                 .bodyMedium
                                 .fontWeight,
@@ -415,19 +398,10 @@ class _SystemsMenuWidgetState extends State<SystemsMenuWidget> {
                                 .bodyMedium
                                 .fontStyle,
                           ),
-                          color: _model.isHovered == 'automation'
-                              ? FlutterFlowTheme.of(context).primaryText
-                              : FlutterFlowTheme.of(context).secondaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           onEnter: ((event) async {

@@ -1,11 +1,13 @@
 import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
+import '/components/area_card/area_card_widget.dart';
 import '/components/system_tab/system_tab_widget.dart';
-import '/components/systems_card/systems_card_widget.dart';
+import '/components/task_type_section/task_type_section_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:async';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -16,12 +18,23 @@ class SystemsControlPanelWidget extends StatefulWidget {
   const SystemsControlPanelWidget({
     super.key,
     this.openEndDrawer,
-    this.onEdit,
+    this.onAreaEdit,
+    this.onTaskEdit,
   });
 
   final Future Function()? openEndDrawer;
   final Future Function(String areaID, String areaName, String areaDescription,
-      bool areaActive)? onEdit;
+      bool areaActive)? onAreaEdit;
+  final Future Function(
+      String taskID,
+      String? taskName,
+      String? taskType,
+      DateTime? taskDueAt,
+      String? taskPriority,
+      String? taskStatus,
+      String? taskAreaID,
+      String? taskProjectID,
+      bool taskActive)? onTaskEdit;
 
   @override
   State<SystemsControlPanelWidget> createState() =>
@@ -72,8 +85,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
             Padding(
               padding: EdgeInsets.all(24.0),
               child: Container(
-                width: 720.0,
-                height: 540.0,
+                width: 900.0,
+                height: 720.0,
                 decoration: BoxDecoration(
                   color: FlutterFlowTheme.of(context).primaryBackground,
                   borderRadius: BorderRadius.circular(20.0),
@@ -159,154 +172,155 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                     FFAppState().activeSystemTab;
                                 FFAppState().update(() {});
                                 FFAppState().editorMode = 'new';
+                                FFAppState().selectedRecordID = '';
                                 FFAppState().update(() {});
-                                unawaited(
-                                  () async {
-                                    await widget.openEndDrawer?.call();
-                                  }(),
-                                );
+                                await widget.openEndDrawer?.call();
                               },
                             ),
                           ],
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'area';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel1,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Areas',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'area'
-                                        ? true
-                                        : false,
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(
+                            12.0, 0.0, 12.0, 0.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'area';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel1,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Areas',
+                                  isSelected:
+                                      FFAppState().activeSystemTab == 'area'
+                                          ? true
+                                          : false,
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'goal';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel2,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Goals',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'goal'
-                                        ? true
-                                        : false,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'goal';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel2,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Goals',
+                                  isSelected:
+                                      FFAppState().activeSystemTab == 'goal'
+                                          ? true
+                                          : false,
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'project';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel3,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Projects',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'project'
-                                        ? true
-                                        : false,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'project';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel3,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Projects',
+                                  isSelected:
+                                      FFAppState().activeSystemTab == 'project'
+                                          ? true
+                                          : false,
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'task';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel4,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Tasks',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'task'
-                                        ? true
-                                        : false,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'task';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel4,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Tasks',
+                                  isSelected:
+                                      FFAppState().activeSystemTab == 'task'
+                                          ? true
+                                          : false,
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'schedule';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel5,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Schedules',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'schedule'
-                                        ? true
-                                        : false,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'schedule';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel5,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Schedules',
+                                  isSelected:
+                                      FFAppState().activeSystemTab == 'schedule'
+                                          ? true
+                                          : false,
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            focusColor: Colors.transparent,
-                            hoverColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            onTap: () async {
-                              FFAppState().activePanel = 'system';
-                              FFAppState().activeSystemTab = 'automation';
-                              FFAppState().update(() {});
-                            },
-                            child: wrapWithModel(
-                              model: _model.systemTabModel6,
-                              updateCallback: () => safeSetState(() {}),
-                              child: SystemTabWidget(
-                                label: 'Automation',
-                                isSelected:
-                                    FFAppState().activeSystemTab == 'automation'
-                                        ? true
-                                        : false,
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                FFAppState().activePanel = 'system';
+                                FFAppState().activeSystemTab = 'automation';
+                                FFAppState().update(() {});
+                              },
+                              child: wrapWithModel(
+                                model: _model.systemTabModel6,
+                                updateCallback: () => safeSetState(() {}),
+                                child: SystemTabWidget(
+                                  label: 'Automation',
+                                  isSelected: FFAppState().activeSystemTab ==
+                                          'automation'
+                                      ? true
+                                      : false,
+                                ),
                               ),
                             ),
-                          ),
-                        ].divide(SizedBox(width: 40.0)),
+                          ].divide(SizedBox(width: 30.0)),
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.all(16.0),
@@ -316,7 +330,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                           children: [
                             Expanded(
                               child: Container(
-                                width: 200.0,
+                                width: double.infinity,
                                 child: TextFormField(
                                   controller: _model.textController,
                                   focusNode: _model.textFieldFocusNode,
@@ -353,14 +367,20 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                           'area') {
                                         return 'Search areas . . .';
                                       } else if (FFAppState().activeSystemTab ==
-                                          'activity') {
-                                        return 'Search activities . . .';
+                                          'task') {
+                                        return 'Search tasks . . .';
                                       } else if (FFAppState().activeSystemTab ==
                                           'schedule') {
                                         return 'Search schedules . . .';
                                       } else if (FFAppState().activeSystemTab ==
                                           'automation') {
                                         return 'Search automations . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'goal') {
+                                        return 'Search goals . . .';
+                                      } else if (FFAppState().activeSystemTab ==
+                                          'project') {
+                                        return 'Search projects . . .';
                                       } else {
                                         return 'Search . . .';
                                       }
@@ -368,21 +388,15 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                     hintStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .override(
-                                          font: GoogleFonts.inter(
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
+                                          font: GoogleFonts.interTight(
+                                            fontWeight: FontWeight.w500,
                                             fontStyle:
                                                 FlutterFlowTheme.of(context)
                                                     .labelMedium
                                                     .fontStyle,
                                           ),
                                           letterSpacing: 0.0,
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelMedium
-                                                  .fontWeight,
+                                          fontWeight: FontWeight.w500,
                                           fontStyle:
                                               FlutterFlowTheme.of(context)
                                                   .labelMedium
@@ -393,14 +407,14 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                         color: Color(0x00000000),
                                         width: 1.0,
                                       ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(16.0),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
                                         color: Color(0x00000000),
                                         width: 1.0,
                                       ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(16.0),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
@@ -408,7 +422,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                             FlutterFlowTheme.of(context).error,
                                         width: 1.0,
                                       ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(16.0),
                                     ),
                                     focusedErrorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
@@ -416,11 +430,11 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                             FlutterFlowTheme.of(context).error,
                                         width: 1.0,
                                       ),
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(16.0),
                                     ),
                                     filled: true,
-                                    fillColor: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
+                                    fillColor:
+                                        FlutterFlowTheme.of(context).alternate,
                                   ),
                                   style: FlutterFlowTheme.of(context)
                                       .bodyMedium
@@ -460,7 +474,9 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                       ))
                         Expanded(
                           child: Container(
-                            decoration: BoxDecoration(),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
                             child: ListView(
                               padding: EdgeInsets.zero,
                               shrinkWrap: true,
@@ -475,135 +491,165 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                           context: context,
                                           phone: false,
                                         ))
-                                      Container(
-                                        decoration: BoxDecoration(),
-                                        child: Visibility(
-                                          visible: responsiveVisibility(
-                                            context: context,
-                                            phone: false,
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            12.0, 0.0, 12.0, 12.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: FlutterFlowTheme.of(context)
+                                                .alternate,
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
                                           ),
-                                          child: Padding(
-                                            padding: EdgeInsets.all(24.0),
-                                            child:
-                                                FutureBuilder<List<AreasRow>>(
-                                              future: AreasTable().queryRows(
-                                                queryFn: (q) => q
-                                                    .eqOrNull(
-                                                      'user_id',
-                                                      currentUserUid,
-                                                    )
-                                                    .order('created_at',
-                                                        ascending: true),
-                                              ),
-                                              builder: (context, snapshot) {
-                                                // Customize what your widget looks like when it's loading.
-                                                if (!snapshot.hasData) {
-                                                  return Center(
-                                                    child: SizedBox(
-                                                      width: 50.0,
-                                                      height: 50.0,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        valueColor:
-                                                            AlwaysStoppedAnimation<
-                                                                Color>(
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .primary,
+                                          child: Visibility(
+                                            visible: responsiveVisibility(
+                                              context: context,
+                                              phone: false,
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(12.0),
+                                              child:
+                                                  FutureBuilder<List<AreasRow>>(
+                                                future: AreasTable().queryRows(
+                                                  queryFn: (q) => q
+                                                      .eqOrNull(
+                                                        'user_id',
+                                                        currentUserUid,
+                                                      )
+                                                      .order('created_at',
+                                                          ascending: true),
+                                                ),
+                                                builder: (context, snapshot) {
+                                                  // Customize what your widget looks like when it's loading.
+                                                  if (!snapshot.hasData) {
+                                                    return Center(
+                                                      child: SizedBox(
+                                                        width: 50.0,
+                                                        height: 50.0,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation<
+                                                                  Color>(
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .primary,
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                }
-                                                List<AreasRow>
-                                                    wrapAreasRowList =
-                                                    snapshot.data!;
-
-                                                return Wrap(
-                                                  spacing: 24.0,
-                                                  runSpacing: 24.0,
-                                                  alignment:
-                                                      WrapAlignment.start,
-                                                  crossAxisAlignment:
-                                                      WrapCrossAlignment.start,
-                                                  direction: Axis.horizontal,
-                                                  runAlignment:
-                                                      WrapAlignment.start,
-                                                  verticalDirection:
-                                                      VerticalDirection.down,
-                                                  clipBehavior: Clip.none,
-                                                  children: List.generate(
-                                                      wrapAreasRowList.length,
-                                                      (wrapIndex) {
-                                                    final wrapAreasRow =
-                                                        wrapAreasRowList[
-                                                            wrapIndex];
-                                                    return InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      focusColor:
-                                                          Colors.transparent,
-                                                      hoverColor:
-                                                          Colors.transparent,
-                                                      highlightColor:
-                                                          Colors.transparent,
-                                                      onTap: () async {
-                                                        FFAppState()
-                                                                .selectedRecordID =
-                                                            wrapAreasRow.id!;
-                                                        FFAppState()
-                                                            .update(() {});
-                                                        FFAppState()
-                                                                .editorType =
-                                                            FFAppState()
-                                                                .activeSystemTab;
-                                                        FFAppState()
-                                                            .update(() {});
-                                                        FFAppState()
-                                                                .editorMode =
-                                                            'edit';
-                                                        FFAppState()
-                                                            .update(() {});
-                                                        unawaited(
-                                                          () async {
-                                                            await widget.onEdit
-                                                                ?.call(
-                                                              wrapAreasRow.id!,
-                                                              wrapAreasRow.name,
-                                                              wrapAreasRow
-                                                                  .description!,
-                                                              wrapAreasRow
-                                                                  .active!,
-                                                            );
-                                                          }(),
-                                                        );
-                                                      },
-                                                      child: SystemsCardWidget(
-                                                        key: Key(
-                                                            'Keytv3_${wrapIndex}_of_${wrapAreasRowList.length}'),
-                                                        areaName:
-                                                            wrapAreasRow.name,
-                                                        activityCount: 0,
-                                                        isActive: wrapAreasRow
-                                                            .active!,
-                                                      ),
                                                     );
-                                                  }),
-                                                );
-                                              },
+                                                  }
+                                                  List<AreasRow>
+                                                      listViewAreasRowList =
+                                                      snapshot.data!;
+
+                                                  return ListView.builder(
+                                                    padding: EdgeInsets.zero,
+                                                    primary: false,
+                                                    shrinkWrap: true,
+                                                    scrollDirection:
+                                                        Axis.vertical,
+                                                    itemCount:
+                                                        listViewAreasRowList
+                                                            .length,
+                                                    itemBuilder: (context,
+                                                        listViewIndex) {
+                                                      final listViewAreasRow =
+                                                          listViewAreasRowList[
+                                                              listViewIndex];
+                                                      return InkWell(
+                                                        splashColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        highlightColor:
+                                                            Colors.transparent,
+                                                        onTap: () async {
+                                                          FFAppState()
+                                                                  .selectedRecordID =
+                                                              listViewAreasRow
+                                                                  .id!;
+                                                          FFAppState()
+                                                              .update(() {});
+                                                          FFAppState()
+                                                                  .editorType =
+                                                              FFAppState()
+                                                                  .activeSystemTab;
+                                                          FFAppState()
+                                                              .update(() {});
+                                                          FFAppState()
+                                                                  .editorMode =
+                                                              'edit';
+                                                          FFAppState()
+                                                              .update(() {});
+                                                          await widget
+                                                              .onAreaEdit
+                                                              ?.call(
+                                                            listViewAreasRow
+                                                                .id!,
+                                                            listViewAreasRow
+                                                                .name,
+                                                            listViewAreasRow
+                                                                .description!,
+                                                            listViewAreasRow
+                                                                .active!,
+                                                          );
+                                                        },
+                                                        child: AreaCardWidget(
+                                                          key: Key(
+                                                              'Keytv3_${listViewIndex}_of_${listViewAreasRowList.length}'),
+                                                          areaName:
+                                                              listViewAreasRow
+                                                                  .name,
+                                                          activityCount: 0,
+                                                          isActive:
+                                                              listViewAreasRow
+                                                                  .active!,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    if ((FFAppState().activeSystemTab ==
-                                            'activity') &&
-                                        responsiveVisibility(
-                                          context: context,
-                                          phone: false,
-                                        ))
-                                      Container(
-                                        decoration: BoxDecoration(),
+                                    wrapWithModel(
+                                      model: _model.taskTypeSectionModel,
+                                      updateCallback: () => safeSetState(() {}),
+                                      child: TaskTypeSectionWidget(
+                                        onTaskEdit: (taskID,
+                                            taskName,
+                                            taskType,
+                                            taskDueAt,
+                                            taskPriority,
+                                            taskStatus,
+                                            taskAreaID,
+                                            taskProjectID,
+                                            taskActive) async {
+                                          FFAppState().selectedRecordID =
+                                              taskID;
+                                          FFAppState().editorType =
+                                              FFAppState().activeSystemTab;
+                                          FFAppState().editorMode = 'edit';
+                                          FFAppState().update(() {});
+                                          await widget.onTaskEdit?.call(
+                                            taskID,
+                                            taskName,
+                                            taskType,
+                                            taskDueAt,
+                                            taskPriority,
+                                            taskStatus,
+                                            taskAreaID,
+                                            taskProjectID,
+                                            taskActive,
+                                          );
+                                        },
                                       ),
+                                    ),
                                     if ((FFAppState().activeSystemTab ==
                                             'schedule') &&
                                         responsiveVisibility(
@@ -628,7 +674,7 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                             ),
                           ),
                         ),
-                    ].divide(SizedBox(height: 16.0)),
+                    ].divide(SizedBox(height: 12.0)),
                   ),
                 ),
               ),

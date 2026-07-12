@@ -82,4 +82,37 @@ class TasksRow extends SupabaseDataRow {
 
   bool? get completed => getField<bool>('completed');
   set completed(bool? value) => setField<bool>('completed', value);
+
+  double? get targetValue => getField<double>('target_value');
+  set targetValue(double? value) => setField<double>('target_value', value);
+
+  String? get unit => getField<String>('unit');
+  set unit(String? value) => setField<String>('unit', value);
+
+  String? get frequency => getField<String>('frequency');
+  set frequency(String? value) => setField<String>('frequency', value);
+
+  DateTime? get startAt => getField<DateTime>('start_at');
+  set startAt(DateTime? value) => setField<DateTime>('start_at', value);
+
+  DateTime? get endAt => getField<DateTime>('end_at');
+  set endAt(DateTime? value) => setField<DateTime>('end_at', value);
+
+  String? get location => getField<String>('location');
+  set location(String? value) => setField<String>('location', value);
+
+  double? get amount => getField<double>('amount');
+  set amount(double? value) => setField<double>('amount', value);
+
+  String? get payee => getField<String>('payee');
+  set payee(String? value) => setField<String>('payee', value);
+
+  bool? get isActive => getField<bool>('is_active');
+  set isActive(bool? value) => setField<bool>('is_active', value);
+
+  String? get loginUrl => getField<String>('login_url');
+  set loginUrl(String? value) => setField<String>('login_url', value);
+
+  String? get trackingType => getField<String>('tracking_type');
+  set trackingType(String? value) => setField<String>('tracking_type', value);
 }

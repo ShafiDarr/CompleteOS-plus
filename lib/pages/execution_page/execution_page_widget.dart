@@ -9,7 +9,10 @@ import '/components/score/score_widget.dart';
 import '/components/systems_control_panel/systems_control_panel_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'execution_page_model.dart';
 export 'execution_page_model.dart';
@@ -73,23 +76,47 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                   updateOnChange: true,
                   child: EditorHostWidget(
                     closeEndDrawer: () async {
+                      FFAppState().selectedRecordID = '';
+                      FFAppState().update(() {});
+                      safeSetState(() {
+                        _model.editorHostModel.taskFormModel
+                            .taskTypeValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.taskTypeValue =
+                            null;
+                        _model.editorHostModel.taskFormModel.areaValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.areaValue = null;
+                        _model
+                            .editorHostModel.taskFormModel.statusValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.statusValue = null;
+                        _model.editorHostModel.taskFormModel
+                            .projectValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.projectValue =
+                            null;
+                        _model.editorHostModel.taskFormModel
+                            .priorityValueController
+                            ?.reset();
+                        _model.editorHostModel.taskFormModel.priorityValue =
+                            null;
+                      });
                       safeSetState(() {
                         _model.editorHostModel.areaFormModel
                             .nameFieldTextController
                             ?.clear();
                         _model.editorHostModel.areaFormModel.textController2
                             ?.clear();
+                        _model.editorHostModel.taskFormModel
+                            .taskNameTextController
+                            ?.clear();
+                        _model.systemsControlPanelModel.textController?.clear();
                       });
                       safeSetState(() {
-                        _model.editorHostModel.areaFormModel.switchValue =
-                            false;
+                        _model.editorHostModel.areaFormModel.switchValue = true;
+                        _model.editorHostModel.taskFormModel.switchValue = true;
                       });
-                      FFAppState().selectedRecordID = '';
-                      FFAppState().update(() {});
-                      FFAppState().selectedRecordID = '';
-                      FFAppState().update(() {});
-                      FFAppState().selectedRecordID = '';
-                      FFAppState().update(() {});
                       if (scaffoldKey.currentState!.isDrawerOpen ||
                           scaffoldKey.currentState!.isEndDrawerOpen) {
                         Navigator.pop(context);
@@ -204,23 +231,27 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                     context: context,
                     phone: false,
                   ))
-                Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
-                  child: InkWell(
-                    splashColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () async {
-                      FFAppState().activePanel = 'none';
-                      FFAppState().activeSystemTab = 'none';
-                      safeSetState(() {});
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                Opacity(
+                  opacity: 0.8,
+                  child: Align(
+                    alignment: AlignmentDirectional(0.0, 0.0),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () async {
+                        FFAppState().activePanel = 'none';
+                        FFAppState().activeSystemTab = 'none';
+                        safeSetState(() {});
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color:
+                              FlutterFlowTheme.of(context).secondaryBackground,
+                        ),
+                        alignment: AlignmentDirectional(0.0, 0.0),
                       ),
-                      alignment: AlignmentDirectional(0.0, 0.0),
                     ),
                   ),
                 ),
@@ -232,9 +263,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                 Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                    ),
+                    decoration: BoxDecoration(),
                     child: Visibility(
                       visible: (FFAppState().activePanel == 'system') &&
                           responsiveVisibility(
@@ -244,6 +273,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                       child: wrapWithModel(
                         model: _model.systemsControlPanelModel,
                         updateCallback: () => safeSetState(() {}),
+                        updateOnChange: true,
                         child: SystemsControlPanelWidget(
                           openEndDrawer: () async {
                             FFAppState().editorType =
@@ -271,19 +301,29 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                               _model.editorHostModel.areaFormModel.switchValue =
                                   true;
                             });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .taskNameTextController?.text = '';
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .priorityValueController?.value = '';
+                              _model.editorHostModel.taskFormModel
+                                  .priorityValue = '';
+                            });
                           },
-                          onEdit: (areaID, areaName, areaDescription,
+                          onAreaEdit: (areaID, areaName, areaDescription,
                               areaActive) async {
-                            FFAppState().selectedRecordID = areaID;
-                            FFAppState().update(() {});
                             FFAppState().editorType = 'area';
                             FFAppState().update(() {});
                             FFAppState().editorMode = 'edit';
                             FFAppState().update(() {});
+                            FFAppState().selectedRecordID = areaID;
+                            FFAppState().update(() {});
                             scaffoldKey.currentState!.openEndDrawer();
                             await Future.delayed(
                               Duration(
-                                milliseconds: 50,
+                                milliseconds: 100,
                               ),
                             );
                             safeSetState(() {
@@ -291,12 +331,81 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   .nameFieldTextController?.text = areaName;
                             });
                             safeSetState(() {
+                              _model.editorHostModel.areaFormModel.switchValue =
+                                  areaActive;
+                            });
+                            safeSetState(() {
                               _model.editorHostModel.areaFormModel
                                   .textController2?.text = areaDescription;
                             });
+                          },
+                          onTaskEdit: (taskID,
+                              taskName,
+                              taskType,
+                              taskDueAt,
+                              taskPriority,
+                              taskStatus,
+                              taskAreaID,
+                              taskProjectID,
+                              taskActive) async {
                             safeSetState(() {
-                              _model.editorHostModel.areaFormModel.switchValue =
-                                  areaActive;
+                              _model.editorHostModel.taskFormModel
+                                  .taskNameTextController
+                                  ?.clear();
+                            });
+                            FFAppState().editorType = 'task';
+                            FFAppState().editorMode = 'edit';
+                            FFAppState().selectedRecordID = taskID;
+                            FFAppState().update(() {});
+                            scaffoldKey.currentState!.openEndDrawer();
+                            await Future.delayed(
+                              Duration(
+                                milliseconds: 200,
+                              ),
+                            );
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .taskNameTextController?.text = taskName!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .taskTypeValueController?.value = taskType!;
+                              _model.editorHostModel.taskFormModel
+                                  .taskTypeValue = taskType!;
+                            });
+                            safeSetState(() {
+                              _model
+                                  .editorHostModel
+                                  .taskFormModel
+                                  .priorityValueController
+                                  ?.value = taskPriority!;
+                              _model.editorHostModel.taskFormModel
+                                  .priorityValue = taskPriority!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .areaValueController?.value = taskAreaID!;
+                              _model.editorHostModel.taskFormModel.areaValue =
+                                  taskAreaID!;
+                            });
+                            safeSetState(() {
+                              _model
+                                  .editorHostModel
+                                  .taskFormModel
+                                  .projectValueController
+                                  ?.value = taskProjectID!;
+                              _model.editorHostModel.taskFormModel
+                                  .projectValue = taskProjectID!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .statusValueController?.value = taskStatus!;
+                              _model.editorHostModel.taskFormModel.statusValue =
+                                  taskStatus!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel.switchValue =
+                                  taskActive;
                             });
                           },
                         ),

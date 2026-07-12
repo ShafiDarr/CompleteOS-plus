@@ -5,6 +5,7 @@ import 'package:from_css_color/from_css_color.dart';
 
 import '/backend/supabase/supabase.dart';
 
+import '../../flutter_flow/lat_lng.dart';
 import '../../flutter_flow/place.dart';
 import '../../flutter_flow/uploaded_file.dart';
 
@@ -253,8 +254,6 @@ dynamic deserializeParam<T>(
             return DayBlocksRow(data);
           case HabitLogsRow:
             return HabitLogsRow(data);
-          case HabitsRow:
-            return HabitsRow(data);
           case ProfilesRow:
             return ProfilesRow(data);
           case ProjectsRow:
@@ -265,8 +264,6 @@ dynamic deserializeParam<T>(
             return RoutineStepLogsRow(data);
           case RoutineStepsRow:
             return RoutineStepsRow(data);
-          case RoutinesRow:
-            return RoutinesRow(data);
           case TasksRow:
             return TasksRow(data);
           default:

@@ -31,4 +31,13 @@ class AreasRow extends SupabaseDataRow {
 
   bool? get active => getField<bool>('active');
   set active(bool? value) => setField<bool>('active', value);
+
+  String? get icon => getField<String>('icon');
+  set icon(String? value) => setField<String>('icon', value);
+
+  String? get color => getField<String>('color');
+  set color(String? value) => setField<String>('color', value);
+
+  int? get sortOrder => getField<int>('sort_order');
+  set sortOrder(int? value) => setField<int>('sort_order', value);
 }

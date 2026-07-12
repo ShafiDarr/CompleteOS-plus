@@ -1,7 +1,9 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'system_tab_model.dart';
 export 'system_tab_model.dart';
 
@@ -47,18 +49,19 @@ class _SystemTabWidgetState extends State<SystemTabWidget> {
       decoration: BoxDecoration(),
       child: Text(
         valueOrDefault<String>(
-          widget.label,
+          widget!.label,
           'label',
         ),
         textAlign: TextAlign.center,
         style: FlutterFlowTheme.of(context).bodyMedium.override(
-              font: GoogleFonts.inter(
+              font: GoogleFonts.interTight(
                 fontWeight: FontWeight.w600,
                 fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
               ),
-              color: widget.isSelected == true
+              color: widget!.isSelected == true
                   ? FlutterFlowTheme.of(context).primaryText
                   : FlutterFlowTheme.of(context).secondaryText,
+              fontSize: 18.0,
               letterSpacing: 0.0,
               fontWeight: FontWeight.w600,
               fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
