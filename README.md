@@ -1,4 +1,4 @@
-# CompleteOS v1
+# CompleteOS+ v1
 
 A new Flutter project.
 
