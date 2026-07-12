@@ -617,39 +617,41 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                           ),
                                         ),
                                       ),
-                                    wrapWithModel(
-                                      model: _model.taskTypeSectionModel,
-                                      updateCallback: () => safeSetState(() {}),
-                                      child: TaskTypeSectionWidget(
-                                        onTaskEdit: (taskID,
-                                            taskName,
-                                            taskType,
-                                            taskDueAt,
-                                            taskPriority,
-                                            taskStatus,
-                                            taskAreaID,
-                                            taskProjectID,
-                                            taskActive) async {
-                                          FFAppState().selectedRecordID =
-                                              taskID;
-                                          FFAppState().editorType =
-                                              FFAppState().activeSystemTab;
-                                          FFAppState().editorMode = 'edit';
-                                          FFAppState().update(() {});
-                                          await widget.onTaskEdit?.call(
-                                            taskID,
-                                            taskName,
-                                            taskType,
-                                            taskDueAt,
-                                            taskPriority,
-                                            taskStatus,
-                                            taskAreaID,
-                                            taskProjectID,
-                                            taskActive,
-                                          );
-                                        },
+                                    if (FFAppState().activeSystemTab == 'task')
+                                      wrapWithModel(
+                                        model: _model.taskTypeSectionModel,
+                                        updateCallback: () =>
+                                            safeSetState(() {}),
+                                        child: TaskTypeSectionWidget(
+                                          onTaskEdit: (taskID,
+                                              taskName,
+                                              taskType,
+                                              taskDueAt,
+                                              taskPriority,
+                                              taskStatus,
+                                              taskAreaID,
+                                              taskProjectID,
+                                              taskActive) async {
+                                            FFAppState().selectedRecordID =
+                                                taskID;
+                                            FFAppState().editorType =
+                                                FFAppState().activeSystemTab;
+                                            FFAppState().editorMode = 'edit';
+                                            FFAppState().update(() {});
+                                            await widget.onTaskEdit?.call(
+                                              taskID,
+                                              taskName,
+                                              taskType,
+                                              taskDueAt,
+                                              taskPriority,
+                                              taskStatus,
+                                              taskAreaID,
+                                              taskProjectID,
+                                              taskActive,
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ),
                                     if ((FFAppState().activeSystemTab ==
                                             'schedule') &&
                                         responsiveVisibility(
