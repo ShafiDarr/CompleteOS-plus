@@ -12,7 +12,21 @@ import 'task_type_section_model.dart';
 export 'task_type_section_model.dart';
 
 class TaskTypeSectionWidget extends StatefulWidget {
-  const TaskTypeSectionWidget({super.key});
+  const TaskTypeSectionWidget({
+    super.key,
+    this.onTaskEdit,
+  });
+
+  final Future Function(
+      String taskID,
+      String? taskName,
+      String? taskType,
+      DateTime? taskDueAt,
+      String? taskPriority,
+      String? taskStatus,
+      String? taskAreaID,
+      String? taskProjectID,
+      bool taskActive)? onTaskEdit;
 
   @override
   State<TaskTypeSectionWidget> createState() => _TaskTypeSectionWidgetState();
@@ -151,10 +165,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Task',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -196,34 +206,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Task',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Task',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -233,68 +279,152 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                          ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
                                                               ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
+                                                          ),
+                                                          Text(
+                                                            listViewTasksRow
+                                                                        .dueAt !=
+                                                                    null
+                                                                ? dateTimeFormat(
+                                                                    "MMMM d, yyyy  h:mm a",
+                                                                    listViewTasksRow
+                                                                        .dueAt!)
+                                                                : 'Set Due Date/Time',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font: GoogleFonts
+                                                                      .interTight(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: listViewTasksRow
+                                                                              .dueAt !=
+                                                                          null
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            valueOrDefault<
+                                                                String>(
+                                                              listViewTasksRow.priority !=
+                                                                          null &&
+                                                                      listViewTasksRow
+                                                                              .priority !=
+                                                                          ''
+                                                                  ? listViewTasksRow
+                                                                      .priority
+                                                                  : 'Set Priority',
+                                                              'Set Priority',
                                                             ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          listViewTasksRow
-                                                                      .dueAt !=
-                                                                  null
-                                                              ? dateTimeFormat(
-                                                                  "MMMM d, yyyy  h:mm a",
-                                                                  listViewTasksRow
-                                                                      .dueAt!)
-                                                              : 'Set Due Date/Time',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .interTight(
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font: GoogleFonts
+                                                                      .interTight(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -304,76 +434,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: listViewTasksRow
-                                                                            .dueAt !=
-                                                                        null
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          valueOrDefault<
-                                                              String>(
-                                                            listViewTasksRow.priority !=
-                                                                        null &&
-                                                                    listViewTasksRow
-                                                                            .priority !=
-                                                                        ''
-                                                                ? listViewTasksRow
-                                                                    .priority
-                                                                : 'Set Priority',
-                                                            'Set Priority',
                                                           ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .interTight(
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -383,70 +464,47 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryText,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          valueOrDefault<
-                                                              String>(
-                                                            listViewTasksRow.status !=
-                                                                        null &&
-                                                                    listViewTasksRow
-                                                                            .status !=
-                                                                        ''
-                                                                ? listViewTasksRow
-                                                                    .status
-                                                                : 'Set Status',
-                                                            'Set Status',
                                                           ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font: GoogleFonts
-                                                                    .interTight(
+                                                          Text(
+                                                            valueOrDefault<
+                                                                String>(
+                                                              listViewTasksRow.status !=
+                                                                          null &&
+                                                                      listViewTasksRow
+                                                                              .status !=
+                                                                          ''
+                                                                  ? listViewTasksRow
+                                                                      .status
+                                                                  : 'Set Status',
+                                                              'Set Status',
+                                                            ),
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font: GoogleFonts
+                                                                      .interTight(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: listViewTasksRow.status !=
+                                                                              null &&
+                                                                          listViewTasksRow.status !=
+                                                                              ''
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -456,44 +514,24 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                color: listViewTasksRow.status !=
-                                                                            null &&
-                                                                        listViewTasksRow.status !=
-                                                                            ''
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -583,10 +621,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Habit',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -628,34 +662,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Habit',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Habit',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -665,175 +735,97 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                          ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          valueOrDefault<
-                                                              String>(
-                                                            listViewTasksRow.frequency !=
-                                                                        null &&
-                                                                    listViewTasksRow
-                                                                            .frequency !=
-                                                                        ''
-                                                                ? listViewTasksRow
-                                                                    .frequency
-                                                                : 'Set Frequency',
-                                                            'Set Frequency',
-                                                          ),
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                color: listViewTasksRow.frequency !=
-                                                                            null &&
-                                                                        listViewTasksRow.frequency !=
-                                                                            ''
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .secondaryText
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        RichText(
-                                                          textScaler:
-                                                              MediaQuery.of(
-                                                                      context)
-                                                                  .textScaler,
-                                                          text: TextSpan(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
                                                             children: [
-                                                              TextSpan(
-                                                                text: '0',
-                                                                style: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .override(
-                                                                      font: GoogleFonts
-                                                                          .inter(
-                                                                        fontWeight: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .fontWeight,
-                                                                        fontStyle: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .fontStyle,
-                                                                      ),
-                                                                      letterSpacing:
-                                                                          0.0,
-                                                                      fontWeight: FlutterFlowTheme.of(
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
                                                                               context)
-                                                                          .bodyMedium
-                                                                          .fontWeight,
-                                                                      fontStyle: FlutterFlowTheme.of(
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
                                                                               context)
-                                                                          .bodyMedium
-                                                                          .fontStyle,
-                                                                    ),
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
                                                               ),
-                                                              TextSpan(
-                                                                text:
-                                                                    ' Day Streak',
-                                                                style:
-                                                                    TextStyle(),
-                                                              )
-                                                            ],
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
+                                                          ),
+                                                          Text(
+                                                            valueOrDefault<
+                                                                String>(
+                                                              listViewTasksRow.frequency !=
+                                                                          null &&
+                                                                      listViewTasksRow
+                                                                              .frequency !=
+                                                                          ''
+                                                                  ? listViewTasksRow
+                                                                      .frequency
+                                                                  : 'Set Frequency',
+                                                              'Set Frequency',
+                                                            ),
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: listViewTasksRow.frequency !=
+                                                                              null &&
+                                                                          listViewTasksRow.frequency !=
+                                                                              ''
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .secondaryText
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                ),
+                                                          ),
+                                                          Text(
+                                                            '•',
                                                             style: FlutterFlowTheme
                                                                     .of(context)
                                                                 .bodyMedium
@@ -862,23 +854,90 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .fontStyle,
                                                                 ),
                                                           ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          RichText(
+                                                            textScaler:
+                                                                MediaQuery.of(
+                                                                        context)
+                                                                    .textScaler,
+                                                            text: TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: '0',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .fontStyle,
+                                                                      ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text:
+                                                                      ' Day Streak',
+                                                                  style:
+                                                                      TextStyle(),
+                                                                )
+                                                              ],
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    font: GoogleFonts
+                                                                        .inter(
+                                                                      fontWeight: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .fontWeight,
+                                                                      fontStyle: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .bodyMedium
+                                                                          .fontStyle,
+                                                                    ),
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -968,10 +1027,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Routine',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -1013,34 +1068,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Routine',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Routine',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -1050,68 +1141,68 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                          ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        RichText(
-                                                          textScaler:
-                                                              MediaQuery.of(
-                                                                      context)
-                                                                  .textScaler,
-                                                          text: TextSpan(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
                                                             children: [
-                                                              TextSpan(
-                                                                text: '0',
-                                                                style: FlutterFlowTheme.of(
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
+                                                              ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
+                                                          ),
+                                                          RichText(
+                                                            textScaler:
+                                                                MediaQuery.of(
                                                                         context)
-                                                                    .bodyMedium
-                                                                    .override(
-                                                                      font: GoogleFonts
-                                                                          .inter(
+                                                                    .textScaler,
+                                                            text: TextSpan(
+                                                              children: [
+                                                                TextSpan(
+                                                                  text: '0',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        letterSpacing:
+                                                                            0.0,
                                                                         fontWeight: FlutterFlowTheme.of(context)
                                                                             .bodyMedium
                                                                             .fontWeight,
@@ -1119,8 +1210,20 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                             .bodyMedium
                                                                             .fontStyle,
                                                                       ),
-                                                                      letterSpacing:
-                                                                          0.0,
+                                                                ),
+                                                                TextSpan(
+                                                                  text:
+                                                                      ' Steps',
+                                                                  style:
+                                                                      TextStyle(),
+                                                                )
+                                                              ],
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                    font: GoogleFonts
+                                                                        .inter(
                                                                       fontWeight: FlutterFlowTheme.of(
                                                                               context)
                                                                           .bodyMedium
@@ -1130,20 +1233,8 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                           .bodyMedium
                                                                           .fontStyle,
                                                                     ),
-                                                              ),
-                                                              TextSpan(
-                                                                text: ' Steps',
-                                                                style:
-                                                                    TextStyle(),
-                                                              )
-                                                            ],
-                                                            style: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font:
-                                                                      GoogleFonts
-                                                                          .inter(
+                                                                    letterSpacing:
+                                                                        0.0,
                                                                     fontWeight: FlutterFlowTheme.of(
                                                                             context)
                                                                         .bodyMedium
@@ -1153,35 +1244,25 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                         .bodyMedium
                                                                         .fontStyle,
                                                                   ),
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -1271,10 +1352,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Appointment',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -1316,34 +1393,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Appointment',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Appointment',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -1353,62 +1466,64 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
+                                                              ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
                                                           ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1418,27 +1533,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1448,27 +1563,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1478,34 +1593,24 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -1594,10 +1699,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Bill',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -1639,34 +1740,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Bill',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Bill',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -1676,62 +1813,64 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
+                                                              ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
                                                           ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1741,27 +1880,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1771,27 +1910,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -1801,34 +1940,24 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -1917,10 +2046,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Reminder',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -1962,34 +2087,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Reminder',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Reminder',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -1999,62 +2160,64 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
+                                                              ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
                                                           ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2064,27 +2227,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2094,27 +2257,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2124,34 +2287,24 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -2240,10 +2393,6 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                         'task_type',
                                         'Event',
                                       )
-                                      .neqOrNull(
-                                        'status',
-                                        'Archived',
-                                      )
                                       .order('due_at', ascending: true),
                                 ),
                                 builder: (context, snapshot) {
@@ -2285,34 +2434,70 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
                                                   12.0, 0.0, 12.0, 0.0),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 12.0, 0.0, 12.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      valueOrDefault<String>(
-                                                        listViewTasksRow.name,
-                                                        'Event',
-                                                      ),
-                                                      maxLines: 1,
-                                                      style: FlutterFlowTheme
-                                                              .of(context)
-                                                          .bodyMedium
-                                                          .override(
-                                                            font: GoogleFonts
-                                                                .interTight(
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              FFAppState().selectedRecordID =
+                                                  listViewTasksRow.id!;
+                                              FFAppState().editorType =
+                                                  FFAppState().activeSystemTab;
+                                              FFAppState().editorMode = 'edit';
+                                              FFAppState().update(() {});
+                                              await widget.onTaskEdit?.call(
+                                                listViewTasksRow.id!,
+                                                listViewTasksRow.name,
+                                                listViewTasksRow.taskType,
+                                                listViewTasksRow.dueAt,
+                                                listViewTasksRow.priority,
+                                                listViewTasksRow.status,
+                                                listViewTasksRow.areaId,
+                                                listViewTasksRow.projectId,
+                                                listViewTasksRow.isActive!,
+                                              );
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          0.0, 12.0, 0.0, 12.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        valueOrDefault<String>(
+                                                          listViewTasksRow.name,
+                                                          'Event',
+                                                        ),
+                                                        maxLines: 1,
+                                                        style: FlutterFlowTheme
+                                                                .of(context)
+                                                            .bodyMedium
+                                                            .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                              ),
+                                                              fontSize: 15.0,
+                                                              letterSpacing:
+                                                                  0.0,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w600,
@@ -2322,62 +2507,64 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                             ),
-                                                            fontSize: 15.0,
-                                                            letterSpacing: 0.0,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Container(
+                                                                width: 8.0,
+                                                                height: 8.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: listViewTasksRow
+                                                                              .isActive ==
+                                                                          true
+                                                                      ? FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .success
+                                                                      : FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .error,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              99.0),
+                                                                ),
+                                                              ),
+                                                            ].divide(SizedBox(
+                                                                width: 6.0)),
                                                           ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisSize:
-                                                              MainAxisSize.max,
-                                                          children: [
-                                                            Container(
-                                                              width: 8.0,
-                                                              height: 8.0,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: listViewTasksRow
-                                                                            .isActive ==
-                                                                        true
-                                                                    ? FlutterFlowTheme.of(
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .success
-                                                                    : FlutterFlowTheme.of(
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
                                                                             context)
-                                                                        .error,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            99.0),
-                                                              ),
-                                                            ),
-                                                          ].divide(SizedBox(
-                                                              width: 6.0)),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2387,27 +2574,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2417,27 +2604,27 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                        Text(
-                                                          '•',
-                                                          style: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
+                                                          ),
+                                                          Text(
+                                                            '•',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
                                                                           context)
                                                                       .bodyMedium
@@ -2447,34 +2634,24 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                       .bodyMedium
                                                                       .fontStyle,
                                                                 ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                        ),
-                                                      ].divide(SizedBox(
-                                                          width: 24.0)),
-                                                    ),
-                                                  ].divide(
-                                                      SizedBox(height: 6.0)),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 24.0)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 6.0)),
+                                                  ),
                                                 ),
-                                              ),
-                                              Spacer(),
-                                              Icon(
-                                                Icons.chevron_right,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryText,
-                                                size: 24.0,
-                                              ),
-                                            ].divide(SizedBox(width: 12.0)),
+                                                Spacer(),
+                                                Icon(
+                                                  Icons.chevron_right,
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primaryText,
+                                                  size: 24.0,
+                                                ),
+                                              ].divide(SizedBox(width: 12.0)),
+                                            ),
                                           ),
                                         ),
                                       );

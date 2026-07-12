@@ -15,7 +15,12 @@ import 'task_form_model.dart';
 export 'task_form_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
-  const TaskFormWidget({super.key});
+  const TaskFormWidget({
+    super.key,
+    this.initialDueAt,
+  });
+
+  final DateTime? initialDueAt;
 
   @override
   State<TaskFormWidget> createState() => _TaskFormWidgetState();
@@ -37,7 +42,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.selectedDueAt = null;
+      _model.selectedDueAt = widget!.initialDueAt;
       safeSetState(() {});
     });
 
@@ -49,6 +54,30 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
 
   @override
   void dispose() {
+    // On component dispose action.
+    () async {
+      safeSetState(() {
+        _model.taskNameTextController?.clear();
+      });
+      safeSetState(() {
+        _model.taskTypeValueController?.reset();
+        _model.taskTypeValue = null;
+        _model.priorityValueController?.reset();
+        _model.priorityValue = null;
+        _model.areaValueController?.reset();
+        _model.areaValue = null;
+        _model.projectValueController?.reset();
+        _model.projectValue = null;
+        _model.statusValueController?.reset();
+        _model.statusValue = null;
+      });
+      safeSetState(() {
+        _model.switchValue = true;
+      });
+      _model.selectedDueAt = null;
+      _model.updatePage(() {});
+    }();
+
     _model.maybeDispose();
 
     super.dispose();
@@ -188,7 +217,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                   ),
                   FlutterFlowDropDown<String>(
                     controller: _model.taskTypeValueController ??=
-                        FormFieldController<String>(null),
+                        FormFieldController<String>(
+                      _model.taskTypeValue ??= 'Task',
+                    ),
                     options: [
                       'Task',
                       'Habit',
@@ -352,7 +383,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         });
                       }
                       _model.selectedDueAt = _model.datePicked;
-                      safeSetState(() {});
+                      _model.updatePage(() {});
                     },
                     child: Container(
                       width: double.infinity,
@@ -448,7 +479,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 children: [
                   FlutterFlowDropDown<String>(
                     controller: _model.priorityValueController ??=
-                        FormFieldController<String>(null),
+                        FormFieldController<String>(
+                      _model.priorityValue ??= 'Medium',
+                    ),
                     options: ['Critical', 'High', 'Medium', 'Low'],
                     onChanged: (val) =>
                         safeSetState(() => _model.priorityValue = val),
@@ -681,7 +714,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 children: [
                   FlutterFlowDropDown<String>(
                     controller: _model.statusValueController ??=
-                        FormFieldController<String>(null),
+                        FormFieldController<String>(
+                      _model.statusValue ??= 'Pending',
+                    ),
                     options: [
                       'Pending',
                       'In Progress',
