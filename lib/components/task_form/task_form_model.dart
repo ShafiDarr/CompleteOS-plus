@@ -20,10 +20,23 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
 
   ///  State fields for stateful widgets in this component.
 
+  final formKey = GlobalKey<FormState>();
   // State field(s) for TaskName widget.
   FocusNode? taskNameFocusNode;
   TextEditingController? taskNameTextController;
   String? Function(BuildContext, String?)? taskNameTextControllerValidator;
+  String? _taskNameTextControllerValidator(BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Task Name is required';
+    }
+
+    if (val.length < 3) {
+      return 'Not enough characters';
+    }
+
+    return null;
+  }
+
   // State field(s) for TaskType widget.
   String? taskTypeValue;
   FormFieldController<String>? taskTypeValueController;
@@ -44,7 +57,9 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   bool? switchValue;
 
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    taskNameTextControllerValidator = _taskNameTextControllerValidator;
+  }
 
   @override
   void dispose() {

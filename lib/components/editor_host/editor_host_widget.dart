@@ -181,6 +181,12 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         onTap: () async {
                           if ((FFAppState().editorType == 'area') &&
                               (FFAppState().editorMode == 'new')) {
+                            if (_model.areaFormModel.formKey.currentState ==
+                                    null ||
+                                !_model.areaFormModel.formKey.currentState!
+                                    .validate()) {
+                              return;
+                            }
                             await AreasTable().insert({
                               'name': _model
                                   .areaFormModel.nameFieldTextController.text,
@@ -205,6 +211,12 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           } else {
                             if ((FFAppState().editorType == 'area') &&
                                 (FFAppState().editorMode == 'edit')) {
+                              if (_model.areaFormModel.formKey.currentState ==
+                                      null ||
+                                  !_model.areaFormModel.formKey.currentState!
+                                      .validate()) {
+                                return;
+                              }
                               await AreasTable().update(
                                 data: {
                                   'name': _model.areaFormModel
@@ -239,6 +251,12 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                             } else {
                               if ((FFAppState().editorMode == 'new') &&
                                   (FFAppState().editorType == 'task')) {
+                                if (_model.taskFormModel.formKey.currentState ==
+                                        null ||
+                                    !_model.taskFormModel.formKey.currentState!
+                                        .validate()) {
+                                  return;
+                                }
                                 await TasksTable().insert({
                                   'name': _model.taskFormModel
                                       .taskNameTextController.text,
@@ -287,6 +305,14 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                               } else {
                                 if ((FFAppState().editorMode == 'edit') &&
                                     (FFAppState().editorType == 'task')) {
+                                  if (_model.taskFormModel.formKey
+                                              .currentState ==
+                                          null ||
+                                      !_model
+                                          .taskFormModel.formKey.currentState!
+                                          .validate()) {
+                                    return;
+                                  }
                                   await TasksTable().update(
                                     data: {
                                       'name': _model.taskFormModel
