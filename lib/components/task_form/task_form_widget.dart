@@ -277,7 +277,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                       final _datePickedDate = await showDatePicker(
                         context: context,
                         initialDate: getCurrentTimestamp,
-                        firstDate: getCurrentTimestamp,
+                        firstDate: DateTime(1900),
                         lastDate: DateTime(2050),
                         builder: (context, child) {
                           return wrapInMaterialDatePickerTheme(

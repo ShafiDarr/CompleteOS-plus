@@ -358,24 +358,15 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                             FFAppState().selectedRecordID = taskID;
                             FFAppState().update(() {});
                             scaffoldKey.currentState!.openEndDrawer();
+                            await Future.delayed(
+                              Duration(
+                                milliseconds: 200,
+                              ),
+                            );
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
                                   .taskNameTextController?.text = taskName!;
                             });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  taskName!,
-                                  style: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryText,
-                                  ),
-                                ),
-                                duration: Duration(milliseconds: 4000),
-                                backgroundColor:
-                                    FlutterFlowTheme.of(context).secondary,
-                              ),
-                            );
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
                                   .taskTypeValueController?.value = taskType!;
