@@ -1,3 +1,5 @@
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart';
 import '/components/collapsed_sidebar/collapsed_sidebar_widget.dart';
 import '/components/current_action/current_action_widget.dart';
 import '/components/date_time_component/date_time_component_widget.dart';

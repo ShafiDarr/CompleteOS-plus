@@ -1,3 +1,5 @@
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart';
 import '/components/collapsed_sidebar/collapsed_sidebar_widget.dart';
 import '/components/current_action/current_action_widget.dart';
 import '/components/date_time_component/date_time_component_widget.dart';
@@ -175,27 +177,93 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                           updateCallback: () => safeSetState(() {}),
                           child: DateTimeComponentWidget(),
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            wrapWithModel(
-                              model: _model.currentActionModel,
-                              updateCallback: () => safeSetState(() {}),
-                              child: CurrentActionWidget(
-                                actionTitle: 'Make up bed',
-                                actionType: 'task',
-                                actionId: 'test-123',
-                                metadataText: 'Health',
-                                showMetadata: true,
-                                isExpandable: false,
-                                canSkip: true,
-                                canPostpone: true,
-                                canInspect: true,
-                                stepCountText: '0/0',
-                              ),
-                            ),
-                          ],
+                        FutureBuilder<List<CurrentActionCandidatesRow>>(
+                          future: CurrentActionCandidatesTable().querySingleRow(
+                            queryFn: (q) => q
+                                .eqOrNull(
+                                  'user_id',
+                                  currentUserUid,
+                                )
+                                .neqOrNull(
+                                  'status',
+                                  'Completed',
+                                )
+                                .neqOrNull(
+                                  'status',
+                                  'Skipped',
+                                )
+                                .order('priority_rank', ascending: true)
+                                .order('due_at', ascending: true),
+                          ),
+                          builder: (context, snapshot) {
+                            // Customize what your widget looks like when it's loading.
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: SizedBox(
+                                  width: 50.0,
+                                  height: 50.0,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      FlutterFlowTheme.of(context).primary,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            List<CurrentActionCandidatesRow>
+                                rowCurrentActionCandidatesRowList =
+                                snapshot.data!;
+
+                            final rowCurrentActionCandidatesRow =
+                                rowCurrentActionCandidatesRowList.isNotEmpty
+                                    ? rowCurrentActionCandidatesRowList.first
+                                    : null;
+
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (rowCurrentActionCandidatesRow?.id != ''
+                                    ? true
+                                    : false)
+                                  wrapWithModel(
+                                    model: _model.currentActionModel,
+                                    updateCallback: () => safeSetState(() {}),
+                                    child: CurrentActionWidget(
+                                      actionTitle:
+                                          rowCurrentActionCandidatesRow!.name!,
+                                      actionType: rowCurrentActionCandidatesRow!
+                                          .taskType!,
+                                      actionId:
+                                          rowCurrentActionCandidatesRow!.id!,
+                                      metadataText:
+                                          rowCurrentActionCandidatesRow?.areaId,
+                                      showMetadata:
+                                          rowCurrentActionCandidatesRow
+                                                          ?.areaId !=
+                                                      null &&
+                                                  rowCurrentActionCandidatesRow
+                                                          ?.areaId !=
+                                                      ''
+                                              ? true
+                                              : false,
+                                      isExpandable:
+                                          rowCurrentActionCandidatesRow
+                                                      ?.taskType ==
+                                                  'Routine'
+                                              ? true
+                                              : false,
+                                      status:
+                                          rowCurrentActionCandidatesRow?.status,
+                                      canSkip: true,
+                                      canPostpone: true,
+                                      canInspect: true,
+                                      stepCountText: '0/0',
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),

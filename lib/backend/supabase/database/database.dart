@@ -7,6 +7,7 @@ export 'table.dart';
 
 export 'tables/areas.dart';
 export 'tables/block_items.dart';
+export 'tables/current_action_candidates.dart';
 export 'tables/daily_plan_blocks.dart';
 export 'tables/daily_plans.dart';
 export 'tables/daily_status.dart';
