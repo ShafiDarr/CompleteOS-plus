@@ -10,10 +10,23 @@ import 'package:provider/provider.dart';
 class AreaFormModel extends FlutterFlowModel<AreaFormWidget> {
   ///  State fields for stateful widgets in this component.
 
+  final formKey = GlobalKey<FormState>();
   // State field(s) for NameField widget.
   FocusNode? nameFieldFocusNode;
   TextEditingController? nameFieldTextController;
   String? Function(BuildContext, String?)? nameFieldTextControllerValidator;
+  String? _nameFieldTextControllerValidator(BuildContext context, String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Area Name is required';
+    }
+
+    if (val.length < 3) {
+      return 'Not enough characters';
+    }
+
+    return null;
+  }
+
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode;
   TextEditingController? textController2;
@@ -22,7 +35,9 @@ class AreaFormModel extends FlutterFlowModel<AreaFormWidget> {
   bool? switchValue;
 
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    nameFieldTextControllerValidator = _nameFieldTextControllerValidator;
+  }
 
   @override
   void dispose() {
