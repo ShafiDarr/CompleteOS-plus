@@ -516,7 +516,7 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                 ),
                                                           ),
                                                         ].divide(SizedBox(
-                                                            width: 24.0)),
+                                                            width: 12.0)),
                                                       ),
                                                     ].divide(
                                                         SizedBox(height: 6.0)),

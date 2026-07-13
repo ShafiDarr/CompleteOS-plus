@@ -738,8 +738,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         'Pending',
                         'In Progress',
                         'Completed',
-                        'Skipped',
-                        'Postponed'
+                        'Canceled'
                       ],
                       onChanged: (val) =>
                           safeSetState(() => _model.statusValue = val),

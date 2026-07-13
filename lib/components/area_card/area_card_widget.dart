@@ -404,7 +404,7 @@ class _AreaCardWidgetState extends State<AreaCardWidget> {
                               ),
                         ),
                       ),
-                    ].divide(SizedBox(width: 24.0)),
+                    ].divide(SizedBox(width: 12.0)),
                   ),
                 ].divide(SizedBox(height: 6.0)),
               ),

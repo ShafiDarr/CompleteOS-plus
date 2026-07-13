@@ -297,57 +297,59 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                               ),
                             ),
                           ),
-                        if (widget!.isExpandable == false)
-                          Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                shape: CircleBorder(),
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).secondary,
+                        Theme(
+                          data: ThemeData(
+                            checkboxTheme: CheckboxThemeData(
+                              visualDensity: VisualDensity.compact,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              shape: CircleBorder(),
                             ),
-                            child: Checkbox(
-                              value: _model.checkboxValue1 ??= false,
-                              onChanged: (newValue) async {
-                                safeSetState(
-                                    () => _model.checkboxValue1 = newValue!);
-                                if (newValue!) {
-                                  if (_model.checkboxValue1 != true) {
-                                    await TasksTable().update(
-                                      data: {
-                                        'status': 'Completed',
-                                        'completed_at': supaSerialize<DateTime>(
-                                            getCurrentTimestamp),
-                                      },
-                                      matchingRows: (rows) => rows
-                                          .eqOrNull(
-                                            'id',
-                                            widget!.actionId,
-                                          )
-                                          .eqOrNull(
-                                            'user_id',
-                                            currentUserUid,
-                                          ),
-                                    );
-                                  }
-                                }
-                              },
-                              side: (FlutterFlowTheme.of(context).secondary !=
-                                      null)
-                                  ? BorderSide(
-                                      width: 2,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondary!,
-                                    )
-                                  : null,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context)
-                                  .primaryBackground,
-                            ),
+                            unselectedWidgetColor:
+                                FlutterFlowTheme.of(context).secondary,
                           ),
+                          child: Checkbox(
+                            value: _model.checkboxValue1 ??= false,
+                            onChanged: (newValue) async {
+                              safeSetState(
+                                  () => _model.checkboxValue1 = newValue!);
+                              if (newValue!) {
+                                await TasksTable().update(
+                                  data: {
+                                    'status': 'Completed',
+                                    'completed_at': supaSerialize<DateTime>(
+                                        getCurrentTimestamp),
+                                  },
+                                  matchingRows: (rows) => rows
+                                      .eqOrNull(
+                                        'id',
+                                        widget!.actionId,
+                                      )
+                                      .eqOrNull(
+                                        'user_id',
+                                        currentUserUid,
+                                      ),
+                                );
+                                FFAppState().currentActionRefreshTrigger = true;
+                                FFAppState().update(() {});
+                                safeSetState(() {
+                                  _model.checkboxValue1 = false;
+                                });
+                              }
+                            },
+                            side: (FlutterFlowTheme.of(context).secondary !=
+                                    null)
+                                ? BorderSide(
+                                    width: 2,
+                                    color:
+                                        FlutterFlowTheme.of(context).secondary!,
+                                  )
+                                : null,
+                            activeColor: FlutterFlowTheme.of(context).primary,
+                            checkColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                          ),
+                        ),
                       ],
                     ),
                     if (widget!.isExpandable == true)
