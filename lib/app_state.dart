@@ -78,6 +78,12 @@ class FFAppState extends ChangeNotifier {
   set selectedRecordID(String value) {
     _selectedRecordID = value;
   }
+
+  bool _currentActionRefreshTrigger = true;
+  bool get currentActionRefreshTrigger => _currentActionRefreshTrigger;
+  set currentActionRefreshTrigger(bool value) {
+    _currentActionRefreshTrigger = value;
+  }
 }
 
 void _safeInit(Function() initializeField) {

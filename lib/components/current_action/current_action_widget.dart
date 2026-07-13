@@ -1,3 +1,5 @@
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart';
 import '/components/action_option_sheet/action_option_sheet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -80,7 +82,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
         child: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 40.0,
@@ -312,6 +314,26 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                               onChanged: (newValue) async {
                                 safeSetState(
                                     () => _model.checkboxValue1 = newValue!);
+                                if (newValue!) {
+                                  if (_model.checkboxValue1 != true) {
+                                    await TasksTable().update(
+                                      data: {
+                                        'status': 'Completed',
+                                        'completed_at': supaSerialize<DateTime>(
+                                            getCurrentTimestamp),
+                                      },
+                                      matchingRows: (rows) => rows
+                                          .eqOrNull(
+                                            'id',
+                                            widget!.actionId,
+                                          )
+                                          .eqOrNull(
+                                            'user_id',
+                                            currentUserUid,
+                                          ),
+                                    );
+                                  }
+                                }
                               },
                               side: (FlutterFlowTheme.of(context).secondary !=
                                       null)
