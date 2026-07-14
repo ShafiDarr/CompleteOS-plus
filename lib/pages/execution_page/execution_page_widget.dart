@@ -77,9 +77,12 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                   updateCallback: () => safeSetState(() {}),
                   updateOnChange: true,
                   child: EditorHostWidget(
+                    initialTaskDueAt: _model.editingTaskDueAt,
                     closeEndDrawer: () async {
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
+                      _model.editingTaskDueAt = null;
+                      safeSetState(() {});
                       safeSetState(() {
                         _model.editorHostModel.taskFormModel
                             .taskTypeValueController
@@ -416,21 +419,20 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                               taskAreaID,
                               taskProjectID,
                               taskActive) async {
-                            safeSetState(() {
-                              _model.editorHostModel.taskFormModel
-                                  .taskNameTextController
-                                  ?.clear();
-                            });
                             FFAppState().editorType = 'task';
                             FFAppState().editorMode = 'edit';
                             FFAppState().selectedRecordID = taskID;
                             FFAppState().update(() {});
+                            _model.editingTaskDueAt = taskDueAt;
+                            safeSetState(() {});
                             scaffoldKey.currentState!.openEndDrawer();
                             await Future.delayed(
                               Duration(
                                 milliseconds: 200,
                               ),
                             );
+
+                            safeSetState(() {});
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
                                   .taskNameTextController?.text = taskName!;
@@ -452,6 +454,12 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                             });
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
+                                  .statusValueController?.value = taskStatus!;
+                              _model.editorHostModel.taskFormModel.statusValue =
+                                  taskStatus!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
                                   .areaValueController?.value = taskAreaID!;
                               _model.editorHostModel.taskFormModel.areaValue =
                                   taskAreaID!;
@@ -464,12 +472,6 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   ?.value = taskProjectID!;
                               _model.editorHostModel.taskFormModel
                                   .projectValue = taskProjectID!;
-                            });
-                            safeSetState(() {
-                              _model.editorHostModel.taskFormModel
-                                  .statusValueController?.value = taskStatus!;
-                              _model.editorHostModel.taskFormModel.statusValue =
-                                  taskStatus!;
                             });
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel.switchValue =

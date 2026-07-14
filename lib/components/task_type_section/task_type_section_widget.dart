@@ -229,6 +229,26 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                 listViewTasksRow.projectId,
                                                 listViewTasksRow.isActive!,
                                               );
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    listViewTasksRow.status!,
+                                                    style: TextStyle(
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                    ),
+                                                  ),
+                                                  duration: Duration(
+                                                      milliseconds: 4000),
+                                                  backgroundColor:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .secondary,
+                                                ),
+                                              );
                                             },
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
@@ -493,16 +513,9 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                         .bodyMedium
                                                                         .fontStyle,
                                                                   ),
-                                                                  color: listViewTasksRow.status !=
-                                                                              null &&
-                                                                          listViewTasksRow.status !=
-                                                                              ''
-                                                                      ? FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .secondaryText
-                                                                      : FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .error,
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
                                                                   letterSpacing:
                                                                       0.0,
                                                                   fontWeight: FlutterFlowTheme.of(
@@ -516,7 +529,7 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                                                 ),
                                                           ),
                                                         ].divide(SizedBox(
-                                                            width: 24.0)),
+                                                            width: 12.0)),
                                                       ),
                                                     ].divide(
                                                         SizedBox(height: 6.0)),

@@ -14,6 +14,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditorHostModel extends FlutterFlowModel<EditorHostWidget> {
+  ///  Local state fields for this component.
+
+  DateTime? taskDueAt;
+
   ///  State fields for stateful widgets in this component.
 
   // Model for AreaForm component.

@@ -1,3 +1,5 @@
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart';
 import '/components/action_option_sheet/action_option_sheet_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -80,7 +82,7 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
         child: Padding(
           padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: 40.0,
@@ -295,37 +297,59 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                               ),
                             ),
                           ),
-                        if (widget!.isExpandable == false)
-                          Theme(
-                            data: ThemeData(
-                              checkboxTheme: CheckboxThemeData(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                shape: CircleBorder(),
-                              ),
-                              unselectedWidgetColor:
-                                  FlutterFlowTheme.of(context).secondary,
+                        Theme(
+                          data: ThemeData(
+                            checkboxTheme: CheckboxThemeData(
+                              visualDensity: VisualDensity.compact,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              shape: CircleBorder(),
                             ),
-                            child: Checkbox(
-                              value: _model.checkboxValue1 ??= false,
-                              onChanged: (newValue) async {
-                                safeSetState(
-                                    () => _model.checkboxValue1 = newValue!);
-                              },
-                              side: (FlutterFlowTheme.of(context).secondary !=
-                                      null)
-                                  ? BorderSide(
-                                      width: 2,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondary!,
-                                    )
-                                  : null,
-                              activeColor: FlutterFlowTheme.of(context).primary,
-                              checkColor: FlutterFlowTheme.of(context)
-                                  .primaryBackground,
-                            ),
+                            unselectedWidgetColor:
+                                FlutterFlowTheme.of(context).secondary,
                           ),
+                          child: Checkbox(
+                            value: _model.checkboxValue1 ??= false,
+                            onChanged: (newValue) async {
+                              safeSetState(
+                                  () => _model.checkboxValue1 = newValue!);
+                              if (newValue!) {
+                                await TasksTable().update(
+                                  data: {
+                                    'status': 'Completed',
+                                    'completed_at': supaSerialize<DateTime>(
+                                        getCurrentTimestamp),
+                                  },
+                                  matchingRows: (rows) => rows
+                                      .eqOrNull(
+                                        'id',
+                                        widget!.actionId,
+                                      )
+                                      .eqOrNull(
+                                        'user_id',
+                                        currentUserUid,
+                                      ),
+                                );
+                                FFAppState().currentActionRefreshTrigger = true;
+                                FFAppState().update(() {});
+                                safeSetState(() {
+                                  _model.checkboxValue1 = false;
+                                });
+                              }
+                            },
+                            side: (FlutterFlowTheme.of(context).secondary !=
+                                    null)
+                                ? BorderSide(
+                                    width: 2,
+                                    color:
+                                        FlutterFlowTheme.of(context).secondary!,
+                                  )
+                                : null,
+                            activeColor: FlutterFlowTheme.of(context).primary,
+                            checkColor:
+                                FlutterFlowTheme.of(context).primaryBackground,
+                          ),
+                        ),
                       ],
                     ),
                     if (widget!.isExpandable == true)

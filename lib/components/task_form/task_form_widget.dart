@@ -17,9 +17,11 @@ export 'task_form_model.dart';
 class TaskFormWidget extends StatefulWidget {
   const TaskFormWidget({
     super.key,
+    this.onDueAtChange,
     this.initialDueAt,
   });
 
+  final Future Function(DateTime dueAt)? onDueAtChange;
   final DateTime? initialDueAt;
 
   @override
@@ -54,30 +56,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
 
   @override
   void dispose() {
-    // On component dispose action.
-    () async {
-      safeSetState(() {
-        _model.taskNameTextController?.clear();
-      });
-      safeSetState(() {
-        _model.taskTypeValueController?.reset();
-        _model.taskTypeValue = null;
-        _model.priorityValueController?.reset();
-        _model.priorityValue = null;
-        _model.areaValueController?.reset();
-        _model.areaValue = null;
-        _model.projectValueController?.reset();
-        _model.projectValue = null;
-        _model.statusValueController?.reset();
-        _model.statusValue = null;
-      });
-      safeSetState(() {
-        _model.switchValue = true;
-      });
-      _model.selectedDueAt = null;
-      _model.updatePage(() {});
-    }();
-
     _model.maybeDispose();
 
     super.dispose();
@@ -394,6 +372,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         }
                         _model.selectedDueAt = _model.datePicked;
                         _model.updatePage(() {});
+                        await widget.onDueAtChange?.call(
+                          _model.selectedDueAt!,
+                        );
                       },
                       child: Container(
                         width: double.infinity,
@@ -738,8 +719,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         'Pending',
                         'In Progress',
                         'Completed',
-                        'Skipped',
-                        'Postponed'
+                        'Canceled'
                       ],
                       onChanged: (val) =>
                           safeSetState(() => _model.statusValue = val),
