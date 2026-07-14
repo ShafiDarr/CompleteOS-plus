@@ -393,49 +393,10 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                     ),
                   if (FFAppState().editorType == 'task')
                     Expanded(
-                      child: FutureBuilder<List<TasksRow>>(
-                        future: TasksTable().querySingleRow(
-                          queryFn: (q) => q
-                              .eqOrNull(
-                                'id',
-                                FFAppState().selectedRecordID,
-                              )
-                              .eqOrNull(
-                                'user_id',
-                                currentUserUid,
-                              ),
-                        ),
-                        builder: (context, snapshot) {
-                          // Customize what your widget looks like when it's loading.
-                          if (!snapshot.hasData) {
-                            return Center(
-                              child: SizedBox(
-                                width: 50.0,
-                                height: 50.0,
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    FlutterFlowTheme.of(context).primary,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          List<TasksRow> taskFormTasksRowList = snapshot.data!;
-
-                          final taskFormTasksRow =
-                              taskFormTasksRowList.isNotEmpty
-                                  ? taskFormTasksRowList.first
-                                  : null;
-
-                          return wrapWithModel(
-                            model: _model.taskFormModel,
-                            updateCallback: () => safeSetState(() {}),
-                            updateOnChange: true,
-                            child: TaskFormWidget(
-                              initialDueAt: taskFormTasksRow?.dueAt,
-                            ),
-                          );
-                        },
+                      child: wrapWithModel(
+                        model: _model.taskFormModel,
+                        updateCallback: () => safeSetState(() {}),
+                        child: TaskFormWidget(),
                       ),
                     ),
                 ].divide(SizedBox(height: 20.0)),

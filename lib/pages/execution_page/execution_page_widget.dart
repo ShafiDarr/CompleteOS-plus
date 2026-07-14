@@ -80,6 +80,8 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                     closeEndDrawer: () async {
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
+
+                      safeSetState(() {});
                       safeSetState(() {
                         _model.editorHostModel.taskFormModel
                             .taskTypeValueController
@@ -416,11 +418,6 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                               taskAreaID,
                               taskProjectID,
                               taskActive) async {
-                            safeSetState(() {
-                              _model.editorHostModel.taskFormModel
-                                  .taskNameTextController
-                                  ?.clear();
-                            });
                             FFAppState().editorType = 'task';
                             FFAppState().editorMode = 'edit';
                             FFAppState().selectedRecordID = taskID;
@@ -431,31 +428,50 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                 milliseconds: 200,
                               ),
                             );
-                            _model.editorHostModel.taskFormModel
-                                .taskNameTextController?.text = taskName!;
-
-                            _model.editorHostModel.taskFormModel
-                                .taskTypeValueController?.value = taskType!;
-                            _model.editorHostModel.taskFormModel.taskTypeValue =
-                                taskType!;
-                            _model.editorHostModel.taskFormModel
-                                .priorityValueController?.value = taskPriority!;
-                            _model.editorHostModel.taskFormModel.priorityValue =
-                                taskPriority!;
-                            _model.editorHostModel.taskFormModel
-                                .areaValueController?.value = taskAreaID!;
-                            _model.editorHostModel.taskFormModel.areaValue =
-                                taskAreaID!;
-                            _model.editorHostModel.taskFormModel
-                                .projectValueController?.value = taskProjectID!;
-                            _model.editorHostModel.taskFormModel.projectValue =
-                                taskProjectID!;
-                            _model.editorHostModel.taskFormModel
-                                .statusValueController?.value = taskStatus!;
-                            _model.editorHostModel.taskFormModel.statusValue =
-                                taskStatus!;
-                            _model.editorHostModel.taskFormModel.switchValue =
-                                taskActive;
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .taskNameTextController?.text = taskName!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .taskTypeValueController?.value = taskType!;
+                              _model.editorHostModel.taskFormModel
+                                  .taskTypeValue = taskType!;
+                            });
+                            safeSetState(() {
+                              _model
+                                  .editorHostModel
+                                  .taskFormModel
+                                  .priorityValueController
+                                  ?.value = taskPriority!;
+                              _model.editorHostModel.taskFormModel
+                                  .priorityValue = taskPriority!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .statusValueController?.value = taskStatus!;
+                              _model.editorHostModel.taskFormModel.statusValue =
+                                  taskStatus!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel
+                                  .areaValueController?.value = taskAreaID!;
+                              _model.editorHostModel.taskFormModel.areaValue =
+                                  taskAreaID!;
+                            });
+                            safeSetState(() {
+                              _model
+                                  .editorHostModel
+                                  .taskFormModel
+                                  .projectValueController
+                                  ?.value = taskProjectID!;
+                              _model.editorHostModel.taskFormModel
+                                  .projectValue = taskProjectID!;
+                            });
+                            safeSetState(() {
+                              _model.editorHostModel.taskFormModel.switchValue =
+                                  taskActive;
+                            });
                           },
                         ),
                       ),

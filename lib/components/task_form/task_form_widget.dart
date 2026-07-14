@@ -8,19 +8,13 @@ import '/flutter_flow/form_field_controller.dart';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'task_form_model.dart';
 export 'task_form_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
-  const TaskFormWidget({
-    super.key,
-    this.initialDueAt,
-  });
-
-  final DateTime? initialDueAt;
+  const TaskFormWidget({super.key});
 
   @override
   State<TaskFormWidget> createState() => _TaskFormWidgetState();
@@ -40,12 +34,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
     super.initState();
     _model = createModel(context, () => TaskFormModel());
 
-    // On component load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.selectedDueAt = widget!.initialDueAt;
-      safeSetState(() {});
-    });
-
     _model.taskNameTextController ??= TextEditingController();
     _model.taskNameFocusNode ??= FocusNode();
 
@@ -54,30 +42,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
 
   @override
   void dispose() {
-    // On component dispose action.
-    () async {
-      safeSetState(() {
-        _model.taskNameTextController?.clear();
-      });
-      safeSetState(() {
-        _model.taskTypeValueController?.reset();
-        _model.taskTypeValue = null;
-        _model.priorityValueController?.reset();
-        _model.priorityValue = null;
-        _model.areaValueController?.reset();
-        _model.areaValue = null;
-        _model.projectValueController?.reset();
-        _model.projectValue = null;
-        _model.statusValueController?.reset();
-        _model.statusValue = null;
-      });
-      safeSetState(() {
-        _model.switchValue = true;
-      });
-      _model.selectedDueAt = null;
-      _model.updatePage(() {});
-    }();
-
     _model.maybeDispose();
 
     super.dispose();
