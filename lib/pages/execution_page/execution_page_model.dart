@@ -23,6 +23,8 @@ class ExecutionPageModel extends FlutterFlowModel<ExecutionPageWidget> {
 
   String? isHovered;
 
+  DateTime? editingTaskDueAt;
+
   ///  State fields for stateful widgets in this page.
 
   // Model for Score component.

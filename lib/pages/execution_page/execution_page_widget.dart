@@ -77,10 +77,11 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                   updateCallback: () => safeSetState(() {}),
                   updateOnChange: true,
                   child: EditorHostWidget(
+                    initialTaskDueAt: _model.editingTaskDueAt,
                     closeEndDrawer: () async {
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
-
+                      _model.editingTaskDueAt = null;
                       safeSetState(() {});
                       safeSetState(() {
                         _model.editorHostModel.taskFormModel
@@ -422,12 +423,16 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                             FFAppState().editorMode = 'edit';
                             FFAppState().selectedRecordID = taskID;
                             FFAppState().update(() {});
+                            _model.editingTaskDueAt = taskDueAt;
+                            safeSetState(() {});
                             scaffoldKey.currentState!.openEndDrawer();
                             await Future.delayed(
                               Duration(
                                 milliseconds: 200,
                               ),
                             );
+
+                            safeSetState(() {});
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
                                   .taskNameTextController?.text = taskName!;

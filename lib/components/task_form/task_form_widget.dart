@@ -8,13 +8,21 @@ import '/flutter_flow/form_field_controller.dart';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'task_form_model.dart';
 export 'task_form_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
-  const TaskFormWidget({super.key});
+  const TaskFormWidget({
+    super.key,
+    this.onDueAtChange,
+    this.initialDueAt,
+  });
+
+  final Future Function(DateTime dueAt)? onDueAtChange;
+  final DateTime? initialDueAt;
 
   @override
   State<TaskFormWidget> createState() => _TaskFormWidgetState();
@@ -33,6 +41,12 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => TaskFormModel());
+
+    // On component load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.selectedDueAt = widget!.initialDueAt;
+      safeSetState(() {});
+    });
 
     _model.taskNameTextController ??= TextEditingController();
     _model.taskNameFocusNode ??= FocusNode();
@@ -358,6 +372,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         }
                         _model.selectedDueAt = _model.datePicked;
                         _model.updatePage(() {});
+                        await widget.onDueAtChange?.call(
+                          _model.selectedDueAt!,
+                        );
                       },
                       child: Container(
                         width: double.infinity,
