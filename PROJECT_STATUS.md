@@ -2,7 +2,7 @@
 
 ## Audit Record
 
-- **Date/time of audit:** 2026-07-14 05:10 UTC
+- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; no code changed)
 - **Audited commit:** `f69cabc5a1df25f8891388ea77e48d9b8aec9413`
 - **Audited branch:** `claude/completeos-audit-v1-path-hfpb6c` (identical to `develop` at audit time; `flutterflow` fully merged in, 0 commits ahead)
 - **Overall V1 completion: 52%**
@@ -20,14 +20,19 @@
 | Areas CRUD | 6 | 75% | 4.50 | Real per-category activity counts (currently hardcoded 0) |
 | Goals CRUD | 1 | 0% | 0.00 | Not required for V1 — hide the dead tab instead of building it |
 | Projects CRUD | 6 | 25% | 1.50 | Build full CRUD (read-only dropdown only today) |
-| Tasks CRUD (base) | 10 | 100% | 10.00 | None |
-| Task-type support (Habit/Routine/Bill/Appointment/Reminder/Event) | 10 | 25% | 2.50 | Dynamic form fields; wire habit_logs / routine_steps / routine_step_logs |
+| Tasks CRUD (base/common fields only, task_type='Task') | 10 | 100% | 10.00 | None — does NOT represent overall Task CRUD across all 7 types |
+| Task-type support: Habit | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, real streak metadata, habit_logs write, e2e test |
+| Task-type support: Routine | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, real step metadata, routine_steps/routine_step_logs write, e2e test |
+| Task-type support: Bill | 1.67 | 25% | 0.42 | Fields (amount/payee/login_url), DB mappings, create/edit wiring, display metadata, e2e test |
+| Task-type support: Appointment | 1.67 | 25% | 0.42 | Fields (start_at/end_at/location), DB mappings, create/edit wiring, display metadata, e2e test |
+| Task-type support: Reminder | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, display metadata, e2e test |
+| Task-type support: Event | 1.67 | 25% | 0.42 | Fields (start_at/end_at/location), DB mappings, create/edit wiring, display metadata, e2e test |
 | Schedules (Day Blocks/Daily Plans/Block Items) | 8 | 25% | 2.00 | Build UI end-to-end (schema + generated wrappers only today) |
 | Automations | 2 | 0% | 0.00 | Not required for V1 — hide the dead tab; no `automations` table exists |
 | Systems Control Panel | 6 | 50% | 3.00 | Wire Projects/Schedules tab bodies; hide Goals/Automation |
 | EditorHost | 6 | 50% | 3.00 | Add Project support (currently Area + Task only) |
-| Execution Dashboard | 6 | 50% | 3.00 | Wire Action Option Sheet (Skip/Postpone/Not Now/View Details — currently no onTap at all) |
-| Current Action and prioritization | 8 | 75% | 6.00 | Real routine step counts (currently hardcoded '0/0') |
+| Execution Dashboard | 6 | 50% | 3.00 | Wire Action Option Sheet (Skip/Postpone/Not Now/View Details — currently no onTap at all); make task-type icon dynamic |
+| Current Action and prioritization | 8 | 75% | 6.00 | Real routine step counts (currently hardcoded '0/0'); make task-type icon dynamic per active task's task_type (newly added, currently static) |
 | Testing and bug fixing | 4 | 0% | 0.00 | Only default FlutterFlow boilerplate test exists |
 | Deployment readiness | 3 | 25% | 0.75 | Pin Flutter/Dart SDK; resolve git-pinned dependency; verify prod RLS |
 | **Total** | **100** | — | **≈52%** | |
@@ -38,7 +43,7 @@
 
 - Email/password auth: sign in, sign up, session persistence/restoration, error handling — fully wired to Supabase.
 - Areas CRUD: create/edit/delete/list, correctly scoped by `user_id`.
-- Tasks CRUD (base object): create/edit/delete/list/status/priority/area+project assignment/active toggle — fully wired, correctly scoped.
+- Tasks CRUD — base/common fields only (task_type='Task'): create/edit/delete/list/status/priority/area+project assignment/active toggle — fully wired, correctly scoped. **Does not cover the other 6 task types — see Task-type support rows above, none of which are complete.**
 - Current Action prioritization: real server-side view (`current_action_candidates`), ordered by `priority_rank`/`due_at`, filtered by user and status; "mark complete" writes back correctly.
 - Application-level multi-user query isolation: all 25 real query call-sites in the app include a `user_id` filter — no gaps found in the code itself (server-side RLS is unverified, see risks).
 - `flutterflow` → `develop` merge pipeline: functioning as documented, 0 unmerged FlutterFlow work outstanding.
@@ -70,7 +75,14 @@ Tasks:
 
 1. **Immediate:** Confirm RLS + `profiles` trigger status on the live Supabase project.
 2. Approve and begin the Projects CRUD sprint described above.
-3. After Projects: Habit/Routine dynamic fields + logging UI (largest remaining V1 gap).
+3. After Projects — complete type-specific Task behavior for all 6 non-base types (largest remaining V1 gap), in this order:
+   a. Define the required additional fields for every task type (Habit, Routine, Bill, Appointment, Reminder, Event).
+   b. Add the fields to TaskForm using conditional visibility by `task_type`.
+   c. Verify the required columns/related tables exist in the live Supabase project (not just `schema.sql`, already known to be stale in at least one place).
+   d. Wire create and edit mappings for every type-specific field.
+   e. Update the task-type list subtitles to show correct metadata per type.
+   f. Make the Current Action icon dynamic based on the active task's `task_type`.
+   g. Test each task type end to end.
 4. Then: Action Option Sheet wiring (closes out Milestone 2).
 5. Then: Recurring Templates → Day Blocks/Daily Plans (Milestone 3/4, both required by the V1 Definition of Done).
 6. Hide Goals and Automation tabs — not required for V1, currently shipped as broken UX.

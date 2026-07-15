@@ -2,7 +2,7 @@
 
 Permanent source of truth for CompleteOS+ V1 completion. Update this file as work lands — do not let it drift from reality; re-verify against actual code, not intentions, before checking anything off.
 
-Last audited: 2026-07-14, commit `f69cabc`. **Overall: 52%.**
+Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product owner re: Task-type completion and Current Action icon; no code changed). **Overall: 52%.**
 
 ---
 
@@ -55,7 +55,9 @@ Last audited: 2026-07-14, commit `f69cabc`. **Overall: 52%.**
 - [ ] List/browse tab content in Systems Control Panel
 - [ ] EditorHost support (`editorType == 'project'`)
 
-## Tasks CRUD (base object) — weight 10, **100%**
+## Tasks CRUD (base/common fields only — task_type='Task') — weight 10, **100%**
+
+**Scope note:** this row covers only the shared/common fields (name, due date, priority, status, area/project assignment, active flag) on the generic `task_type='Task'` path. It does NOT represent overall Task CRUD across all 7 types — see the per-type breakdown below, which is tracked and scored separately and is explicitly NOT complete.
 
 - [x] Create
 - [x] Edit
@@ -69,12 +71,27 @@ Last audited: 2026-07-14, commit `f69cabc`. **Overall: 52%.**
 
 ## Task-type support (Habit/Routine/Bill/Appointment/Reminder/Event) — weight 10, **25%**
 
-- [x] Type selector on Task form (all 7 `task_type` values)
-- [x] Separately-filtered, correctly-scoped lists per type (7 real queries)
-- [ ] Dynamic form fields per type (Habit: target_value/unit/frequency; Bill: amount/payee; Appointment/Event: start_at/end_at/location) — form is currently one generic set of fields regardless of type
+**Scoring rule:** a type is NOT credited for completion merely because it appears in the `task_type` dropdown or has its own list section. Each type is scored on: required form fields, database mappings, create flow, edit flow, display metadata, and execution behavior — all six of which must actually work.
+
+| Type | Form fields | DB mappings verified | Create flow | Edit flow | Display metadata | Execution behavior | Completion |
+|---|---|---|---|---|---|---|---|
+| Habit | ✗ | Not verified | ✗ | ✗ | Partial (real `frequency`; streak hardcoded `'0'`) | ✗ (no `habit_logs` write) | 25% |
+| Routine | ✗ | Not verified | ✗ | ✗ | ✗ (steps count hardcoded `'0'`) | ✗ ("Routine steps go here" placeholder) | 25% |
+| Bill | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+| Appointment | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+| Reminder | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+| Event | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+
+- [x] Type selector on Task form (all 7 `task_type` values) — structure only, not a completion signal per scoring rule above
+- [x] Separately-filtered, correctly-scoped lists per type (7 real queries) — structure only, same caveat
+- [ ] Required additional fields defined for every type (Habit, Routine, Bill, Appointment, Reminder, Event)
+- [ ] Fields added to TaskForm with conditional visibility by `task_type` (form is currently one generic set of fields regardless of type)
+- [ ] Required columns/related tables verified to exist in the live Supabase project (not just `schema.sql`, which is already known to be stale in at least one place)
+- [ ] Create and edit mappings wired for every type-specific field (currently zero type-specific fields are read or written on save)
+- [ ] Task-type list subtitles updated to show correct metadata per type (currently Habit/Routine show hardcoded placeholder counts; Bill/Appointment/Reminder/Event show none)
 - [ ] Habit check-in logging UI (`habit_logs` table exists, generated wrapper never called)
-- [ ] Routine steps checklist UI (`routine_steps`/`routine_step_logs` tables exist, generated wrappers never called; Current Action literally shows placeholder text "Routine steps go here")
-- [ ] Real streak/step counts (currently hardcoded `'0'`)
+- [ ] Routine steps checklist UI (`routine_steps`/`routine_step_logs` tables exist, generated wrappers never called)
+- [ ] Each type tested end to end (create → edit → list display → Current Action behavior → completion)
 - [ ] De-duplicate `task_type_section_widget.dart`'s ~7x repeated per-type block into one parameterized component
 
 ## Schedules (Day Blocks / Daily Plans / Block Items) — weight 8, **25%**
@@ -113,6 +130,7 @@ Last audited: 2026-07-14, commit `f69cabc`. **Overall: 52%.**
 - [x] Mark-complete write-back
 - [ ] Action Option Sheet functional (Not Now / Skip Today / Postpone / View Details currently have no `onTap` at all)
 - [ ] Real step-count display (currently hardcoded `'0/0'`)
+- [ ] Task-type icon on the Current Action card is dynamic (icon exists but is currently static — does not change based on the active task record's `task_type`)
 
 ## Current Action and prioritization — weight 8, **75%**
 
@@ -120,6 +138,7 @@ Last audited: 2026-07-14, commit `f69cabc`. **Overall: 52%.**
 - [x] Correctly scoped, excludes completed/skipped
 - [x] Mark-complete works
 - [ ] Real routine-step content (currently placeholder text)
+- [ ] Task-type icon dynamic per active task's `task_type` (newly added, currently static — tracked here as its own item per explicit correction, not folded into other gaps)
 
 ## Testing and bug fixing — weight 4, **0%**
 
