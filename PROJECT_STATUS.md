@@ -79,6 +79,8 @@ Tasks:
 
 **Resolved since last update:** the Current Action query's removal of `.neqOrNull('status', 'Skipped')` is **confirmed intentional** by the Product Architect — "Skipped" represents a task that's now overdue and was never completed, so there's no product reason to permanently exclude it from resurfacing as the current action. Not a bug; no further action needed.
 
+**Status options shortened (verified in code):** `task_form_widget.dart:1179-1184` now offers only `Pending` / `In Progress` / `Completed` — `Skipped` and `Postponed` have been removed from the dropdown, and a full-tree grep confirms zero remaining references to either value anywhere in `lib/` (clean removal, no stale code). **DATABASE.md is now out of date** — it still documents `status` as `Pending / In Progress / Completed / Skipped / Postponed` (line ~50) and should be updated to match the 3-value model.
+
 ## Next Actions
 
 1. **Immediate:** Confirm RLS + `profiles` trigger status on the live Supabase project.
