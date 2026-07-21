@@ -196,7 +196,11 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   'Completed',
                                 )
                                 .order('priority_rank', ascending: true)
-                                .order('due_at', ascending: true),
+                                .order('start_at',
+                                    ascending: true, nullsFirst: false)
+                                .order('due_at',
+                                    ascending: true, nullsFirst: false)
+                                .order('created_at', ascending: true),
                           ),
                           builder: (context, snapshot) {
                             // Customize what your widget looks like when it's loading.
