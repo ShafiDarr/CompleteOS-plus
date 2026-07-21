@@ -1,24 +1,6 @@
 # PROJECT_STATUS.md
 
-## Architectural Decisions (Source of Truth — Product Architect, 2026-07-22)
-
-These are confirmed product/architecture decisions, treated as authoritative going forward regardless of current code/doc state. Where they conflict with DATABASE.md/ROADMAP.md as written, these decisions win until those docs are updated.
-
-1. **The Universal Task Model is the foundation of CompleteOS+.** Finish it before expanding other systems.
-2. **Tasks are moving away from a simple `due_at` model.** The scheduling model going forward is Start Date & Time + End Date & Time, with Deadline reserved as a possible future addition only if needed later. This scheduling model applies throughout the system, not just to one task type — exact scope across task types is being clarified (see Open Questions below).
-3. **Scheduling is block-first internally but calendar-first for the user.** Users visually build days/weeks/months; underneath, the system runs on Day Blocks and Daily Plans (existing schema, zero UI today).
-4. **Foundations before polish.** Do not recommend UI polish, visual fixes, or minor features while core systems (Universal Task Model, scheduling) are incomplete. This explicitly deprioritizes items previously flagged as "Milestone 5 polish" (dead Finance button, decorative search fields, theme toggle UI, etc.) until foundations are done.
-5. **When recommending work, prioritize what reduces future rework and strengthens the foundation** — not what's fastest or smallest in isolation.
-6. **Do not assume the codebase reflects every architectural decision.** Ask before recommending a build order when a decision's implementation scope is ambiguous.
-
-### Clarified scope (resolved 2026-07-22 — supersedes DATABASE.md's current `due_at`-only model)
-
-- **Start Date & Time + End Date & Time are the primary scheduling fields for tasks, used throughout the system** — not limited to Appointment/Event as today. Applies broadly across task types, not just duration-based ones.
-- **`due_at` is repurposed as an optional "Deadline" field** — not removed from the schema, but no longer "the" scheduling field. Populated only when a task actually requires a hard deadline distinct from its start/end window.
-- **Current Action's ordering should move from `due_at` to `start_at`** as the tiebreaker after `priority_rank` (currently `execution_page_widget.dart:198` orders by `due_at` — this is targeted for change, not yet implemented).
-- **Projects CRUD is NOT blocked by decision #1** — it can proceed in parallel with Universal Task Model completion since it doesn't touch task scheduling and reuses the already-proven Area/EditorHost pattern.
-
-**Status: none of the above exists in code yet.** `due_at` is still the sole scheduling field used everywhere in `task_form_widget.dart`/`editor_host_widget.dart` except the already-wired Appointment/Event `start_at`/`end_at`, and Current Action still orders by `due_at`. This section records target architecture agreed with the Product Architect, to guide the next round of TaskForm/scheduling work — implementation has not started.
+This file tracks implementation status and progress only. Architecture decisions live in ARCHITECTURE.md — see its "Confirmed Architecture Decisions" section for the Universal Task Model priority, the Start/End/Deadline scheduling model, and the block-first/calendar-first scheduling approach, all of which inform the priorities below.
 
 ## Audit Record
 

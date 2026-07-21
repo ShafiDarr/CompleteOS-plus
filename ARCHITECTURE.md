@@ -83,3 +83,33 @@ Responsibilities
 - Logout
 - Registration
 -
+
+---
+
+# Confirmed Architecture Decisions (Product Architect, 2026-07-22)
+
+These decisions are authoritative for CompleteOS+'s architecture going forward, regardless of current implementation state. Where they conflict with other documents as currently written (DATABASE.md's `due_at`-only description, ROADMAP.md's sequencing), these decisions take precedence until those documents are updated to match.
+
+## Universal Task Model Is The Foundation
+
+The Universal Task Model (see DOMAIN_ARCHITECTURE.md's Task section and DATABASE.md's "Universal Task Model") is the foundation of CompleteOS+. It must be finished — all seven `task_type` values genuinely supported end to end — before other systems are expanded. Projects CRUD is treated as independent of this rule: it does not touch task scheduling and may proceed in parallel.
+
+## Task Scheduling Model: Start/End, Not Due Date
+
+Tasks are moving away from a single `due_at` field as the primary scheduling mechanism. The scheduling model going forward:
+
+- **Start Date & Time** and **End Date & Time** are the primary scheduling fields, used throughout the system across task types — not limited to any single `task_type`.
+- **Deadline** (the existing `due_at` column, repurposed) is an optional field, populated only when a task genuinely requires a hard deadline distinct from its start/end window. It is not removed from the schema; its role changes from "the" scheduling field to a secondary, optional one.
+- Current Action prioritization orders candidate tasks by priority, then by start time (not due/deadline time).
+
+This supersedes DATABASE.md's current description of `due_at` as the primary scheduling field for tasks generally — DATABASE.md should be updated to match once this model is implemented.
+
+## Scheduling Is Block-First Internally, Calendar-First For The User
+
+Scheduling is architected as block-first internally: the system runs on Day Blocks (reusable time-block templates) and Daily Plans (a specific day's generated/instantiated blocks), per DATABASE.md's existing `day_blocks`/`daily_plans`/`daily_plan_blocks`/`block_items` tables. The user-facing experience should feel like a calendar — users visually build days, weeks, and months — while the underlying system continues to operate on Day Blocks and Daily Plans beneath that view.
+
+## Build Priority For This Phase
+
+- **Foundations before polish.** UI polish, visual improvements, and minor features should not be prioritized while core systems (the Universal Task Model and its scheduling model above) remain incomplete.
+- **Minimize future rework.** When multiple valid next steps exist, prefer the one that reduces rework and strengthens the foundation over the one that is fastest or smallest in isolation.
+- **Verify before assuming.** Do not assume the codebase reflects every architectural decision made outside of it. Confirm scope with the Product Architect before proposing a build order when a decision's implementation scope is ambiguous.
