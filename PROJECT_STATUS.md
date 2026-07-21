@@ -75,8 +75,9 @@ Tasks:
 3. No automated test coverage exists at all (only the default FlutterFlow boilerplate widget test).
 4. **`ScoreWidget` (`lib/components/score/score_widget.dart:56-57`) renders a hardcoded `'88'` and is live on the Execution Page** (`execution_page_widget.dart:146`) — every user sees a permanent fake score on the main dashboard. Found in a second, adversarial audit pass; **re-verified still present after the 2026-07-21 FlutterFlow export/merge — untouched.** Should be wired to the unused `daily_status.alignment_score` column or removed before any release.
 5. An entire "verification / reminder / calendar-sync" subsystem implied by DATABASE.md (`calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced`, `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` on `tasks`) is confirmed 100% unused in application code — not partially built, entirely vestigial.
-6. **Current Action query's status filter changed** — the 2026-07-21 FlutterFlow export removed `.neqOrNull('status', 'Skipped')` from the Current Action query (`execution_page_widget.dart`), so Skipped tasks can now resurface as the current action. This may be intentional (skipped work should come back around) or an unintended side effect of the re-export — worth a quick confirmation with the Product Architect since it changes user-facing prioritization behavior.
-7. Habit, Routine, Bill, and Reminder task types remain completely unwired for type-specific fields (only Appointment/Event got `start_at`/`end_at` in the latest export) — Habit and Routine are the two types actually required by the V1 Definition of Done, and neither was touched.
+6. Habit, Routine, Bill, and Reminder task types remain completely unwired for type-specific fields (only Appointment/Event got `start_at`/`end_at` in the latest export) — Habit and Routine are the two types actually required by the V1 Definition of Done, and neither was touched.
+
+**Resolved since last update:** the Current Action query's removal of `.neqOrNull('status', 'Skipped')` is **confirmed intentional** by the Product Architect — "Skipped" represents a task that's now overdue and was never completed, so there's no product reason to permanently exclude it from resurfacing as the current action. Not a bug; no further action needed.
 
 ## Next Actions
 

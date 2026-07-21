@@ -145,7 +145,7 @@ Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c
 - [x] Mark-complete works
 - [x] Task-type icon dynamic per active task's `task_type` — **verified fixed in commit `1c08b68`/PR #14**
 - [ ] Real routine-step content (currently placeholder text — untouched by the latest export)
-- [ ] **Confirm intentional:** the latest export removed the `.neqOrNull('status','Skipped')` filter from the Current Action query — Skipped tasks can now resurface as the current action. May be deliberate; flagged for Product Architect confirmation since it changes prioritization behavior.
+- [x] Skipped-status filter removed from the Current Action query — **confirmed intentional** by the Product Architect: "Skipped" is just an overdue, never-completed task, so it should keep resurfacing rather than being permanently excluded. Not a bug.
 
 ## Testing and bug fixing — weight 4, **0%**
 
