@@ -2,7 +2,7 @@
 
 ## Audit Record
 
-- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; no code changed)
+- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; self-challenge pass applied 2026-07-15 21:56 UTC — found a hardcoded fake score widget live on the dashboard and confirmed an entire unused verification/calendar-sync column set; no code changed in any pass)
 - **Audited commit:** `f69cabc5a1df25f8891388ea77e48d9b8aec9413`
 - **Audited branch:** `claude/completeos-audit-v1-path-hfpb6c` (identical to `develop` at audit time; `flutterflow` fully merged in, 0 commits ahead)
 - **Overall V1 completion: 52%**
@@ -70,6 +70,8 @@ Tasks:
 1. RLS enforcement and `profiles` auto-provisioning are unverifiable from this repository — must be checked against the live Supabase project before this audit's risk assessment can be trusted.
 2. `schema.sql` is stale relative to the live database: it's missing `tasks.priority_rank` and the entire `current_action_candidates` relation, both of which the Current Action feature depends on.
 3. No automated test coverage exists at all (only the default FlutterFlow boilerplate widget test).
+4. **`ScoreWidget` (`lib/components/score/score_widget.dart:56-57`) renders a hardcoded `'88'` and is live on the Execution Page** (`execution_page_widget.dart:146`) — every user sees a permanent fake score on the main dashboard. Found in a second, adversarial audit pass; should be wired to the unused `daily_status.alignment_score` column or removed before any release.
+5. An entire "verification / reminder / calendar-sync" subsystem implied by DATABASE.md (`calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced`, `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` on `tasks`) is confirmed 100% unused in application code — not partially built, entirely vestigial.
 
 ## Next Actions
 

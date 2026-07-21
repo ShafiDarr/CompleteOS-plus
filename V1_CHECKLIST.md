@@ -31,6 +31,8 @@ Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product own
 - [ ] RLS policies confirmed enabled on the live project (zero policy statements exist in `schema.sql`; cannot be verified from this repo)
 - [ ] `schema.sql` refreshed to include `tasks.priority_rank` and the `current_action_candidates` relation (both actively used by the app, absent from the dump)
 - [ ] Orphaned `areas.icon`/`color`/`sort_order` fields in generated model reconciled (either drop from generated code or confirm they exist live)
+- [ ] **Confirmed via targeted per-column grep (not just table-level sampling):** 8 `tasks` columns documented in DATABASE.md as core "Universal" fields — `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced`, `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` — have ZERO references anywhere in application code outside the generated backend wrapper. An entire verification/reminder/calendar-sync subsystem implied by the schema and docs is fully vestigial, not partially built.
+- [ ] Type-specific `tasks` columns (`target_value`, `unit`, `tracking_type`, `amount`, `payee`, `login_url`, `start_at`, `end_at`) confirmed at absolute zero UI usage (not merely "missing from the form" — no read or write path exists anywhere)
 
 ## Areas CRUD — weight 6, **75%**
 
@@ -128,9 +130,11 @@ Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product own
 
 - [x] Real "what's next" query and display
 - [x] Mark-complete write-back
+- [x] Real current date/time display (`DateTimeComponentWidget`, live and functional)
 - [ ] Action Option Sheet functional (Not Now / Skip Today / Postpone / View Details currently have no `onTap` at all)
 - [ ] Real step-count display (currently hardcoded `'0/0'`)
 - [ ] Task-type icon on the Current Action card is dynamic (icon exists but is currently static — does not change based on the active task record's `task_type`)
+- [ ] **`ScoreWidget` is a hardcoded fake metric** (`lib/components/score/score_widget.dart:56-57`, literal `'88'`, no query at all) — placed live on the Execution Page (`execution_page_widget.dart:146`), so every user sees a permanent fabricated score on the main dashboard. Should map to `daily_status.alignment_score`, which exists in schema for exactly this purpose but is never queried anywhere in the client. Found via a second, more adversarial audit pass — missed in the first pass because the `score` component directory was never opened.
 
 ## Current Action and prioritization — weight 8, **75%**
 
