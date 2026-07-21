@@ -2,9 +2,9 @@
 
 ## Audit Record
 
-- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; self-challenge pass applied 2026-07-15 21:56 UTC — found a hardcoded fake score widget live on the dashboard and confirmed an entire unused verification/calendar-sync column set; no code changed in any pass)
-- **Audited commit:** `f69cabc5a1df25f8891388ea77e48d9b8aec9413`
-- **Audited branch:** `claude/completeos-audit-v1-path-hfpb6c` (identical to `develop` at audit time; `flutterflow` fully merged in, 0 commits ahead)
+- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; self-challenge pass applied 2026-07-15 21:56 UTC — found a hardcoded fake score widget live on the dashboard and confirmed an entire unused verification/calendar-sync column set; **new FlutterFlow export verified merged 2026-07-21 21:39 UTC (commit `1c08b68`, merged into `develop` via PR #14) — re-verified against actual merged code, not just diffs, on 2026-07-21**)
+- **Audited commit:** `6c3d02e` (merge of PR #14, includes the audit docs from PR #13 and the new FlutterFlow export)
+- **Audited branch:** `claude/completeos-audit-v1-path-hfpb6c`, restarted from `origin/develop` after its own PR (#13) merged — no unmerged local work exists; branch is currently identical to `develop`
 - **Overall V1 completion: 52%**
 - **Audit confidence: Medium** — high confidence on anything verifiable from source (code, git history, actual query call-sites); low confidence on anything that only exists in the live Supabase project (RLS policies, `profiles` auto-creation trigger, and whether `tasks.priority_rank` / `current_action_candidates` genuinely exist server-side, since `schema.sql` is a stale/partial dump missing both).
 
@@ -24,9 +24,9 @@
 | Task-type support: Habit | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, real streak metadata, habit_logs write, e2e test |
 | Task-type support: Routine | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, real step metadata, routine_steps/routine_step_logs write, e2e test |
 | Task-type support: Bill | 1.67 | 25% | 0.42 | Fields (amount/payee/login_url), DB mappings, create/edit wiring, display metadata, e2e test |
-| Task-type support: Appointment | 1.67 | 25% | 0.42 | Fields (start_at/end_at/location), DB mappings, create/edit wiring, display metadata, e2e test |
-| Task-type support: Reminder | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, display metadata, e2e test |
-| Task-type support: Event | 1.67 | 25% | 0.42 | Fields (start_at/end_at/location), DB mappings, create/edit wiring, display metadata, e2e test |
+| Task-type support: Appointment | 1.67 | 50% | 0.84 | **Verified fixed in commit 1c08b68:** start_at/end_at now wired end-to-end (TaskForm → EditorHost → Supabase create/update → Systems Control Panel edit callback). Still missing: `location` field (zero references anywhere), list display metadata, distinct execution behavior, e2e test |
+| Task-type support: Reminder | 1.67 | 25% | 0.42 | Fields, DB mappings, create/edit wiring, display metadata, e2e test — untouched by the latest FlutterFlow export |
+| Task-type support: Event | 1.67 | 50% | 0.84 | **Verified fixed in commit 1c08b68:** start_at/end_at now wired end-to-end, same as Appointment. Still missing: `location` field, list display metadata, distinct execution behavior, e2e test |
 | Schedules (Day Blocks/Daily Plans/Block Items) | 8 | 25% | 2.00 | Build UI end-to-end (schema + generated wrappers only today) |
 | Automations | 2 | 0% | 0.00 | Not required for V1 — hide the dead tab; no `automations` table exists |
 | Systems Control Panel | 6 | 50% | 3.00 | Wire Projects/Schedules tab bodies; hide Goals/Automation |
@@ -35,7 +35,7 @@
 | Current Action and prioritization | 8 | 75% | 6.00 | Real routine step counts (currently hardcoded '0/0'); make task-type icon dynamic per active task's task_type (newly added, currently static) |
 | Testing and bug fixing | 4 | 0% | 0.00 | Only default FlutterFlow boilerplate test exists |
 | Deployment readiness | 3 | 25% | 0.75 | Pin Flutter/Dart SDK; resolve git-pinned dependency; verify prod RLS |
-| **Total** | **100** | — | **≈52%** | |
+| **Total** | **100** | — | **≈53%** (up from ≈52% — Appointment/Event task-type support each moved 25%→50% after verifying commit `1c08b68`'s start_at/end_at wiring against the actual merged code) | |
 
 ---
 
@@ -46,7 +46,10 @@
 - Tasks CRUD — base/common fields only (task_type='Task'): create/edit/delete/list/status/priority/area+project assignment/active toggle — fully wired, correctly scoped. **Does not cover the other 6 task types — see Task-type support rows above, none of which are complete.**
 - Current Action prioritization: real server-side view (`current_action_candidates`), ordered by `priority_rank`/`due_at`, filtered by user and status; "mark complete" writes back correctly.
 - Application-level multi-user query isolation: all 25 real query call-sites in the app include a `user_id` filter — no gaps found in the code itself (server-side RLS is unverified, see risks).
-- `flutterflow` → `develop` merge pipeline: functioning as documented, 0 unmerged FlutterFlow work outstanding.
+- `flutterflow` → `develop` merge pipeline: functioning as documented, 0 unmerged FlutterFlow work outstanding (verified 2026-07-21 after PR #14 merged).
+- **Current Action task-type icon is now genuinely dynamic** — verified against merged code: 7 distinct icons keyed on `task_type` (`current_action_widget.dart:96-133`). Previously flagged as static/incomplete; confirmed fixed in commit `1c08b68`.
+- **Appointment/Event `start_at`/`end_at` fields now have real end-to-end wiring** — verified: `TaskFormWidget`'s `onStartAtChange`/`onEndAtChange` → `EditorHostModel`/`EditorHostWidget` → real Supabase create/update calls → `SystemsControlPanelWidget`'s `onTaskEdit` callback (all 7 task-type sections) → `ExecutionPageModel` state. Confirmed fixed in commit `1c08b68`.
+- **Sidebar title inconsistency fixed** — `mobile_drawer_widget.dart` now reads "CompleteOS+", consistent with `expanded_sidebar_widget.dart`. Confirmed fixed in commit `1c08b68`.
 
 ## Current Sprint
 
@@ -70,8 +73,10 @@ Tasks:
 1. RLS enforcement and `profiles` auto-provisioning are unverifiable from this repository — must be checked against the live Supabase project before this audit's risk assessment can be trusted.
 2. `schema.sql` is stale relative to the live database: it's missing `tasks.priority_rank` and the entire `current_action_candidates` relation, both of which the Current Action feature depends on.
 3. No automated test coverage exists at all (only the default FlutterFlow boilerplate widget test).
-4. **`ScoreWidget` (`lib/components/score/score_widget.dart:56-57`) renders a hardcoded `'88'` and is live on the Execution Page** (`execution_page_widget.dart:146`) — every user sees a permanent fake score on the main dashboard. Found in a second, adversarial audit pass; should be wired to the unused `daily_status.alignment_score` column or removed before any release.
+4. **`ScoreWidget` (`lib/components/score/score_widget.dart:56-57`) renders a hardcoded `'88'` and is live on the Execution Page** (`execution_page_widget.dart:146`) — every user sees a permanent fake score on the main dashboard. Found in a second, adversarial audit pass; **re-verified still present after the 2026-07-21 FlutterFlow export/merge — untouched.** Should be wired to the unused `daily_status.alignment_score` column or removed before any release.
 5. An entire "verification / reminder / calendar-sync" subsystem implied by DATABASE.md (`calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced`, `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` on `tasks`) is confirmed 100% unused in application code — not partially built, entirely vestigial.
+6. **Current Action query's status filter changed** — the 2026-07-21 FlutterFlow export removed `.neqOrNull('status', 'Skipped')` from the Current Action query (`execution_page_widget.dart`), so Skipped tasks can now resurface as the current action. This may be intentional (skipped work should come back around) or an unintended side effect of the re-export — worth a quick confirmation with the Product Architect since it changes user-facing prioritization behavior.
+7. Habit, Routine, Bill, and Reminder task types remain completely unwired for type-specific fields (only Appointment/Event got `start_at`/`end_at` in the latest export) — Habit and Routine are the two types actually required by the V1 Definition of Done, and neither was touched.
 
 ## Next Actions
 

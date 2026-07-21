@@ -2,7 +2,7 @@
 
 Permanent source of truth for CompleteOS+ V1 completion. Update this file as work lands — do not let it drift from reality; re-verify against actual code, not intentions, before checking anything off.
 
-Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product owner re: Task-type completion and Current Action icon; no code changed). **Overall: 52%.**
+Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c08b68`, was merged into `develop` via PR #14 and verified directly against the merged code — not inferred from diffs). **Overall: 53%.**
 
 ---
 
@@ -80,9 +80,11 @@ Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product own
 | Habit | ✗ | Not verified | ✗ | ✗ | Partial (real `frequency`; streak hardcoded `'0'`) | ✗ (no `habit_logs` write) | 25% |
 | Routine | ✗ | Not verified | ✗ | ✗ | ✗ (steps count hardcoded `'0'`) | ✗ ("Routine steps go here" placeholder) | 25% |
 | Bill | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
-| Appointment | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+| Appointment | ✓ (start_at/end_at only — `location` still missing) | ✓ verified (matches `schema.sql`) | ✓ | ✓ | ✗ | ✗ | **50%** — verified fixed in commit `1c08b68`/PR #14 |
 | Reminder | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
-| Event | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
+| Event | ✓ (start_at/end_at only — `location` still missing) | ✓ verified (matches `schema.sql`) | ✓ | ✓ | ✗ | ✗ | **50%** — verified fixed in commit `1c08b68`/PR #14 |
+
+**Note:** Habit and Routine are the only two non-base task types actually named in ROADMAP.md's V1 Definition of Done. The latest FlutterFlow export (commit `1c08b68`) did not touch either — it only wired Appointment/Event. Prioritize Habit/Routine next, not further Appointment/Event polish.
 
 - [x] Type selector on Task form (all 7 `task_type` values) — structure only, not a completion signal per scoring rule above
 - [x] Separately-filtered, correctly-scoped lists per type (7 real queries) — structure only, same caveat
@@ -133,7 +135,7 @@ Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product own
 - [x] Real current date/time display (`DateTimeComponentWidget`, live and functional)
 - [ ] Action Option Sheet functional (Not Now / Skip Today / Postpone / View Details currently have no `onTap` at all)
 - [ ] Real step-count display (currently hardcoded `'0/0'`)
-- [ ] Task-type icon on the Current Action card is dynamic (icon exists but is currently static — does not change based on the active task record's `task_type`)
+- [x] Task-type icon on the Current Action card is dynamic — **verified fixed in commit `1c08b68`/PR #14**: 7 distinct icons keyed on `task_type` (`current_action_widget.dart:96-133`)
 - [ ] **`ScoreWidget` is a hardcoded fake metric** (`lib/components/score/score_widget.dart:56-57`, literal `'88'`, no query at all) — placed live on the Execution Page (`execution_page_widget.dart:146`), so every user sees a permanent fabricated score on the main dashboard. Should map to `daily_status.alignment_score`, which exists in schema for exactly this purpose but is never queried anywhere in the client. Found via a second, more adversarial audit pass — missed in the first pass because the `score` component directory was never opened.
 
 ## Current Action and prioritization — weight 8, **75%**
@@ -141,8 +143,9 @@ Last audited: 2026-07-15, commit `f69cabc` (scoring corrections from product own
 - [x] Server-side prioritized query (`current_action_candidates`, ordered by `priority_rank`/`due_at`)
 - [x] Correctly scoped, excludes completed/skipped
 - [x] Mark-complete works
-- [ ] Real routine-step content (currently placeholder text)
-- [ ] Task-type icon dynamic per active task's `task_type` (newly added, currently static — tracked here as its own item per explicit correction, not folded into other gaps)
+- [x] Task-type icon dynamic per active task's `task_type` — **verified fixed in commit `1c08b68`/PR #14**
+- [ ] Real routine-step content (currently placeholder text — untouched by the latest export)
+- [ ] **Confirm intentional:** the latest export removed the `.neqOrNull('status','Skipped')` filter from the Current Action query — Skipped tasks can now resurface as the current action. May be deliberate; flagged for Product Architect confirmation since it changes prioritization behavior.
 
 ## Testing and bug fixing — weight 4, **0%**
 
