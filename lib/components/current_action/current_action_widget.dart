@@ -91,10 +91,58 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                   color: FlutterFlowTheme.of(context).primaryBackground,
                   borderRadius: BorderRadius.circular(99.0),
                 ),
-                child: Icon(
-                  Icons.notifications_active_rounded,
-                  color: FlutterFlowTheme.of(context).primaryText,
-                  size: 24.0,
+                child: Builder(
+                  builder: (context) {
+                    if (widget!.actionType == 'Task') {
+                      return Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Habit') {
+                      return Icon(
+                        Icons.repeat_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Routine') {
+                      return Icon(
+                        Icons.checklist_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Appointment') {
+                      return Icon(
+                        Icons.event_available_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Bill') {
+                      return Icon(
+                        Icons.receipt_long_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Reminder') {
+                      return Icon(
+                        Icons.notifications_active_rounded,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else if (widget!.actionType == 'Event') {
+                      return Icon(
+                        Icons.celebration_outlined,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    } else {
+                      return Icon(
+                        Icons.category_outlined,
+                        color: FlutterFlowTheme.of(context).primaryText,
+                        size: 24.0,
+                      );
+                    }
+                  },
                 ),
               ),
               Padding(
@@ -105,86 +153,107 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize.max,
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                await showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  enableDrag: false,
-                                  context: context,
-                                  builder: (context) {
-                                    return Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: ActionOptionSheetWidget(
-                                        actionTitle: widget!.actionTitle!,
-                                        actionId: widget!.actionId!,
-                                        actionType: widget!.actionType,
-                                      ),
-                                    );
-                                  },
-                                ).then((value) => safeSetState(() {}));
-                              },
-                              child: Text(
-                                valueOrDefault<String>(
-                                  widget!.actionTitle,
-                                  'Current Task',
-                                ),
-                                textAlign: TextAlign.start,
-                                maxLines: 1,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.interTight(
+                        Container(
+                          width: 200.0,
+                          decoration: BoxDecoration(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  await showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    enableDrag: false,
+                                    context: context,
+                                    builder: (context) {
+                                      return Padding(
+                                        padding:
+                                            MediaQuery.viewInsetsOf(context),
+                                        child: ActionOptionSheetWidget(
+                                          actionTitle: widget!.actionTitle!,
+                                          actionId: widget!.actionId!,
+                                          actionType: widget!.actionType,
+                                        ),
+                                      );
+                                    },
+                                  ).then((value) => safeSetState(() {}));
+                                },
+                                child: Text(
+                                  valueOrDefault<String>(
+                                    widget!.actionTitle,
+                                    'Current Task',
+                                  ),
+                                  textAlign: TextAlign.start,
+                                  maxLines: 1,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.interTight(
+                                          fontWeight: FontWeight.normal,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        fontSize: 15.0,
+                                        letterSpacing: 0.0,
                                         fontWeight: FontWeight.normal,
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .fontStyle,
                                       ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      fontSize: 15.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.normal,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                overflow: TextOverflow.ellipsis,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            if (widget!.showMetadata == true)
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (widget!.showMetadata == true)
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 0.0, 0.0, 8.0),
-                                      child: Text(
-                                        valueOrDefault<String>(
-                                          widget!.metadataText,
-                                          'No Area',
-                                        ),
-                                        textAlign: TextAlign.start,
-                                        maxLines: 1,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.inter(
+                              if (widget!.showMetadata == true)
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (widget!.showMetadata == true)
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 0.0, 8.0),
+                                        child: Text(
+                                          valueOrDefault<String>(
+                                            widget!.metadataText,
+                                            'No Area',
+                                          ),
+                                          textAlign: TextAlign.start,
+                                          maxLines: 1,
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyMedium
+                                              .override(
+                                                font: GoogleFonts.inter(
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryText,
+                                                fontSize: 12.0,
+                                                letterSpacing: 0.0,
                                                 fontWeight:
                                                     FlutterFlowTheme.of(context)
                                                         .bodyMedium
@@ -194,26 +263,13 @@ class _CurrentActionWidgetState extends State<CurrentActionWidget> {
                                                         .bodyMedium
                                                         .fontStyle,
                                               ),
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              fontSize: 12.0,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                ],
-                              ),
-                          ].divide(SizedBox(height: 6.0)),
+                                  ],
+                                ),
+                            ].divide(SizedBox(height: 6.0)),
+                          ),
                         ),
                         Container(
                           width: 24.0,

@@ -18,6 +18,10 @@ class EditorHostModel extends FlutterFlowModel<EditorHostWidget> {
 
   DateTime? taskDueAt;
 
+  DateTime? taskStartAt;
+
+  DateTime? taskEndAt;
+
   ///  State fields for stateful widgets in this component.
 
   // Model for AreaForm component.

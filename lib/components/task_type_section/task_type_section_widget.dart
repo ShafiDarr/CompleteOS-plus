@@ -112,7 +112,7 @@ class _TaskTypeSectionWidgetState extends State<TaskTypeSectionWidget> {
                                     borderRadius: BorderRadius.circular(99.0),
                                   ),
                                   child: Icon(
-                                    Icons.check_circle_outline,
+                                    Icons.check_circle_outline_rounded,
                                     color: FlutterFlowTheme.of(context)
                                         .primaryText,
                                     size: 24.0,

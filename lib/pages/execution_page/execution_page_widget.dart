@@ -78,10 +78,14 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                   updateOnChange: true,
                   child: EditorHostWidget(
                     initialTaskDueAt: _model.editingTaskDueAt,
+                    initialTaskStartAt: _model.editingTaskStartAt,
+                    initialTaskEndAt: _model.editingTaskEndAt,
                     closeEndDrawer: () async {
                       FFAppState().selectedRecordID = '';
                       FFAppState().update(() {});
                       _model.editingTaskDueAt = null;
+                      _model.editingTaskStartAt = null;
+                      _model.editingTaskEndAt = null;
                       safeSetState(() {});
                       safeSetState(() {
                         _model.editorHostModel.taskFormModel
@@ -191,10 +195,6 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                   'status',
                                   'Completed',
                                 )
-                                .neqOrNull(
-                                  'status',
-                                  'Skipped',
-                                )
                                 .order('priority_rank', ascending: true)
                                 .order('due_at', ascending: true),
                           ),
@@ -217,6 +217,10 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                 rowCurrentActionCandidatesRowList =
                                 snapshot.data!;
 
+                            // Return an empty Container when the item does not exist.
+                            if (snapshot.data!.isEmpty) {
+                              return Container();
+                            }
                             final rowCurrentActionCandidatesRow =
                                 rowCurrentActionCandidatesRowList.isNotEmpty
                                     ? rowCurrentActionCandidatesRowList.first
@@ -418,7 +422,9 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                               taskStatus,
                               taskAreaID,
                               taskProjectID,
-                              taskActive) async {
+                              taskActive,
+                              taskStartAt,
+                              taskEndAt) async {
                             FFAppState().editorType = 'task';
                             FFAppState().editorMode = 'edit';
                             FFAppState().selectedRecordID = taskID;

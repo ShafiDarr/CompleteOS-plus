@@ -70,7 +70,7 @@ class _MobileDrawerWidgetState extends State<MobileDrawerWidget> {
                     padding:
                         EdgeInsetsDirectional.fromSTEB(32.0, 24.0, 0.0, 0.0),
                     child: Text(
-                      'CompleteOS',
+                      'CompleteOS+',
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                         font: GoogleFonts.interTight(
                           fontWeight: FontWeight.bold,
