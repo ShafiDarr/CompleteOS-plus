@@ -318,6 +318,18 @@ Avoid duplicating logic across task types unless there is a compelling reason th
 
 ---
 
+# P023 — Defer Non-Blocking Technical Debt
+
+When architectural violations or technical debt are discovered during implementation, do not immediately recommend refactoring.
+
+1. Determine whether the issue blocks the current objective.
+2. If it does not block the objective, record it as future technical debt and continue with the current objective.
+3. Only recommend immediate refactoring when leaving the issue in place would cause significant future rework, incorrect architecture, or data integrity problems.
+
+Favor shipping V1 over achieving architectural perfection.
+
+---
+
 # Engineering Decision Framework
 
 Before implementing any change, ask:
