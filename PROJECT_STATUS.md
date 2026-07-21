@@ -101,21 +101,23 @@ Tasks:
 
 **Status options shortened (verified in code):** `task_form_widget.dart:1179-1184` now offers only `Pending` / `In Progress` / `Completed` — `Skipped` and `Postponed` have been removed from the dropdown, and a full-tree grep confirms zero remaining references to either value anywhere in `lib/` (clean removal, no stale code). **DATABASE.md is now out of date** — it still documents `status` as `Pending / In Progress / Completed / Skipped / Postponed` (line ~50) and should be updated to match the 3-value model.
 
-## Next Actions
+## Next Actions (updated 2026-07-22 to reflect the Start/End scheduling architecture)
 
-1. **Immediate:** Confirm RLS + `profiles` trigger status on the live Supabase project.
-2. Approve and begin the Projects CRUD sprint described above.
-3. After Projects — complete type-specific Task behavior for all 6 non-base types (largest remaining V1 gap), in this order:
-   a. Define the required additional fields for every task type (Habit, Routine, Bill, Appointment, Reminder, Event).
-   b. Add the fields to TaskForm using conditional visibility by `task_type`.
-   c. Verify the required columns/related tables exist in the live Supabase project (not just `schema.sql`, already known to be stale in at least one place).
-   d. Wire create and edit mappings for every type-specific field.
-   e. Update the task-type list subtitles to show correct metadata per type.
-   f. Make the Current Action icon dynamic based on the active task's `task_type`.
-   g. Test each task type end to end.
-4. Then: Action Option Sheet wiring (closes out Milestone 2).
-5. Then: Recurring Templates → Day Blocks/Daily Plans (Milestone 3/4, both required by the V1 Definition of Done).
-6. Hide Goals and Automation tabs — not required for V1, currently shipped as broken UX.
+1. **Generalize Start/End Date & Time to all task types** (currently Appointment/Event-only), demoting `due_at` to an optional "Deadline" field in the same form. Do this before adding any more type-specific fields — extending the already-proven Appointment/Event pattern now costs less than rebuilding Habit/Routine fields on the old model later.
+2. **Update Current Action's ordering** from `priority_rank`/`due_at` to `priority_rank`/`start_at` (`execution_page_widget.dart:198`) — do this right after step 1, since it depends on `start_at` being populated across all types.
+3. **Habit fields** (`target_value`, `unit`, `frequency`, `tracking_type`) on top of the now-universal Start/End base.
+4. **Habit check-in write path** (`habit_logs` insert) — streak metadata has nothing to read without this.
+5. **Routine steps sub-flow** (`routine_steps` CRUD + `routine_step_logs` completion) — replaces the "Routine steps go here" placeholder. Largest remaining chunk.
+6. **TaskTypeSection display-metadata pass** across all types, once 1-5 give it real data — do this last, not per-type as each field lands.
+7. **Projects CRUD** — can run in parallel with any of the above (confirmed by Product Architect: not blocked by "finish Task Model first," since it doesn't touch scheduling and reuses the proven Area/EditorHost pattern).
+
+**Deferred per decision #4 (foundations before polish) — do not recommend until the Task Model above is done:** Bill/Reminder type-specific fields (not in V1 DoD), `ScoreWidget`'s hardcoded score, dead Finance sidebar button, decorative search fields, theme-mode toggle UI, Goals/Automation tab hiding.
+
+**Flagged, not yet actionable:** the Action Option Sheet's "Skip Today"/"Postpone" buttons were designed around `Skipped`/`Postponed` status values that no longer exist after the 3-value status simplification (`Pending`/`In Progress`/`Completed`). When this gets picked up, it needs a rethink of what those buttons should do now, not a direct wire-up of the original design.
+
+**After the Universal Task Model is functionally complete:** Day Blocks + Daily Plans — the block-first internal engine with a calendar-first UI (decisions #1 and #3), matching ROADMAP.md's own Milestone 3 → Milestone 4 sequencing.
+
+**Still outstanding, no dependency on the above, do whenever convenient:** Confirm RLS + `profiles` trigger status on the live Supabase project.
 
 ## Branch Strategy
 
