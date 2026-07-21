@@ -308,6 +308,16 @@ Confirm scope before recommending a build order when a decision's implementation
 
 ---
 
+# P022 — Prefer Generic Solutions Over Type-Specific Ones
+
+Whenever possible, design systems to be generic rather than type-specific.
+
+If a capability can be implemented once in the Universal Task Model instead of separately for Tasks, Habits, Routines, Bills, Appointments, and Events, prefer the generic solution.
+
+Avoid duplicating logic across task types unless there is a compelling reason that the behavior truly differs.
+
+---
+
 # Engineering Decision Framework
 
 Before implementing any change, ask:
