@@ -309,7 +309,13 @@ When tradeoffs exist, prioritize in this order:
 5. Performance
 6. Convenience
 
-Never sacrifice architecture for speed.
+Never sacrifice the long-term architecture for short-term speed.
+
+However, do not delay V1 by pursuing architectural perfection when the remaining issue is non-blocking technical debt.
+
+Architecture comes first. Perfection does not.
+
+See SYSTEM_PRINCIPLES.md P023 for how to handle technical debt discovered during implementation.
 
 ---
 
