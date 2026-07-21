@@ -19,10 +19,14 @@ class EditorHostWidget extends StatefulWidget {
     super.key,
     this.closeEndDrawer,
     this.initialTaskDueAt,
+    this.initialTaskStartAt,
+    this.initialTaskEndAt,
   });
 
   final Future Function()? closeEndDrawer;
   final DateTime? initialTaskDueAt;
+  final DateTime? initialTaskStartAt;
+  final DateTime? initialTaskEndAt;
 
   @override
   State<EditorHostWidget> createState() => _EditorHostWidgetState();
@@ -274,6 +278,10 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                       _model.taskFormModel.projectValue,
                                   'task_type':
                                       _model.taskFormModel.taskTypeValue,
+                                  'start_at': supaSerialize<DateTime>(
+                                      _model.taskStartAt),
+                                  'end_at':
+                                      supaSerialize<DateTime>(_model.taskEndAt),
                                 });
                                 safeSetState(() {
                                   _model.taskFormModel.taskNameTextController
@@ -332,6 +340,10 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                                       'area_id': _model.taskFormModel.areaValue,
                                       'project_id':
                                           _model.taskFormModel.projectValue,
+                                      'start_at': supaSerialize<DateTime>(
+                                          _model.taskStartAt),
+                                      'end_at': supaSerialize<DateTime>(
+                                          _model.taskEndAt),
                                     },
                                     matchingRows: (rows) => rows
                                         .eqOrNull(
@@ -402,8 +414,18 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                         updateOnChange: true,
                         child: TaskFormWidget(
                           initialDueAt: widget!.initialTaskDueAt,
+                          initialStartAt: widget!.initialTaskStartAt,
+                          initialEndAt: widget!.initialTaskEndAt,
                           onDueAtChange: (dueAt) async {
                             _model.taskDueAt = dueAt;
+                            safeSetState(() {});
+                          },
+                          onStartAtChange: (startAt) async {
+                            _model.taskStartAt = startAt;
+                            safeSetState(() {});
+                          },
+                          onEndAtChange: (endAt) async {
+                            _model.taskEndAt = endAt;
                             safeSetState(() {});
                           },
                         ),

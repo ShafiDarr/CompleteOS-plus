@@ -65,7 +65,7 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                  color: FlutterFlowTheme.of(context).alternate,
                   borderRadius: BorderRadius.circular(16.0),
                 ),
                 child: Column(
@@ -118,13 +118,12 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                                 ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            color: Color(0x00000000),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -132,9 +131,9 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: Color(0x00000000),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
@@ -142,9 +141,9 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: FlutterFlowTheme.of(context).error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
@@ -152,13 +151,11 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: FlutterFlowTheme.of(context).error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
-                        filled: true,
-                        fillColor: FlutterFlowTheme.of(context).alternate,
                       ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             font: GoogleFonts.interTight(
@@ -229,13 +226,12 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                                 ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context)
-                                .secondaryBackground,
+                            color: Color(0x00000000),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16.0),
-                            bottomRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -243,9 +239,9 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: Color(0x00000000),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16.0),
-                            bottomRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
@@ -253,9 +249,9 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: FlutterFlowTheme.of(context).error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16.0),
-                            bottomRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
@@ -263,13 +259,11 @@ class _AreaFormWidgetState extends State<AreaFormWidget> {
                             color: FlutterFlowTheme.of(context).error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(16.0),
-                            bottomRight: Radius.circular(16.0),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4.0),
+                            topRight: Radius.circular(4.0),
                           ),
                         ),
-                        filled: true,
-                        fillColor: FlutterFlowTheme.of(context).alternate,
                       ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             font: GoogleFonts.interTight(

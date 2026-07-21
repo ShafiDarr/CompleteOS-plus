@@ -25,6 +25,10 @@ class ExecutionPageModel extends FlutterFlowModel<ExecutionPageWidget> {
 
   DateTime? editingTaskDueAt;
 
+  DateTime? editingTaskStartAt;
+
+  DateTime? editingTaskEndAt;
+
   ///  State fields for stateful widgets in this page.
 
   // Model for Score component.

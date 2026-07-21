@@ -34,7 +34,9 @@ class SystemsControlPanelWidget extends StatefulWidget {
       String? taskStatus,
       String? taskAreaID,
       String? taskProjectID,
-      bool taskActive)? onTaskEdit;
+      bool taskActive,
+      DateTime taskStartAt,
+      DateTime taskEndAt)? onTaskEdit;
 
   @override
   State<SystemsControlPanelWidget> createState() =>
@@ -857,18 +859,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
-                                                                              );
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(
-                                                                                  content: Text(
-                                                                                    listViewTasksRow.status!,
-                                                                                    style: TextStyle(
-                                                                                      color: FlutterFlowTheme.of(context).primaryText,
-                                                                                    ),
-                                                                                  ),
-                                                                                  duration: Duration(milliseconds: 4000),
-                                                                                  backgroundColor: FlutterFlowTheme.of(context).secondary,
-                                                                                ),
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -1211,6 +1203,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -1544,6 +1538,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -1849,6 +1845,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -2155,6 +2153,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -2461,6 +2461,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:
@@ -2767,6 +2769,8 @@ class _SystemsControlPanelWidgetState extends State<SystemsControlPanelWidget> {
                                                                                 listViewTasksRow.areaId,
                                                                                 listViewTasksRow.projectId,
                                                                                 listViewTasksRow.isActive!,
+                                                                                listViewTasksRow.startAt!,
+                                                                                listViewTasksRow.endAt!,
                                                                               );
                                                                             },
                                                                             child:

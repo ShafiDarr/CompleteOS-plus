@@ -18,6 +18,10 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
 
   DateTime? selectedDueAt;
 
+  DateTime? selectedStartAt;
+
+  DateTime? selectedEndAt;
+
   ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
@@ -40,7 +44,9 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   // State field(s) for TaskType widget.
   String? taskTypeValue;
   FormFieldController<String>? taskTypeValueController;
-  DateTime? datePicked;
+  DateTime? datePicked1;
+  DateTime? datePicked2;
+  DateTime? datePicked3;
   // State field(s) for Priority widget.
   String? priorityValue;
   FormFieldController<String>? priorityValueController;
