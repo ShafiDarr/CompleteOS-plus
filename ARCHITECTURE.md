@@ -107,9 +107,3 @@ This supersedes DATABASE.md's current description of `due_at` as the primary sch
 ## Scheduling Is Block-First Internally, Calendar-First For The User
 
 Scheduling is architected as block-first internally: the system runs on Day Blocks (reusable time-block templates) and Daily Plans (a specific day's generated/instantiated blocks), per DATABASE.md's existing `day_blocks`/`daily_plans`/`daily_plan_blocks`/`block_items` tables. The user-facing experience should feel like a calendar — users visually build days, weeks, and months — while the underlying system continues to operate on Day Blocks and Daily Plans beneath that view.
-
-## Build Priority For This Phase
-
-- **Foundations before polish.** UI polish, visual improvements, and minor features should not be prioritized while core systems (the Universal Task Model and its scheduling model above) remain incomplete.
-- **Minimize future rework.** When multiple valid next steps exist, prefer the one that reduces rework and strengthens the foundation over the one that is fastest or smallest in isolation.
-- **Verify before assuming.** Do not assume the codebase reflects every architectural decision made outside of it. Confirm scope with the Product Architect before proposing a build order when a decision's implementation scope is ambiguous.

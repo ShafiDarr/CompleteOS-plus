@@ -282,6 +282,32 @@ Avoid shortcuts that create unnecessary architectural debt.
 
 ---
 
+# P019 — Foundations Before Polish
+
+Do not prioritize UI polish, visual improvements, or minor features while core systems remain incomplete.
+
+Finish the foundation first.
+
+---
+
+# P020 — Minimize Future Rework
+
+When multiple valid next steps exist, prefer the one that reduces future rework and strengthens the foundation.
+
+Do not choose the fastest or smallest option in isolation if it creates rework later.
+
+---
+
+# P021 — Ask Before Assuming
+
+Do not assume the codebase reflects every architectural decision.
+
+When the code and the architecture diverge, ask for clarification rather than guessing.
+
+Confirm scope before recommending a build order when a decision's implementation is ambiguous.
+
+---
+
 # Engineering Decision Framework
 
 Before implementing any change, ask:
