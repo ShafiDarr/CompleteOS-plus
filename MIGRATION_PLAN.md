@@ -181,19 +181,19 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **This is already-confirmed architecture (ARCHITECTURE.md, 2026-07-22) being implemented, not a new decision.** No new approval is required for the *direction*; each item is still gated on Phase 1 landing for the specific tables it touches.
 
-### 4.1 Generalize Start/End Date & Time to all task types; demote `due_at` to Deadline; update `current_action_candidates`
+### 4.1 Restore Start/End Date & Time wiring, then generalize to all task types; demote `due_at` to Deadline; update `current_action_candidates`
 
-**What:** Extend the already-proven Appointment/Event `start_at`/`end_at` wiring (form → EditorHost → Supabase → Systems Control Panel) to every `task_type`. Relabel `due_at` as an optional Deadline field. Update the `current_action_candidates` view's filter (currently `WHERE due_at IS NULL OR due_at < CURRENT_DATE + 1 day`) and the Dart-side ordering (`execution_page_widget.dart:198`) to use `start_at` instead of `due_at`, together — not one without the other, or the two will disagree about which tasks are eligible.
+**What:** **Corrected 2026-07-25 — this is now a two-part item, not a one-part extension.** Part A: restore the `start_at`/`end_at` wiring (form → EditorHost → Supabase → Systems Control Panel) that previously existed for Appointment/Event as of commit `1c08b68`, but was subsequently removed during unrelated EditorHost debugging — only the Due Date implementation was restored afterward. Part B: once restored and verified, generalize that wiring to every `task_type`, relabel `due_at` as an optional Deadline field, and update the `current_action_candidates` view's filter (currently `WHERE due_at IS NULL OR due_at < CURRENT_DATE + 1 day`) and the Dart-side ordering (`execution_page_widget.dart:198`) to use `start_at` instead of `due_at` — together, not one without the other, or the two will disagree about which tasks are eligible. **`due_at` remains the current production scheduling field, for every task type, until Part A and B are both done and verified — do not build or assume any dependency on `start_at` before then.**
 
-**Why:** Confirmed architecture decision; confirmed live 2026-07-24 that the view was never updated for it and that zero live tasks have `start_at` populated yet, so this is genuinely unbuilt, not just untested.
+**Why:** Confirmed architecture decision (unchanged); confirmed live 2026-07-24 that the view was never updated and zero live tasks have `start_at` populated. **Additionally confirmed by the Product Architect 2026-07-25: there is currently zero Start/End wiring in the app at all, for any type — not merely "ungeneralized."** The regression happened after the 2026-07-24 audit and after `MIGRATION_PLAN.md`'s original draft, so the original wording ("extend the already-proven pattern") described a baseline that no longer exists.
 
-**Risk:** Low-Medium — the view change alters what surfaces as the Current Action, a real behavior change for the end user, even though the decision itself is already approved.
+**Risk:** Low-Medium, **revised from the original estimate** — this now includes a full restoration of previously-working functionality before any generalization work starts, not just a view/ordering change on top of existing wiring. The view change itself still alters what surfaces as the Current Action, a real behavior change for the end user.
 
 **Depends on:** Phase 1 (this only touches `tasks`, which already has working RLS — no hard dependency, but sequenced after Phase 1 as a matter of course).
 
-**Affected files:** `lib/` (TaskForm, EditorHost, per-type sections), Supabase migration (view definition), `execution_page_widget.dart`.
+**Affected files:** `lib/` (TaskForm, EditorHost, per-type sections — restoration first, then generalization), Supabase migration (view definition), `execution_page_widget.dart`.
 
-**Approval:** 🟢 Not required for direction (already confirmed); 🟡 the `current_action_candidates` view edit specifically is worth a heads-up since it changes live user-facing behavior, not a full re-approval.
+**Approval:** 🟢 Not required for direction (target architecture already confirmed and unaffected by this correction); 🟡 the `current_action_candidates` view edit specifically is worth a heads-up since it changes live user-facing behavior, not a full re-approval. **Verification requirement added 2026-07-25: restoration (Part A) must be independently verified against the live app — not just re-reading a diff — before Part B (generalization) begins, given the previous wiring was verified once already and regressed without anyone intending it to.**
 
 ### 4.2 Habit fields + `habit_logs` write path
 
@@ -253,7 +253,7 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 | 2.2 | Vestigial column set | 🔴 Required | Blocks Reminder in Phase 4.4 |
 | 2.3 | Recurring Templates scope | 🔴 Required | Blocks part of Phase 6 |
 | 3.1 | Scoped UNIQUE constraints | 🟡 Required | No |
-| 4.1–4.3 | Start/End, Habit, Routine | 🟢 None (direction already approved) | Each gated on Phase 1 landing |
+| 4.1–4.3 | Start/End (restore + generalize, see 2026-07-25 correction), Habit, Routine | 🟢 None (direction already approved) | Each gated on Phase 1 landing |
 | 4.4 | Bill / Reminder | 🟢 / blocked on 2.2 | Reminder blocked, Bill not |
 | 5 | Projects CRUD | 🟢 None | Gated on 1.1's `projects` policy only |
 | 6 | Schedules | 🟢 None (direction already approved) | Gated on Phase 1 + Phase 4 |

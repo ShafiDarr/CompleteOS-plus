@@ -2,7 +2,9 @@
 
 Permanent source of truth for CompleteOS+ V1 completion. Update this file as work lands — do not let it drift from reality; re-verify against actual code, not intentions, before checking anything off. For the product-level definition of V1's scope, mission, and Commitment Types this checklist measures against, see V1_PRODUCT.md.
 
-Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c08b68`, was merged into `develop` via PR #14 and verified directly against the merged code — not inferred from diffs). **Overall: 53%.**
+Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c08b68`, was merged into `develop` via PR #14 and verified directly against the merged code — not inferred from diffs).
+
+**Correction 2026-07-25 (Product Architect report, not a re-audit):** the Start Date/End Date (`start_at`/`end_at`) wiring credited to Appointment/Event below as fixed in `1c08b68` was subsequently removed during unrelated EditorHost debugging, and only Due Date was restored. Appointment and Event rows below are corrected from 50% back to 25% to reflect current implementation state. This is an implementation regression, not a change to the approved Start/End/Deadline target architecture. **Overall: 53%** — this file's Task-type support section header already stated a 25% average, which the corrected per-type rows below now actually match (the previous 50%/50% Appointment/Event rows were inconsistent with that header even before this correction); the header-driven total is therefore unchanged by this specific edit. **PROJECT_STATUS.md has the authoritative, fully-recomputed total (≈51%)**, which additionally reflects the separate live RLS findings not yet synced into this file — treat that number, not this one, as current.
 
 ---
 
@@ -80,11 +82,11 @@ Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c
 | Habit | ✗ | Not verified | ✗ | ✗ | Partial (real `frequency`; streak hardcoded `'0'`) | ✗ (no `habit_logs` write) | 25% |
 | Routine | ✗ | Not verified | ✗ | ✗ | ✗ (steps count hardcoded `'0'`) | ✗ ("Routine steps go here" placeholder) | 25% |
 | Bill | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
-| Appointment | ✓ (start_at/end_at only — `location` still missing) | ✓ verified (matches `schema.sql`) | ✓ | ✓ | ✗ | ✗ | **50%** — verified fixed in commit `1c08b68`/PR #14 |
+| Appointment | ✗ **[regressed]** | Not verified | ✗ | ✗ | ✗ | ✗ | 25% — **was 50%, verified fixed in `1c08b68`/PR #14; that wiring was subsequently removed during unrelated EditorHost debugging (reported 2026-07-25) and only Due Date was restored — see PROJECT_STATUS.md Blocker #8** |
 | Reminder | ✗ | Not verified | ✗ | ✗ | ✗ | ✗ | 25% |
-| Event | ✓ (start_at/end_at only — `location` still missing) | ✓ verified (matches `schema.sql`) | ✓ | ✓ | ✗ | ✗ | **50%** — verified fixed in commit `1c08b68`/PR #14 |
+| Event | ✗ **[regressed]** | Not verified | ✗ | ✗ | ✗ | ✗ | 25% — same regression as Appointment, see above |
 
-**Note:** Habit and Routine are the only two non-base task types actually named in ROADMAP.md's V1 Definition of Done. The latest FlutterFlow export (commit `1c08b68`) did not touch either — it only wired Appointment/Event. Prioritize Habit/Routine next, not further Appointment/Event polish.
+**Note:** Habit and Routine are the only two non-base task types actually named in ROADMAP.md's V1 Definition of Done. The `1c08b68` FlutterFlow export wired Appointment/Event's `start_at`/`end_at`, not Habit/Routine — and that wiring has since been reverted entirely (see regression note above), so as of 2026-07-25 all six non-base types are equally unwired. Prioritize Habit/Routine next per the V1 Definition of Done; Start/End restoration for Appointment/Event is separately tracked in MIGRATION_PLAN.md Phase 4.1, now scoped as a rebuild rather than an extension.
 
 - [x] Type selector on Task form (all 7 `task_type` values) — structure only, not a completion signal per scoring rule above
 - [x] Separately-filtered, correctly-scoped lists per type (7 real queries) — structure only, same caveat

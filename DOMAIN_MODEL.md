@@ -93,8 +93,8 @@ Every entity and field below is marked:
 | `status` | text | IN V1 (frozen) | **Three values only: `Pending` / `In Progress` / `Completed`.** `Skipped`/`Postponed` were removed from the UI and confirmed intentional (see MIGRATION_PLAN.md — the Action Option Sheet's Skip/Postpone buttons need rethinking, not restoring the old values). Any document still showing five values is stale. |
 | `priority` | text | IN V1 | Critical / High / Medium / Low |
 | `priority_rank` | smallint | IN V1 | drives Current Action ordering; exists live, was missing from `schema.sql` until this migration |
-| `due_at` | timestamptz | IN V1, repurposed | becomes the optional **Deadline** field, not the primary scheduling mechanism — see Scheduling Model below |
-| `start_at`, `end_at` | timestamptz | IN V1, not yet generalized | primary scheduling fields; currently wired for Appointment/Event only; 0 of 24 live rows have either set — this is unimplemented, not merely unused |
+| `due_at` | timestamptz | IN V1 target architecture, repurposed to Deadline — **but currently the sole production scheduling field** | Target: becomes the optional **Deadline** field once Start/End is implemented. **Current implementation baseline (corrected 2026-07-25): `due_at` is the only scheduling field wired end-to-end today, for every `task_type`.** See Scheduling Model below for the current-vs-target split. |
+| `start_at`, `end_at` | timestamptz | IN V1 target architecture; **not currently implemented for any task_type** | Target: the primary scheduling fields, universal across all types. **Current implementation baseline (corrected 2026-07-25): zero wiring exists.** These were wired for Appointment/Event as of commit `1c08b68` (verified 2026-07-21), but that wiring was subsequently removed during unrelated EditorHost debugging and never restored — only the Due Date implementation was restored afterward. 0 of 24 live rows have either set. Do not assume any code path (TaskForm, EditorHost, Current Action, `current_action_candidates`) can read or write these fields until this is rebuilt and re-verified. |
 | `completed_at` | timestamptz | IN V1 | completion timestamp |
 | `completed` | boolean | **DEPRECATED — do not use** | Redundant with `status`. Live data confirms it has already drifted: 12 of 24 rows have `completed = false` while `status = 'Completed'`. Not read anywhere in application code (verified: only the generated Supabase accessor references it). `status` is the single source of truth going forward, per SYSTEM_PRINCIPLES.md P007. Resolution is a migration item, not a documentation-only note — see MIGRATION_PLAN.md Phase 2. |
 | `is_active` | boolean | IN V1 | universal; for Habit/Routine it means "is the recurring definition still enabled"; for other types it defaults `true` and carries no meaning yet |
@@ -102,12 +102,19 @@ Every entity and field below is marked:
 | `requires_verification`, `verification_status` | — | OPEN QUESTION | V1_PRODUCT.md explicitly asks whether this is a personal completion-honesty feature or vestigial multi-person-accountability scope that doesn't belong in V1 at all |
 | `reminder_level`, `acknowledged_at` | — | OPEN QUESTION | V1_PRODUCT.md explicitly asks what these should do for the Reminder Commitment Type. **Note:** 10 of 24 live rows have `reminder_level` set despite zero application code ever writing it — this is very likely seed/test data inserted directly, not evidence of real usage; do not treat it as a signal that this field is already working. |
 
-### Scheduling Model (Confirmed Architecture Decision, ARCHITECTURE.md, 2026-07-22)
+### Scheduling Model
+
+**Target architecture (Confirmed Architecture Decision, ARCHITECTURE.md, 2026-07-22 — unchanged, still approved):**
 
 - **Start Date & Time / End Date & Time** are the primary scheduling fields, used across every `task_type` — not Appointment/Event-only.
 - **Deadline** (the `due_at` column, repurposed) is optional, populated only when a task genuinely needs a hard deadline distinct from its start/end window.
 - Current Action orders candidates by `priority_rank`, then start time — not due/deadline time.
-- **Not yet implemented:** the live `current_action_candidates` view still filters on `due_at` only, and no live task has `start_at` populated. This is tracked as MIGRATION_PLAN.md Phase 4.1, not a documentation gap.
+
+**Current implementation baseline (corrected 2026-07-25 — this is implementation status, not an architecture change):**
+
+- `due_at` is the only scheduling field currently wired end-to-end, for every `task_type`. Treat it as the current production scheduling field until Start/End is rebuilt.
+- `start_at`/`end_at` have **zero current wiring**, for any type. They were wired for Appointment/Event as of commit `1c08b68` (verified 2026-07-21), but that wiring was removed during unrelated EditorHost debugging and never restored. This is a regression to fix, not new ground to break.
+- The live `current_action_candidates` view still filters on `due_at` only — this is now the *correct* current-state description, not a stale one. Current Action ordering by `start_at` must not be assumed to work, or built against, until Phase 4.1 (MIGRATION_PLAN.md) both restores the Start/End wiring and updates this view together, and both are verified against real data.
 
 ### Relationships
 
@@ -186,7 +193,7 @@ Per ARCHITECTURE.md's Confirmed Architecture Decision: the system runs internall
 
 **Definition:** The single highest-priority Task the user should execute next, across all Commitment Types. Served by the live `current_action_candidates` view (verified to exist; absent from `schema.sql`).
 
-**Not an entity with its own storage** — it's a query result over `tasks`, ordered by `priority_rank` then (today) `due_at`, soon to be `start_at` per the Scheduling Model above.
+**Not an entity with its own storage** — it's a query result over `tasks`, ordered by `priority_rank` then `due_at`. This will move to `start_at` per the target Scheduling Model above, but not until Start/End is rebuilt and verified (see the Current Implementation Baseline note above) — do not assume or build against a `start_at`-based ordering as a present-tense fact.
 
 ---
 
