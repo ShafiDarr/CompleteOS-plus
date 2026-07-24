@@ -4,11 +4,11 @@ This file tracks implementation status and progress only. Product scope (mission
 
 ## Audit Record
 
-- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; self-challenge pass applied 2026-07-15 21:56 UTC — found a hardcoded fake score widget live on the dashboard and confirmed an entire unused verification/calendar-sync column set; **new FlutterFlow export verified merged 2026-07-21 21:39 UTC (commit `1c08b68`, merged into `develop` via PR #14) — re-verified against actual merged code, not just diffs, on 2026-07-21**)
+- **Date/time of audit:** 2026-07-14 05:10 UTC (scoring corrections applied 2026-07-15 02:08 UTC — product owner clarified Task-type completion criteria and flagged the Current Action icon gap; self-challenge pass applied 2026-07-15 21:56 UTC — found a hardcoded fake score widget live on the dashboard and confirmed an entire unused verification/calendar-sync column set; **new FlutterFlow export verified merged 2026-07-21 21:39 UTC (commit `1c08b68`, merged into `develop` via PR #14) — re-verified against actual merged code, not just diffs, on 2026-07-21**; **live Supabase project queried directly 2026-07-24 — RLS, `profiles` trigger, `priority_rank`/`current_action_candidates`, and actual row data all verified server-side for the first time, see updated Blockers and Audit Confidence below**)
 - **Audited commit:** `6c3d02e` (merge of PR #14, includes the audit docs from PR #13 and the new FlutterFlow export)
 - **Audited branch:** `claude/completeos-audit-v1-path-hfpb6c`, restarted from `origin/develop` after its own PR (#13) merged — no unmerged local work exists; branch is currently identical to `develop`
-- **Overall V1 completion: 52%**
-- **Audit confidence: Medium** — high confidence on anything verifiable from source (code, git history, actual query call-sites); low confidence on anything that only exists in the live Supabase project (RLS policies, `profiles` auto-creation trigger, and whether `tasks.priority_rank` / `current_action_candidates` genuinely exist server-side, since `schema.sql` is a stale/partial dump missing both).
+- **Overall V1 completion: ≈52%** (down from ≈53% — see Database and Supabase row: live RLS audit found 11 of 13 tables have zero policies, which is worse than the "unverified" assumption the previous score was based on)
+- **Audit confidence: Medium-High** — high confidence on anything verifiable from source (code, git history, actual query call-sites), now also high confidence on the live Supabase project itself (RLS policies, `profiles` auto-creation trigger, and `tasks.priority_rank` / `current_action_candidates` all directly queried 2026-07-24). Remaining gap: no way to test the *actual app* against the live project from this environment, so behavior (as opposed to schema/policy state) is still inferred, not observed.
 
 ---
 
@@ -18,7 +18,7 @@ This file tracks implementation status and progress only. Product scope (mission
 |---|---:|---:|---:|---|
 | Foundation and architecture | 8 | 75% | 6.00 | Finish ARCHITECTURE.md (cuts off mid-section); document Repository pattern honestly |
 | Authentication and multi-user isolation | 8 | 75% | 6.00 | Add "Forgot password" UI; enable `requireAuth`; verify/insert `profiles` on signup |
-| Database and Supabase | 8 | 50% | 4.00 | Refresh `schema.sql`; document `current_action_candidates` view; verify RLS live |
+| Database and Supabase | 8 | 35% | 2.80 | **Live-verified 2026-07-24 (lowered from 50%, was previously an optimistic assumption):** 11 of 13 tables (`profiles`, `projects`, `recurring_templates`, `habit_logs`, `day_blocks`, `block_items`, `daily_status`, `routine_step_logs`, `routine_steps`, `daily_plans`, `daily_plan_blocks`) have RLS enabled but zero policies — default-deny, so the app's `anon`/`authenticated` client cannot read or write any of them today. Only `areas` and `tasks` have real policies. Add per-table RLS policies (straightforward `auth.uid() = user_id` for 9 of the 11; `profiles` needs `auth.uid() = id`; `routine_steps` has no `user_id` column at all and needs a subquery policy through its parent `tasks.user_id`). Also refresh `schema.sql` (confirmed still missing `priority_rank` and `current_action_candidates`, both of which exist live) and fix `handle_new_user()`'s mutable `search_path` (linter WARN) |
 | Areas CRUD | 6 | 75% | 4.50 | Real per-category activity counts (currently hardcoded 0) |
 | Goals CRUD | 1 | 0% | 0.00 | Not required for V1 — hide the dead tab instead of building it |
 | Projects CRUD | 6 | 25% | 1.50 | Build full CRUD (read-only dropdown only today) |
@@ -37,7 +37,7 @@ This file tracks implementation status and progress only. Product scope (mission
 | Current Action and prioritization | 8 | 75% | 6.00 | Real routine step counts (currently hardcoded '0/0'); make task-type icon dynamic per active task's task_type (newly added, currently static) |
 | Testing and bug fixing | 4 | 0% | 0.00 | Only default FlutterFlow boilerplate test exists |
 | Deployment readiness | 3 | 25% | 0.75 | Pin Flutter/Dart SDK; resolve git-pinned dependency; verify prod RLS |
-| **Total** | **100** | — | **≈53%** (up from ≈52% — Appointment/Event task-type support each moved 25%→50% after verifying commit `1c08b68`'s start_at/end_at wiring against the actual merged code) | |
+| **Total** | **100** | — | **≈52%** (down from ≈53% — Database and Supabase dropped 50%→35% after live RLS audit found 11 of 13 tables have no policies at all; previous score assumed RLS was probably fine pending verification) | |
 
 ---
 
@@ -55,10 +55,12 @@ This file tracks implementation status and progress only. Product scope (mission
 
 ## Current Sprint
 
-**Objective:** Complete Projects CRUD end-to-end (reusing the proven Area/EditorHost pattern), in parallel with a one-time manual check of live Supabase RLS + `profiles` trigger status.
+**Objective:** Complete Projects CRUD end-to-end (reusing the proven Area/EditorHost pattern).
+
+**Blocking prerequisite (found 2026-07-24, see Blocker #1): `public.projects` has RLS enabled with zero policies.** Nothing in this sprint's Tasks 2-7 can pass its own acceptance criteria (or even the existing read-only dropdown) against the live project until a policy like `areas`'/`tasks`' four (`auth.uid() = user_id`, one each for `SELECT`/`INSERT`/`UPDATE`/`DELETE`) is added to `projects`. Add that policy first — this is a database change and needs the Product Architect's sign-off same as any other schema change per CLAUDE.md, not something to slip in silently while building the Dart side.
 
 Tasks:
-1. Verify RLS policies + `profiles` auto-creation trigger on the live Supabase project (dashboard/CLI check, not code).
+1. ~~Verify RLS policies + `profiles` auto-creation trigger on the live Supabase project~~ — **done 2026-07-24, see Blocker #1**: `profiles` trigger confirmed working; RLS confirmed enabled-but-policyless on `projects` (and 10 other tables) — add the `projects` RLS policy before continuing this sprint.
 2. Add `ProjectFormModel`/`ProjectFormWidget` mirroring `area_form`.
 3. Wire `EditorHostModel`/`EditorHostWidget` with a `'project'` editorType branch (create + edit + save).
 4. Add a `'project'` branch to `ConfirmDeleteDialogWidget`.
@@ -72,12 +74,13 @@ Tasks:
 
 ## Blockers
 
-1. RLS enforcement and `profiles` auto-provisioning are unverifiable from this repository — must be checked against the live Supabase project before this audit's risk assessment can be trusted.
-2. `schema.sql` is stale relative to the live database: it's missing `tasks.priority_rank` and the entire `current_action_candidates` relation, both of which the Current Action feature depends on.
+1. **[VERIFIED LIVE 2026-07-24, updated from "unverifiable"]** `profiles` auto-provisioning works as documented — `auth.users` has an `on_auth_user_created` trigger firing a `SECURITY DEFINER` function `handle_new_user()` that inserts a `profiles` row on signup. **But RLS itself is a live, confirmed blocker, not a theoretical risk:** every table in `public` gets RLS auto-enabled by an event trigger (`rls_auto_enable()`, fires on `CREATE TABLE`) — this explains why `rls_enabled` is `true` everywhere — but that trigger only flips the RLS switch, it never creates a policy. Someone then hand-wrote policies for `areas` and `tasks` only (4 each: `SELECT`/`INSERT`/`UPDATE`/`DELETE`, all `auth.uid() = user_id`). The other **11 tables have RLS enabled with zero policies**, which is Postgres default-deny: `profiles`, `projects`, `recurring_templates`, `habit_logs`, `day_blocks`, `block_items`, `daily_status`, `routine_step_logs`, `routine_steps`, `daily_plans`, `daily_plan_blocks` are all completely inaccessible to the app's real `anon`/`authenticated` client — not a data-leak risk, the opposite: total lockout. Concretely this means: the "read-only Projects dropdown" this audit previously called 25% done is almost certainly rendering empty for every real signed-in user right now (the 9 `projects` rows found in the live DB could only have been inserted via a privileged/service-role connection, not through the app), and the current sprint's Projects CRUD objective cannot pass its own acceptance criteria until a `projects` policy exists. Every unbuilt table this audit has been treating as "just needs UI wiring" (`habit_logs`, `routine_steps`, `day_blocks`, `daily_plans`, etc.) also needs an RLS policy added before that wiring can work at all — this is now a prerequisite step for every remaining Next Action, not just Projects. `routine_steps` has no `user_id` column, so its policy can't copy the `areas`/`tasks` pattern — it needs a subquery through `tasks.user_id` via `task_id`. Also flagged by the linter: `handle_new_user()` has a mutable `search_path` (hijacking risk for a `SECURITY DEFINER` function, WARN level), and Auth's leaked-password-protection setting is disabled (WARN, one-toggle fix).
+2. **[VERIFIED LIVE 2026-07-24, confirmed accurate]** `schema.sql` is stale relative to the live database: confirmed via direct query that `tasks.priority_rank` (`smallint`) and the `current_action_candidates` view both exist live and neither appears anywhere in `schema.sql`. The view's definition also only filters on `due_at` (`WHERE due_at IS NULL OR due_at < CURRENT_DATE + 1 day`) — it was never updated for the Start/End scheduling architecture, and no live task has `start_at` populated yet (0 of 24 rows), so Next Action #2 below ("update ordering to `priority_rank`/`start_at`") should also update this view's filter, not just the Dart query, or the two will disagree about which tasks are eligible.
 3. No automated test coverage exists at all (only the default FlutterFlow boilerplate widget test).
 4. **`ScoreWidget` (`lib/components/score/score_widget.dart:56-57`) renders a hardcoded `'88'` and is live on the Execution Page** (`execution_page_widget.dart:146`) — every user sees a permanent fake score on the main dashboard. Found in a second, adversarial audit pass; **re-verified still present after the 2026-07-21 FlutterFlow export/merge — untouched.** Should be wired to the unused `daily_status.alignment_score` column or removed before any release.
 5. An entire "verification / reminder / calendar-sync" subsystem implied by DATABASE.md (`calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced`, `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` on `tasks`) is confirmed 100% unused in application code — not partially built, entirely vestigial.
 6. Habit, Routine, Bill, and Reminder task types remain completely unwired for type-specific fields (only Appointment/Event got `start_at`/`end_at` in the latest export) — Habit and Routine are the two types actually required by the V1 Definition of Done, and neither was touched.
+7. **[NEW, live data 2026-07-24]** `tasks.completed` (boolean) and `tasks.status` (text) are redundant and actively out of sync in production: 12 of the 24 live rows have `completed = false` while `status = 'Completed'` (zero rows show the opposite mismatch). The 3-value `status` field is clearly the one the UI actually reads/writes (consistent with the already-verified `Pending`/`In Progress`/`Completed` dropdown); `completed` looks like an orphaned FlutterFlow default nothing keeps updated. Not urgent by itself, but anything that ever reads `completed` (a filter, a metric, a future migration) will silently get the wrong answer for half the completed tasks in the DB today. Worth consolidating onto `status` alone when the schema is next touched, same treatment as the `calendar_sync`/verification column set in item 5.
 
 **Resolved since last update:** the Current Action query's removal of `.neqOrNull('status', 'Skipped')` is **confirmed intentional** by the Product Architect — "Skipped" represents a task that's now overdue and was never completed, so there's no product reason to permanently exclude it from resurfacing as the current action. Not a bug; no further action needed.
 
@@ -99,7 +102,7 @@ Tasks:
 
 **After the Universal Task Model is functionally complete:** Day Blocks + Daily Plans — the block-first internal engine with a calendar-first UI (decisions #1 and #3), matching ROADMAP.md's own Milestone 3 → Milestone 4 sequencing.
 
-**Still outstanding, no dependency on the above, do whenever convenient:** Confirm RLS + `profiles` trigger status on the live Supabase project.
+**Resolved 2026-07-24:** RLS + `profiles` trigger status confirmed on the live Supabase project — `profiles` trigger works, but RLS turned out to have zero policies on 11 of 13 tables. See Blocker #1. New outstanding item this raises: add RLS policies for those 11 tables (product-owner sign-off needed on policy shape per CLAUDE.md's database rules, even though the pattern is mechanical for 10 of them).
 
 ## Branch Strategy
 
@@ -110,13 +113,20 @@ Tasks:
 
 ## Audit Confidence & Unverified Items
 
-**Confidence: Medium.**
+**Confidence: Medium-High** (raised from Medium 2026-07-24 — the live Supabase project itself is no longer a blind spot, see below).
 
-Cannot be verified from this repository (require direct access to the live Supabase project):
-- Whether RLS is actually enabled and correctly scoped on all 13 tables.
-- Whether a signup trigger auto-creates `profiles` rows.
-- Whether `tasks.priority_rank` and `current_action_candidates` genuinely exist server-side (used by the app, absent from `schema.sql`).
-- Whether the anon key embedded in `lib/backend/supabase/supabase.dart` corresponds to a project with restrictive RLS (the key itself is a public anon key, not a secret leak, but its safety depends entirely on server-side policy).
+**Verified directly against the live Supabase project, 2026-07-24** (previously listed below as unverifiable):
+- RLS is enabled on all 13 tables, but only `areas` and `tasks` have actual policies — the other 11 have RLS-enabled-with-no-policy, i.e. total lockout for the app's real client. See Blocker #1.
+- The `on_auth_user_created` → `handle_new_user()` signup trigger does auto-create `profiles` rows, exactly as documented.
+- `tasks.priority_rank` (`smallint`) and the `current_action_candidates` view both genuinely exist server-side; `schema.sql` is confirmed stale (missing both, plus every column the view selects). See Blocker #2.
+- Live row counts as of 2026-07-24 (ground truth, not estimates — see methodology note below): `tasks` 24 (`Task` 16 [4 Completed/1 In Progress/11 Pending], `Reminder` 4, `Habit` 2, `Routine` 2 — **zero** `Bill`/`Appointment`/`Event` rows exist despite those types having form fields), `recurring_templates` 46 (10 tasks reference one via `template_id`, all valid/non-orphaned — this table is quietly non-trivial, not dead, but is one of the 11 tables the app can't currently reach), `routine_steps` 15, `areas` 9, `projects` 9, `profiles` 3, everything else (`habit_logs`, `day_blocks`, `block_items`, `daily_status`, `routine_step_logs`, `daily_plans`, `daily_plan_blocks`) 0.
+- No row currently has `start_at` or `end_at` set (0 of 24) despite the Start/End scheduling architecture being "confirmed" — the schema and form support it, but no real data has ever exercised it yet.
+
+**Methodology note:** the Supabase table-listing tool's row counts are Postgres planner estimates (`pg_class.reltuples`), not live counts, and were caught stale for both `recurring_templates` (reported 0, actually 46) and `projects` (reported 0, actually 9) during this audit. Any future row-count claim in this doc should be a direct `count(*)`, not a table-listing estimate.
+
+Still cannot be verified from this repository or this environment:
+- Whether the anon key embedded in `lib/backend/supabase/supabase.dart` corresponds to *this* project (it should, but was not cross-checked byte-for-byte against the live project's API settings).
+- Actual app behavior against the live project — schema/policy state was queried directly, but no build of the app was run against it, so e.g. "does the Projects dropdown actually render empty" is a strong inference from the RLS state, not an observed screenshot.
 
 Assumptions made in this audit:
 - `schema.sql`'s header ("for context only... may not be valid for execution") was taken at face value — it's treated as a possibly-stale reference, not the authoritative live schema.
