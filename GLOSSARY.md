@@ -2,7 +2,7 @@
 
 # CompleteOS+ Glossary
 
-This document defines the official terminology used throughout CompleteOS+.
+This is a short, alphabetical quick-reference index. **DOMAIN_MODEL.md is the canonical, detailed, live-verified source for domain language** — fields, states, V1 scope, and relationships. Entries below give the one-line meaning; consult DOMAIN_MODEL.md for the authoritative definition of any entity that also appears there.
 
 All documentation, database tables, UI, and code should use these definitions consistently.
 

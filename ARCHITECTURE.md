@@ -15,8 +15,10 @@ It complements:
 - VISION.md (Why the platform exists)
 - V1_PRODUCT.md (What V1 specifically must do, for whom, and by when)
 - SYSTEM_PRINCIPLES.md (How engineering decisions are made)
-- DOMAIN_ARCHITECTURE.md (What the platform manages)
+- DOMAIN_ARCHITECTURE.md (What the platform manages, long-term)
+- DOMAIN_MODEL.md (The frozen, live-verified, V1-scoped domain language — canonical for entity/field/state definitions)
 - DATABASE.md (How domain data is stored)
+- MIGRATION_PLAN.md (The phased plan for closing the gap between this architecture and the live database/app code)
 
 ---
 
@@ -87,9 +89,9 @@ Responsibilities
 
 ---
 
-# Confirmed Architecture Decisions (Product Architect, 2026-07-22)
+# Confirmed Architecture Decisions (Product Architect, 2026-07-22; domain model frozen 2026-07-24)
 
-These decisions are authoritative for CompleteOS+'s architecture going forward, regardless of current implementation state. Where they conflict with other documents as currently written (DATABASE.md's `due_at`-only description, ROADMAP.md's sequencing), these decisions take precedence until those documents are updated to match.
+These decisions are authoritative for CompleteOS+'s architecture going forward, regardless of current implementation state. Where they conflict with other documents as currently written (DATABASE.md's `due_at`-only description, ROADMAP.md's sequencing), these decisions take precedence until those documents are updated to match. As of 2026-07-24 these decisions, plus everything verified live against the Supabase project, are consolidated into DOMAIN_MODEL.md (the frozen domain language) and MIGRATION_PLAN.md (the phased implementation plan, including which phases still need approval before implementation starts) — read those two documents before implementing any of the below.
 
 ## Universal Task Model Is The Foundation
 

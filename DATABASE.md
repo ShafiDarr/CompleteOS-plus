@@ -4,7 +4,9 @@
 
 This document describes the current Supabase/PostgreSQL database for CompleteOS+.
 
-See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Event, Reminder) that this schema implements.
+See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Event, Reminder) that this schema implements, and **DOMAIN_MODEL.md for the canonical, live-verified domain language** — where this document and DOMAIN_MODEL.md ever disagree, DOMAIN_MODEL.md's live-verified facts win until this document is corrected to match. See MIGRATION_PLAN.md for the phased plan closing the gaps this document flags below.
+
+**Live-verified 2026-07-24:** several facts below were confirmed directly against the live Supabase project for the first time. Where a fact here was previously a recommendation or an assumption, it is now marked live-confirmed or live-contradicted.
 
 The database currently contains **13 public tables**.
 
@@ -50,7 +52,11 @@ This directly implements SYSTEM_PRINCIPLES.md's P009 ("Tasks Are The Universal E
 
 Fields not relevant to a given `task_type` are simply left null on that row.
 
-`status` is documented here as `Pending` / `In Progress` / `Completed` / `Skipped` / `Postponed`, but the live application currently only uses three values: `Pending` / `In Progress` / `Completed`. How "skip" and "postpone" should work, if not via `status`, is an open product question — see PROJECT_STATUS.md and V1_PRODUCT.md's Open Questions. This section should be updated once that's decided; it is not being resolved here.
+`status` is **frozen at three values**: `Pending` / `In Progress` / `Completed`. `Skipped`/`Postponed` were removed from the UI and confirmed intentional by the Product Architect — this is no longer an open question about the `status` field itself. How "skip" and "postpone" should work as *actions* (not status values) is a separate, still-open UI question — see PROJECT_STATUS.md's Action Option Sheet note. See DOMAIN_MODEL.md for the frozen state machine.
+
+`completed` (boolean) is **deprecated** — redundant with `status`, and live data confirms active drift: 12 of 24 rows have `completed = false` while `status = 'Completed'` (verified 2026-07-24). It is never read outside the generated Supabase accessor. Its removal/deprecation is a pending decision — see MIGRATION_PLAN.md Phase 2.1. Do not write new code against it.
+
+`priority_rank` (smallint) exists live and drives Current Action ordering. It was confirmed live 2026-07-24 and was previously missing from this document and from `schema.sql`.
 
 `is_active` is a separate, universal boolean (not part of `status`) — for Habits/Routines it represents whether the recurring definition is still enabled; for other task types it defaults `true` and is largely unused.
 
@@ -221,11 +227,12 @@ Tasks are the **universal execution object** of CompleteOS+ — see "Universal T
 | `area_id` | uuid | Optional parent area |
 | `template_id` | uuid | Optional recurring template |
 | `name` | text | Title |
-| `status` | text | Pending / In Progress / Completed / Skipped / Postponed |
+| `status` | text | Pending / In Progress / Completed (frozen, 3 values — see DOMAIN_MODEL.md) |
 | `priority` | text | Critical / High / Medium / Low |
-| `due_at` | timestamptz | Due date/time |
+| `priority_rank` | smallint | Drives Current Action ordering; live-confirmed 2026-07-24, missing from `schema.sql` until refreshed (MIGRATION_PLAN.md 1.3) |
+| `due_at` | timestamptz | Deadline (optional, secondary) — repurposed from "the" scheduling field; see Scheduling Model in DOMAIN_MODEL.md |
 | `completed_at` | timestamptz | Completion timestamp |
-| `completed` | boolean | Completion flag |
+| `completed` | boolean | **Deprecated.** Redundant with `status`, confirmed drifted in live data (12/24 rows disagree). Pending removal/deprecation decision — MIGRATION_PLAN.md 2.1 |
 | `task_type` | text | Task / Habit / Routine / Bill / Appointment / Event / Reminder |
 | `is_active` | boolean | Whether this record is enabled (mainly meaningful for Habit/Routine) |
 | `calendar_sync` | boolean | Whether to sync to calendar |
@@ -851,6 +858,18 @@ For `profiles`, the policy should use:
 ```sql
 auth.uid() = id
 ```
+
+## Live Reality (verified 2026-07-24)
+
+RLS is enabled on all 13 tables — an event trigger (`rls_auto_enable()`) auto-enables it on every new table created in `public`. **But only `areas` and `tasks` actually have policies.** The other 11 tables (`profiles`, `projects`, `recurring_templates`, `habit_logs`, `day_blocks`, `block_items`, `daily_status`, `routine_step_logs`, `routine_steps`, `daily_plans`, `daily_plan_blocks`) have RLS enabled with **zero policies**, which is Postgres default-deny — the app's real client cannot read or write any of them today. This is the single highest-priority item in MIGRATION_PLAN.md (Phase 1.1). `routine_steps` has no `user_id` column and needs a subquery policy through `tasks.user_id` via `task_id`, not the standard pattern above.
+
+---
+
+# current_action_candidates (view)
+
+Not a table — a live database view backing the Current Action feature. Confirmed to exist 2026-07-24; was previously undocumented here and absent from `schema.sql` (now refreshed per MIGRATION_PLAN.md 1.3).
+
+Selects the universal `tasks` columns plus every type-specific column, filtered by `WHERE due_at IS NULL OR due_at < CURRENT_DATE + 1 day`. This filter still keys on `due_at`/Deadline, not `start_at` — updating it to the Start/End scheduling model is MIGRATION_PLAN.md Phase 4.1, not yet done.
 
 ---
 

@@ -116,5 +116,7 @@ These should be resolved by the Product Architect before the corresponding imple
 - **VISION.md** describes the long-term, unbounded ambition (individuals through enterprises). It is not scoped to V1 and should not be used to justify V1 feature decisions.
 - **ROADMAP.md** sequences work and tracks milestone status; it references this document's Commitment Types and Lifecycle rather than redefining them.
 - **DOMAIN_ARCHITECTURE.md** and **DATABASE.md** define how Commitment Types map onto domain objects and schema (the Universal Task Model, `task_type` values).
+- **DOMAIN_MODEL.md** is the frozen, live-verified implementation of this document's scope decisions — the canonical entity/field/state definitions, including which of DOMAIN_ARCHITECTURE.md's long-term concepts are actually in V1.
 - **ARCHITECTURE.md** defines the Start/End/Deadline scheduling model and block-first/calendar-first architecture that apply across every Commitment Type.
+- **MIGRATION_PLAN.md** sequences the work to close the gap between this scope and the live database/app code, and identifies which changes need Product Architect approval before implementation.
 - **PROJECT_STATUS.md** and **V1_CHECKLIST.md** track actual implementation progress against this definition.

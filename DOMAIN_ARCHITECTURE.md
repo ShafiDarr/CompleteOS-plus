@@ -8,9 +8,11 @@ This document defines the domain model of CompleteOS+.
 
 It establishes the core business objects, ownership hierarchy, relationships, and rules that govern the platform.
 
-This document is the authoritative source for understanding **what CompleteOS+ manages**.
+This document is the authoritative source for understanding **what CompleteOS+ manages** across the platform's full, long-term life — V1 and beyond.
 
 Software architecture, database design, APIs, automation, AI, and user interfaces should all implement this domain model.
+
+**For V1 specifically:** see DOMAIN_MODEL.md, the frozen, live-verified, V1-scoped subset of the concepts below — it marks which of these are actually IN V1 versus DEFERRED versus not yet evaluated for V1 at all. Not every object below is a V1 requirement; V1_PRODUCT.md is authoritative for which ones are.
 
 ---
 
@@ -384,6 +386,8 @@ References allow the platform to evolve without restructuring ownership.
 # Domain Categories
 
 To maintain consistency, every domain object belongs to one of four categories.
+
+**V1 note:** Goal and Automation are explicitly deferred by V1_PRODUCT.md, with reasons given there. Document, Person, Asset, and Metric are not mentioned in V1_PRODUCT.md at all — not evaluated, not deferred, simply never brought into V1 scope. No tables exist for any of them today. See DOMAIN_MODEL.md's "Deferred and Out-of-Scope Entities" for the same list with this distinction made explicit, so it isn't inferred from silence.
 
 ## Execution
 
