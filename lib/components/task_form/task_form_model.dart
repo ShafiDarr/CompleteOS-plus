@@ -44,9 +44,7 @@ class TaskFormModel extends FlutterFlowModel<TaskFormWidget> {
   // State field(s) for TaskType widget.
   String? taskTypeValue;
   FormFieldController<String>? taskTypeValueController;
-  DateTime? datePicked1;
-  DateTime? datePicked2;
-  DateTime? datePicked3;
+  DateTime? datePicked;
   // State field(s) for Priority widget.
   String? priorityValue;
   FormFieldController<String>? priorityValueController;
