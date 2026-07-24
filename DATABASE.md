@@ -4,6 +4,8 @@
 
 This document describes the current Supabase/PostgreSQL database for CompleteOS+.
 
+See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Event, Reminder) that this schema implements.
+
 The database currently contains **13 public tables**.
 
 CompleteOS+ uses Supabase Auth for identity. Most application tables are user-owned and should be protected by Row Level Security.
@@ -19,7 +21,7 @@ The database should support:
 - Personal execution
 - Areas of life
 - Projects
-- Tasks (including Habits, Routines, Bills, and Appointments as specialized task types)
+- Tasks (including Habits, Routines, Bills, Appointments, Events, and Reminders as specialized task types — see V1_PRODUCT.md for the full definition of these as V1 Commitment Types)
 - Day blocks
 - Daily plans
 - Daily status
@@ -37,17 +39,18 @@ Habits and Routines are **not** separate tables. They are represented as rows in
 
 This directly implements SYSTEM_PRINCIPLES.md's P009 ("Tasks Are The Universal Execution Object") and DOMAIN_ARCHITECTURE.md's Task section.
 
-`task_type` values in use or planned:
+`task_type` values in use or planned (these are CompleteOS+ V1's Commitment Types — see V1_PRODUCT.md):
 
 - `Task` — default, ordinary actionable work
 - `Habit` — repeated behavior, uses `target_value`, `unit`, `frequency`, `tracking_type`
 - `Routine` — multi-step workflow, whose steps live in `routine_steps` referencing `tasks.id`
 - `Bill` — uses `amount`, `payee`, `login_url`
 - `Appointment`/`Event` — uses `start_at`, `end_at`, `location`
+- `Reminder` — surfaced at the right time rather than executed as work; exact field usage is an open question, see V1_PRODUCT.md's Open Questions
 
 Fields not relevant to a given `task_type` are simply left null on that row.
 
-`status` is universal across all task types: `Pending` / `In Progress` / `Completed` / `Skipped` / `Postponed`.
+`status` is documented here as `Pending` / `In Progress` / `Completed` / `Skipped` / `Postponed`, but the live application currently only uses three values: `Pending` / `In Progress` / `Completed`. How "skip" and "postpone" should work, if not via `status`, is an open product question — see PROJECT_STATUS.md and V1_PRODUCT.md's Open Questions. This section should be updated once that's decided; it is not being resolved here.
 
 `is_active` is a separate, universal boolean (not part of `status`) — for Habits/Routines it represents whether the recurring definition is still enabled; for other task types it defaults `true` and is largely unused.
 
@@ -203,7 +206,7 @@ UNIQUE (user_id, lower(name))
 
 Represents actionable work.
 
-Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, and Appointment/Event is a row in this table, differentiated by `task_type`.
+Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, Appointment, Event, and Reminder is a row in this table, differentiated by `task_type`.
 
 ## Key Columns
 
@@ -223,7 +226,7 @@ Tasks are the **universal execution object** of CompleteOS+ — see "Universal T
 | `due_at` | timestamptz | Due date/time |
 | `completed_at` | timestamptz | Completion timestamp |
 | `completed` | boolean | Completion flag |
-| `task_type` | text | Task / Habit / Routine / Bill / Appointment / Event |
+| `task_type` | text | Task / Habit / Routine / Bill / Appointment / Event / Reminder |
 | `is_active` | boolean | Whether this record is enabled (mainly meaningful for Habit/Routine) |
 | `calendar_sync` | boolean | Whether to sync to calendar |
 | `requires_verification` | boolean | Whether completion needs confirmation |
@@ -436,7 +439,7 @@ A block item references a task — since Habits and Routines are task types, thi
 | `id` | uuid | Primary key |
 | `user_id` | uuid | Owner user |
 | `day_block_id` | uuid | Parent day block |
-| `item_type` | text | Task / Habit / Routine |
+| `item_type` | text | Task / Habit / Routine (documented scope predates V1_PRODUCT.md's full seven Commitment Types — whether Bill/Appointment/Event/Reminder also need to be schedulable into a day block is unresolved, see V1_PRODUCT.md) |
 | `task_id` | uuid | Referenced task (of any task_type) |
 | `title` | text | Display title |
 | `target_amount` | numeric | Optional target amount |
@@ -721,7 +724,7 @@ auth.users
 ├── projects
 │   └── tasks
 │
-├── tasks (task_type: Task / Habit / Routine / Bill / Appointment / Event)
+├── tasks (task_type: Task / Habit / Routine / Bill / Appointment / Event / Reminder)
 │   ├── block_items
 │   ├── habit_logs        (task_type = 'Habit')
 │   └── routine_steps     (task_type = 'Routine')

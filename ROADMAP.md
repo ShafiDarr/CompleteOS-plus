@@ -54,176 +54,33 @@ Prefer completing one workflow end-to-end before beginning another.
 
 ---
 
-# Milestone 1 — Foundation
+# V1 Milestones
 
-## Objective
+CompleteOS+ V1's mission, Commitment Types, and five-stage lifecycle (Capture → Organize → Plan Today → Execute → Review) are defined canonically in **V1_PRODUCT.md**. This roadmap tracks sequencing and status against that definition; it does not redefine it.
 
-Establish the core application infrastructure.
+Each lifecycle stage applies to every V1 Commitment Type (Task, Habit, Routine, Bill, Appointment, Event, Reminder) — a stage is not complete when it only works for Tasks.
 
-### Systems
+## Milestone 1 — Capture
 
-- Authentication
-- User Profiles
-- Navigation
-- Areas
-- Theme
-- Multi-user support
-- Repository foundation
+See V1_PRODUCT.md for the full definition. Current status: strong for the base Task object and Areas; incomplete for Habit, Routine, Bill, Appointment, Event, and Reminder-specific fields, and for Projects.
 
-### Status
+## Milestone 2 — Organize
 
-🟢 Mostly Complete
+See V1_PRODUCT.md for the full definition. Current status: Areas and base priority/status fields work; Search and Filters are not yet functional.
 
----
+## Milestone 3 — Plan Today
 
-# Milestone 2 — Core Execution Engine
+See V1_PRODUCT.md for the full definition. Current status: Current Action's prioritized selection works; Day Blocks and Daily Plans have no UI yet.
 
-## Objective
+## Milestone 4 — Execute
 
-Build the minimum operating system capable of executing work.
+See V1_PRODUCT.md for the full definition. Current status: the Execution page and Current Action's core loop work; per-commitment-type execution behavior (habit check-ins, routine steps, bill payment, appointment attendance, reminder acknowledgment, skip/postpone) is largely unbuilt.
 
-### Systems
+## Milestone 5 — Review
 
-- Tasks CRUD
-- EditorHost
-- Systems Control Panel
-- Current Action
-- Execution Dashboard
-- Task Status Management
-- Task Prioritization
+See V1_PRODUCT.md for the full definition. Current status: not started.
 
-### Success Criteria
-
-A user can:
-
-- Create tasks
-- Edit tasks
-- Delete tasks
-- Complete tasks
-- View the next task
-- Operate entirely from the Execution page
-
-### Status
-
-🟡 In Progress
-
----
-
-# Milestone 3 — Planning Engine
-
-## Objective
-
-Transform individual tasks into structured execution systems.
-
-Habits and Routines are not separate systems to build — they are `task_type` variants of the Universal Task Model (see DATABASE.md). The database migration for this is already complete; what remains is the FlutterFlow UI (dynamic Task form sections, Routine Steps flow) and the Recurring Templates/Daily Status systems.
-
-### Systems
-
-- Projects
-- Habit task_type (dynamic form section + habit_logs display)
-- Routine task_type (dynamic form section + Routine Steps flow)
-- Recurring Templates
-- Daily Status
-
-### Success Criteria
-
-A user can:
-
-- Organize work into projects
-- Track habits
-- Execute routines
-- Generate recurring work
-- Measure daily alignment
-
-### Status
-
-🟡 Planned
-
----
-
-# Milestone 4 — Scheduling Engine
-
-## Objective
-
-Turn planned work into executable schedules.
-
-### Systems
-
-- Day Blocks
-- Block Items
-- Daily Plans
-- Daily Plan Blocks
-- Current Action upgrade
-- Dynamic execution flow
-
-### Success Criteria
-
-The system automatically determines:
-
-- Current block
-- Current task
-- Upcoming work
-- Daily execution flow
-
-### Status
-
-⚪ Planned
-
----
-
-# Milestone 5 — Polish
-
-## Objective
-
-Prepare CompleteOS+ for production.
-
-### Systems
-
-- Performance optimization
-- Bug fixing
-- UX improvements
-- Error handling
-- Loading states
-- Empty states
-- Responsive improvements
-- Accessibility
-- Testing
-
-### Success Criteria
-
-CompleteOS+ is stable enough for daily personal use.
-
-### Status
-
-⚪ Planned
-
----
-
-# Version 1 Definition of Done
-
-Version 1 is complete when a user can:
-
-✅ Sign in
-
-✅ Manage Areas
-
-✅ Create Projects
-
-✅ Create Tasks
-
-✅ Create Habits
-
-✅ Create Routines
-
-✅ Generate recurring work
-
-✅ Execute from the Execution page
-
-✅ Follow Daily Plans
-
-✅ Track progress
-
-✅ Use the application every day without major issues
+For exact, up-to-date completion percentages and evidence, see PROJECT_STATUS.md and V1_CHECKLIST.md rather than this file.
 
 ---
 
@@ -284,12 +141,14 @@ The following capabilities extend the platform but are not required for Version 
 Whenever multiple tasks compete for attention, prioritize in this order:
 
 1. Stability
-2. Core Execution
-3. Planning
-4. Scheduling
-5. Automation
-6. Intelligence
-7. Polish
+2. Capture
+3. Organize
+4. Plan Today
+5. Execute
+6. Review
+7. Automation (post-V1)
+8. Intelligence (post-V1)
+9. Polish
 
 Never sacrifice architectural consistency for development speed.
 
@@ -297,17 +156,11 @@ Never sacrifice architectural consistency for development speed.
 
 # Current Focus
 
-The current objective is to complete Milestone 2.
+The current objective is to complete Milestone 1 (Capture) across all seven V1 Commitment Types defined in V1_PRODUCT.md, not just Tasks.
 
-Immediate priorities:
+Do not begin Milestone 2 in earnest until Milestone 1 is functionally complete for every Commitment Type.
 
-1. Tasks CRUD
-2. EditorHost integration
-3. Systems Control Panel
-4. Current Action
-5. Execution Dashboard
-
-Do not begin Milestone 3 until Milestone 2 is functionally complete.
+See PROJECT_STATUS.md for the exact current priorities and their status.
 
 ---
 

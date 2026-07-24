@@ -66,6 +66,40 @@ Whenever possible, work should begin as a Task.
 
 ---
 
+## Commitment Type
+
+A category of real-world commitment CompleteOS+ manages — Task, Habit, Routine, Bill, Appointment, Event, or Reminder in V1.
+
+All Commitment Types are implemented as `task_type` values within the Universal Task Model, not as separate systems.
+
+See V1_PRODUCT.md.
+
+---
+
+## Bill
+
+A Commitment Type representing a payment obligation, recurring or one-time.
+
+---
+
+## Appointment
+
+A Commitment Type representing a scheduled meeting or commitment at a specific time, often at a specific place.
+
+---
+
+## Event
+
+A Commitment Type representing a scheduled occurrence, similar to an Appointment.
+
+---
+
+## Reminder
+
+A Commitment Type whose primary purpose is to be surfaced at the right time, rather than executed as work.
+
+---
+
 ## Habit
 
 A repeated behavior intended to become automatic over time.

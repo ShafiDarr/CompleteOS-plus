@@ -141,14 +141,16 @@ Whenever possible:
 
 - Bills
 - Appointments
+- Events
 - Habits
 - Routines
 - Reminders
-- Activities
 
 should begin as specialized task types rather than completely separate systems.
 
 Separate entities should exist only when their behavior fundamentally differs from Tasks.
+
+See V1_PRODUCT.md for the current V1 Commitment Types.
 
 ---
 

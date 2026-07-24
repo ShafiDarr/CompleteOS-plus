@@ -135,6 +135,10 @@ Goals do not own work.
 
 Goals are achieved through Projects and Tasks.
 
+## V1 Note
+
+Goal is a long-term domain concept, not a V1 Commitment Type. See V1_PRODUCT.md for why Goal is not currently required for V1.
+
 ---
 
 # Project
@@ -173,19 +177,19 @@ Bills
 
 Appointments
 
+Events
+
 Habits
 
 Routines
 
 Reminders
 
-Activities
-
 should extend or specialize Tasks rather than replace them unless fundamentally different behavior is required.
 
 ## Implementation Note
 
-This is implemented directly in the database: Habits and Routines are not separate tables. They are rows in the `tasks` table, differentiated by a `task_type` column. See DATABASE.md's "Universal Task Model" section for the schema-level detail.
+This is implemented directly in the database: Habits, Routines, Bills, Appointments, Events, and Reminders are not separate tables. They are rows in the `tasks` table, differentiated by a `task_type` column. See DATABASE.md's "Universal Task Model" section for the schema-level detail, and V1_PRODUCT.md for the current V1 Commitment Types and the lifecycle they move through.
 
 ---
 

@@ -128,24 +128,13 @@ These capabilities should extend the existing architecture rather than create in
 
 The long-term vision of CompleteOS+ is intentionally ambitious.
 
-Version 1 is intentionally focused.
+Version 1 is intentionally focused, and is being built for its owner personally first — not yet the public or business version described above.
 
-The objective of V1 is to prove the core execution engine for individuals.
-
-Version 1 succeeds when a user can reliably:
-
-- Capture work
-- Organize work
-- Prioritize work
-- Execute work
-- Measure progress
-- Build consistent habits
-- Complete routines
-- Operate daily from one trusted system
+The authoritative definition of V1's mission, commitment types, and lifecycle lives in **V1_PRODUCT.md**. This section only marks the boundary between the long-term vision above and V1's actual scope.
 
 Enterprise functionality, advanced AI, CRM, HR, manufacturing, inventory, and large-scale organizational capabilities remain outside the scope of V1.
 
-Every V1 decision should strengthen the execution engine rather than expand feature count.
+Every V1 decision should strengthen the personal daily operating loop defined in V1_PRODUCT.md rather than expand feature count.
 
 ---
 

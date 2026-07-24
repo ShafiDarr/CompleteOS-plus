@@ -1,6 +1,6 @@
 # PROJECT_STATUS.md
 
-This file tracks implementation status and progress only. Architecture decisions live in ARCHITECTURE.md — see its "Confirmed Architecture Decisions" section for the Universal Task Model priority, the Start/End/Deadline scheduling model, and the block-first/calendar-first scheduling approach, all of which inform the priorities below.
+This file tracks implementation status and progress only. Product scope (mission, V1 Commitment Types, and the Capture/Organize/Plan Today/Execute/Review lifecycle) lives in V1_PRODUCT.md. Architecture decisions live in ARCHITECTURE.md — see its "Confirmed Architecture Decisions" section for the Universal Task Model priority, the Start/End/Deadline scheduling model, and the block-first/calendar-first scheduling approach, all of which inform the priorities below.
 
 ## Audit Record
 

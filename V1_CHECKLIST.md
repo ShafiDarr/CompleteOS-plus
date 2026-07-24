@@ -1,6 +1,6 @@
 # V1_CHECKLIST.md
 
-Permanent source of truth for CompleteOS+ V1 completion. Update this file as work lands — do not let it drift from reality; re-verify against actual code, not intentions, before checking anything off.
+Permanent source of truth for CompleteOS+ V1 completion. Update this file as work lands — do not let it drift from reality; re-verify against actual code, not intentions, before checking anything off. For the product-level definition of V1's scope, mission, and Commitment Types this checklist measures against, see V1_PRODUCT.md.
 
 Last audited: 2026-07-21, commit `6c3d02e` (a new FlutterFlow export, commit `1c08b68`, was merged into `develop` via PR #14 and verified directly against the merged code — not inferred from diffs). **Overall: 53%.**
 

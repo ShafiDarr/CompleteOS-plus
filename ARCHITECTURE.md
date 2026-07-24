@@ -13,6 +13,7 @@ This document is the authoritative source for **how CompleteOS+ is built**.
 It complements:
 
 - VISION.md (Why the platform exists)
+- V1_PRODUCT.md (What V1 specifically must do, for whom, and by when)
 - SYSTEM_PRINCIPLES.md (How engineering decisions are made)
 - DOMAIN_ARCHITECTURE.md (What the platform manages)
 - DATABASE.md (How domain data is stored)
