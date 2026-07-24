@@ -422,9 +422,7 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                               taskStatus,
                               taskAreaID,
                               taskProjectID,
-                              taskActive,
-                              taskStartAt,
-                              taskEndAt) async {
+                              taskActive) async {
                             FFAppState().editorType = 'task';
                             FFAppState().editorMode = 'edit';
                             FFAppState().selectedRecordID = taskID;
@@ -437,8 +435,6 @@ class _ExecutionPageWidgetState extends State<ExecutionPageWidget> {
                                 milliseconds: 200,
                               ),
                             );
-
-                            safeSetState(() {});
                             safeSetState(() {
                               _model.editorHostModel.taskFormModel
                                   .taskNameTextController?.text = taskName!;

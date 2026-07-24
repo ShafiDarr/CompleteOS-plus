@@ -418,7 +418,7 @@ class _EditorHostWidgetState extends State<EditorHostWidget> {
                           initialEndAt: widget!.initialTaskEndAt,
                           onDueAtChange: (dueAt) async {
                             _model.taskDueAt = dueAt;
-                            safeSetState(() {});
+                            _model.updatePage(() {});
                           },
                           onStartAtChange: (startAt) async {
                             _model.taskStartAt = startAt;
