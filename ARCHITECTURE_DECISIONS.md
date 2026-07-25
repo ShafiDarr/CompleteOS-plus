@@ -17,44 +17,94 @@ This document records architectural decisions as they are proposed and made — 
 
 ## ADR-001: Reminder as a Capability Instead of a Commitment Identity
 
-**Status: Proposed**
-
-**Reviewed 2026-07-25:** direction agreed (Reminder should become a capability), but not approved — remains Proposed until the actual Reminder behavior/mechanism is designed. Do not implement or update canonical docs from this ADR yet.
+**Status: Proposed** — full design below, per the Product Architect's request 2026-07-25. **Keep this ADR in Proposed status until the design itself is approved. Nothing in this section authorizes implementation or a canonical-doc update.**
 
 ### Current Implementation
 
-`Reminder` is one of the seven `task_type` values in the Universal Task Model (`DATABASE.md`, `DOMAIN_MODEL.md`). A Reminder is a full `tasks` row with `task_type = 'Reminder'`. Unlike Habit (`target_value`/`unit`/`frequency`/`tracking_type`) or Bill (`amount`/`payee`/`login_url`), Reminder has no dedicated type-specific columns of its own — its only plausible fields are the universal-but-unused `reminder_level`/`acknowledged_at`, which are confirmed 100% unreferenced in application code. Live-verified 2026-07-24: 4 of 24 `tasks` rows have `task_type = 'Reminder'` (second most common type after `Task`), with zero dedicated create/edit fields, zero distinct display metadata, and zero distinct execution behavior built.
+`Reminder` is one of the seven `task_type` values in the Universal Task Model (`DATABASE.md`, `DOMAIN_MODEL.md`). A Reminder is a full `tasks` row with `task_type = 'Reminder'`. Unlike Habit (`target_value`/`unit`/`frequency`/`tracking_type`) or Bill (`amount`/`payee`/`login_url`), Reminder has no dedicated type-specific columns of its own — its only plausible fields are the universal-but-unused `reminder_level`/`acknowledged_at`.
+
+**Evidence gathered 2026-07-25 to ground this design** (repo code + live data, not assumption):
+
+- No notification-delivery infrastructure exists anywhere in the codebase. `pubspec.yaml` has zero notification packages (no `flutter_local_notifications`, `firebase_messaging`, or equivalent). There is no mechanism today by which CompleteOS+ could fire a push/local alert at a scheduled moment, for any feature. This is a hard constraint on what "reminder" can mean in V1, not a detail — see Recommended Design below.
+- `Reminder`'s only UI presence in `lib/` is: an entry in the `task_type` selector dropdown (`task_form_widget.dart:227`), a `task_type = 'Reminder'` filter in a "Reminders" list section ordered by `due_at` (`systems_control_panel_widget.dart`), and a `notifications_active_rounded` bell icon shown when `task_type == 'Reminder'` (`current_action_widget.dart:126-130`). No dedicated fields, no dedicated create/edit flow, no distinct execution behavior.
+- **The 4 live `task_type = 'Reminder'` rows are all the same real commitment ("traffic court") captured as 4 separate rows with different dates, spaced roughly monthly (2026-04-29 through 2026-07-01).** All 4: `status = 'Completed'`, `due_at` set, **`start_at`/`end_at` both null, `reminder_level` both null, `acknowledged_at` both null.** This is the single most useful piece of evidence available: the one real usage of this feature never touched `reminder_level` or `acknowledged_at` at all, and consistently anchored on `due_at` as "when this matters." Real usage already validates `due_at`/Deadline as the natural reminder anchor, and gives no signal that reminder-intensity or an acknowledgment state were ever needed.
 
 ### Problem
 
 V1_PRODUCT.md defines Reminder by *when it surfaces*, not *what kind of thing it is*: "a commitment whose primary purpose is to be surfaced at the right time, rather than executed as work." That's a cross-cutting behavior, not a distinct kind of work — a Bill or an Appointment can just as easily need "remind me about this" as a standalone Task can. Modeling it as a 7th, mutually-exclusive `task_type` forces a false choice: nothing can be both `Bill` and `Reminder` today. This conflicts directly with SYSTEM_PRINCIPLES.md P022 ("Prefer Generic Solutions Over Type-Specific Ones").
 
-### Proposed Decision
+**What problem Reminder actually solves in V1 (item 1):** not notification delivery — V1 has no infrastructure for that, and V1_PRODUCT.md never mentions push/local notifications as in scope. The real problem is narrower and matches the mission in V1_PRODUCT.md (Capture → Organize → Plan Today → Execute → Review): making sure a commitment whose main risk is *being forgotten* — not being executed wrong, just forgotten entirely — reliably resurfaces through the surfacing mechanisms CompleteOS+ already has (Current Action, Plan Today), rather than silently sitting unflagged among ordinary tasks. Reminder is an attention signal on top of the existing execution engine, not a delivery channel.
 
-Remove `Reminder` from the `task_type` enum. Add a universal capability (working name: `is_remindable`, boolean) alongside the existing `reminder_level`/`acknowledged_at` fields, made meaningful on **any** `task_type` rather than gated behind one. Any task — regardless of its type — can carry a reminder.
+### Recommended V1 Design
 
-*This ADR proposes the structural change only. It does not resolve what `reminder_level`/`acknowledged_at` should actually do — that remains a separate open question (see `V1_PRODUCT.md` Open Questions and `MIGRATION_PLAN.md` Phase 2B.2), unchanged by this ADR.*
+**A single boolean capability on `tasks`, reusing the existing Deadline (`due_at`) field as the reminder's anchor, with no new timing model and no separate acknowledgment state.**
 
-### Benefits
+1. **Problem solved (see above):** surfacing risk, not execution or delivery.
+2. **Minimum V1 behaviors required (item 2):**
+   - Any task, of any type, can be flagged as needing to be remembered.
+   - It surfaces through the *existing* Current Action / Plan Today mechanisms — no new surfacing engine. For V1, this can be as minimal as: no special ordering treatment at all (a remindable task competes on the same `priority_rank`/due-or-start ordering as everything else) — see Open Questions for whether that's sufficient or whether remindable items should get a ordering boost.
+   - Marking it handled uses the existing `status` field (`Completed`) — no separate "acknowledged" concept.
+   - No push/local notification is required for V1 — see Current Implementation's infrastructure note. If real-world need for actual OS-level alerts emerges, that is a distinct, larger feature (notification delivery infrastructure) to design separately, not something to half-build into this schema now.
+3. **Storage shape (item 3):** **fields directly on `tasks`**, not a child table, not a hybrid. A child `reminders` table would only pay for itself if V1 needed multiple independent reminder points per commitment, arbitrary per-reminder offsets, or delivery-channel metadata — none of which V1 needs today (see item 4 and Current Implementation's evidence). Building that structure now, with nothing to populate it meaningfully, would repeat the exact mistake that produced the vestigial `calendar_sync`/verification column set this whole ADR effort exists to clean up. A boolean-plus-existing-field design is the smallest thing that actually serves the stated problem.
+4. **Multiple reminders per commitment (item 4):** **No, not in V1.** No evidence of this need exists — the 4 live rows read as 4 distinct commitments (separate court dates), not one commitment needing several staged nudges, though the evidence is not fully conclusive either way (see Alternatives). If a genuine need for multiple reminder points per single commitment emerges later, that is the trigger for revisiting the child-table alternative below — not something to speculatively support now.
+5. **Timing model (item 5):** **Reuse `due_at`/Deadline directly. No relative/offset timing field.** Live evidence shows the one real usage already treats `due_at` as the reminder's "when," never populating any other field for that purpose. An offset-based model (e.g., "3 days before `start_at`") would require both a new field *and* a scheduler/notification mechanism to ever fire correctly — building the field without the mechanism produces exactly the kind of dead column this project has been finding and removing all week (`reminder_level`, `acknowledged_at`, and the whole `calendar_sync` set). Since Reminder no longer has its own `task_type`, it also no longer needs its own timing field — it inherits whatever `due_at`/Deadline the underlying commitment already has, per the universal Scheduling Model. `start_at`-relative timing is explicitly deferred (see Open Questions and Alternatives).
+6. **`reminder_level` (item 6):** **Remove.** Zero code references it; the one real user of this feature never populated it, even though they clearly wanted reminder behavior. It was speculative infrastructure for a notification-intensity concept that has no meaning without a delivery mechanism to route through. Removing it is the same judgment already applied to `completed` in ADR-004: an unused field that real usage never needed.
+7. **`acknowledged_at` (item 7):** **Remove — do not replace with a new state model.** The existing `status` field (`Pending`/`In Progress`/`Completed`) already answers "has this been dealt with?" for every other commitment type; a Reminder is not special enough to need a second, parallel completion concept. Introducing "acknowledged" as distinct from "completed" would recreate the same redundant-field problem ADR-004 just resolved for `completed` vs. `status` — this design deliberately avoids reintroducing it one ADR later.
+8. **How this differs from adjacent concepts (item 8):**
+   - **Due Date / Deadline (`due_at`):** a *field* every task already has. Reminder is a *capability* (a flag) that says this particular commitment's `due_at` matters enough to be surfaced proactively — it doesn't add a new date, it flags the existing one.
+   - **Start Date (`start_at`):** describes an execution window; irrelevant to Reminder's purpose, which is about not forgetting a single moment, not about a span of work.
+   - **Alerts / push notifications:** a *delivery mechanism* that doesn't exist in this codebase. Reminder-as-capability is a data signal describing intent ("surface this proactively"); it is deliberately decoupled from any specific delivery technology so V1 doesn't have to build one to ship the capability.
+   - **Current Action:** the prioritization *engine* that decides what's next across every commitment. A remindable task is just one more input into that engine — it does not compete with or duplicate Current Action; at most it's a signal that engine could someday weight differently (see Open Questions).
+   - **Recurring occurrences:** explicitly out of scope for this ADR per instruction. Worth flagging directly: the 4-duplicate-row pattern in the live data looks like exactly the kind of manual workaround a real Recurring Templates/repeat decision (Phase 2B.3) might eventually remove — but that connection is noted here only, not resolved.
+9. **Migration of the 4 live rows (item 9):** `task_type` changes from `'Reminder'` to `'Task'` for all 4 rows (nothing else distinguishes them from an ordinary task once the type is gone); set the new capability flag `true` on all 4 (preserves original intent); `due_at`, `status`, `priority` all carry over unchanged; `reminder_level`/`acknowledged_at` are already `NULL` on all 4, so their removal loses no data. Zero ambiguity, zero data loss — a straightforward 4-row `UPDATE`.
+10. **Smallest V1 implementation (item 10):**
+    - **Schema:** one new boolean column on `tasks` (working name `is_remindable`, default `false`); drop `'Reminder'` from the `task_type` check constraint; drop `reminder_level` and `acknowledged_at` columns entirely.
+    - **FlutterFlow/`lib/`:** remove the `Reminder` entry from the `task_type` selector (can ride the same change as ADR-002's `Event` removal, since both touch the same dropdown); add a single toggle/checkbox ("Remind me") near the Deadline field in TaskForm, wired through EditorHost's existing save path exactly like any other boolean field (e.g. `is_active`) — no new save-flow branch needed; change the Systems Control Panel "Reminders" list filter from `task_type = 'Reminder'` to `is_remindable = true` (ordering by `due_at` unchanged); change Current Action's bell-icon condition from `task_type == 'Reminder'` to `is_remindable == true` (see Open Questions for how this interacts with the per-type icon).
 
-- Removes a false mutual-exclusivity — any commitment can be remindable, not just ones typed as `Reminder`.
-- Aligns with P022 (generic over type-specific).
-- No UI sunk cost to preserve: Reminder currently has zero dedicated fields or behavior built, per the V1 audit.
-- Matches V1_PRODUCT.md's own definition of Reminder as a *timing* concern, not an *identity*.
+### Alternatives Considered
+
+- **A. Separate `reminders` child table** (one or more rows per task, arbitrary offsets, delivery-channel metadata). Rejected for V1: no evidence of a multi-reminder-per-task need, and no notification mechanism exists to justify the added complexity. Revisit if/when real push-notification infrastructure becomes a V1+ goal and multiple staged alerts per commitment become a real, requested behavior.
+- **B. Keep `Reminder` as its own `task_type`** (status quo). Rejected — this is the premise ADR-001 already has agreement to change; included only for contrast.
+- **C. Offset-based timing** (`remind_offset_minutes` relative to `due_at` or `start_at`). Rejected for V1 — nothing can consume it without a scheduler, and the one real usage never needed anything beyond the exact `due_at` itself.
+- **D. Richer `reminder_level` enum** (e.g., gentle/urgent, mapped to future notification channels/sounds). Rejected — same no-infrastructure, no-evidence reasoning as C; the field already existed and was never used even once.
 
 ### Tradeoffs
 
-- Reminder stops being a first-class, independently listable "kind" of commitment. Anywhere the product wants "show me my Reminders" as a distinct view, that becomes "tasks where the reminder capability is set" instead of a `task_type` filter — a real filtering/UX change, not just a rename.
-- Requires deciding the exact mechanism (a single boolean vs. something richer) — proposed here as a boolean for simplicity; open to revision.
-- 4 live rows need migrating from `task_type = 'Reminder'` to some other type (proposed: `Task`, with the new capability flag set) — low risk (small row count, verified non-orphaned), but not zero-risk like ADR-002 below.
+- Reminder stops being a first-class, independently listable "kind" of commitment. Anywhere the product wants "show me my Reminders," that becomes "tasks where `is_remindable` is set" instead of a `task_type` filter — a real filtering/UX change, not just a rename (scoped in item 10 above).
+- No support for "remind me before an Appointment starts" (`start_at`-relative timing) — a plausible, genuinely useful future capability, deliberately deferred because it requires both a new field *and* real delivery infrastructure to mean anything; building either alone would recreate a dead column.
+- No support for multiple reminder touchpoints per commitment — if the traffic-court-style pattern actually reflects "one obligation needing several staged nudges" rather than "several distinct obligations," this design doesn't serve that within a single task row; the same manual-duplication workaround the live user already uses would remain the only option, unless a future Recurring Templates decision addresses it instead.
+- Removing `reminder_level`/`acknowledged_at` is destructive (column drop) — irreversible without a backup, though zero data is actually lost (both are `NULL` on every live row that would be affected).
+- A single boolean can't express "remind me, but gently" — that nuance is dropped entirely rather than preserved in simplified form; acceptable because nothing today demonstrates a real need for it, but worth naming as a real capability reduction, not just a cleanup.
+
+### Proposed Schema Changes
+
+- `tasks.is_remindable` — new boolean column, default `false`.
+- `tasks.task_type` — drop `'Reminder'` from the check constraint (5 remaining values, pending this ADR's approval, down from 6 after ADR-002).
+- `tasks.reminder_level` — drop column.
+- `tasks.acknowledged_at` — drop column.
+- No new tables.
 
 ### Migration Impact
 
-- `tasks.task_type` check constraint/enum: drop `'Reminder'`.
-- Add `tasks.is_remindable` (or equivalent) boolean column.
-- Data migration: the 4 live `task_type = 'Reminder'` rows → `task_type = 'Task'`, `is_remindable = true`.
-- `lib/`: every place `task_type` values are enumerated or branched on (task type selector, per-type list filters, `task_type_section_widget.dart`) needs the `Reminder` branch removed and a capability-based UI element added instead — not yet scoped in detail, since no such UI exists to modify today.
-- Docs to update once Approved: `DOMAIN_MODEL.md` (Task entity, Commitment Type table), `DATABASE.md` (`task_type` field, Universal fields table), `GLOSSARY.md` (Reminder, Commitment Type entries), `V1_PRODUCT.md` — Commitment Types would go from six (current, after ADR-002's approval) to five if this ADR is also approved.
+- Supabase migration: add `is_remindable`; 4-row `UPDATE` (`task_type = 'Reminder'` → `'Task'`, `is_remindable = true`); drop `task_type` constraint's `'Reminder'` value; drop `reminder_level`/`acknowledged_at` columns. Can be sequenced together with ADR-002's Event-removal migration since both touch `task_type` and are low-risk/low-row-count.
+- `schema.sql` refresh to match.
+- `lib/`: TaskForm type selector, Systems Control Panel "Reminders" list filter, Current Action's bell-icon condition — all scoped in item 10 above. No Repository-layer redesign needed; this is additive-boolean-field work, not a new data-access pattern.
+- Docs to update once Approved (not now): `DOMAIN_MODEL.md`, `DATABASE.md`, `GLOSSARY.md`, `V1_PRODUCT.md` (Commitment Types drop from six to five), `MIGRATION_PLAN.md` (Phase 2B.1 moves to Phase 2A as a ready-to-implement item; **Phase 2B.2's vestigial-column-set scope narrows** — `reminder_level`/`acknowledged_at` are resolved by this ADR and should be removed from that still-open bucket, leaving only the calendar-sync/verification columns there, which remain untouched by this ADR per instruction).
+
+### UI Impact
+
+- TaskForm: `Reminder` removed from the type dropdown; a new "Remind me" toggle appears near the Deadline field, available on every task type.
+- Systems Control Panel: "Reminders" section becomes a capability-filtered list (`is_remindable = true`) instead of a type-filtered one; visually unchanged otherwise.
+- Current Action: the bell icon's trigger condition changes from a type check to a capability check — see Open Questions for whether it should coexist with the per-type icon or replace it when both apply.
+- No new screens, dialogs, or navigation — this is a field-level change within existing surfaces, consistent with "smallest V1 implementation" above.
+
+### Open Questions Requiring Your Approval
+
+1. **Field name:** `is_remindable` is a working name used throughout this proposal — confirm or rename before implementation.
+2. **Icon treatment in Current Action:** today, `task_type == 'Reminder'` fully replaces the task-type icon with a bell. Once Reminder is a capability layered on any type, does a remindable Bill show the Bill icon, the bell icon, or both (e.g., a small badge)? This wasn't resolvable from existing evidence — it's a real UI call.
+3. **Current Action ordering:** should `is_remindable = true` give a task any priority boost or special treatment in Current Action's ordering, or does it compete purely on the same `priority_rank`/due-or-start basis as everything else? This design assumes "no special treatment" as the minimum viable behavior (item 2) — confirm that's sufficient for V1.
+4. **Destructive column drops:** confirm `reminder_level` and `acknowledged_at` should be fully removed (not deprecated-in-place) — both are empty on every live row, but this is the same category of irreversible decision as ADR-004's `completed` removal and deserves the same explicit sign-off.
+5. **Scope boundary with Phase 2B.2:** confirm that resolving `reminder_level`/`acknowledged_at` here (as part of Reminder's own design) rather than lumping them with the still-open calendar-sync/verification column set is the intended split — this ADR narrows that other bucket as a side effect, and I want that narrowing itself confirmed, not assumed.
 
 ---
 
@@ -180,7 +230,9 @@ Drop the `completed` column. `status = 'Completed'` becomes the sole source of t
 
 ## Review and Next Steps
 
-**Review round 1 (2026-07-25):** ADR-002, ADR-003, and ADR-004 are **Approved** (ADR-002 and ADR-003 each with the revisions/modifications noted in their entries). **ADR-001 remains Proposed** pending a Reminder-behavior design — this is the only ADR still open.
+**Review round 1 (2026-07-25):** ADR-002, ADR-003, and ADR-004 are **Approved** (ADR-002 and ADR-003 each with the revisions/modifications noted in their entries). **ADR-001 remains Proposed** — this is the only ADR still open.
+
+**ADR-001 design drafted 2026-07-25 (still Proposed, not approved):** a full evidence-based design was produced at the Product Architect's request, addressing problem statement, minimum V1 behaviors, storage shape, timing model, `reminder_level`/`acknowledged_at` disposition, differentiation from adjacent concepts, migration of the 4 live rows, alternatives considered, tradeoffs, proposed schema changes, UI impact, and five specific open questions requiring approval — see ADR-001's entry above in full. Recurring Templates (Phase 2B.3) and the remaining calendar-sync/verification column set (Phase 2B.2, narrowed by this design to exclude `reminder_level`/`acknowledged_at`) were deliberately not addressed, per instruction — those stay separate, still-open items.
 
 **Canonical docs updated 2026-07-25 to match the three Approved ADRs:** `DOMAIN_MODEL.md`, `DATABASE.md`, `ARCHITECTURE.md`, `V1_PRODUCT.md`, `GLOSSARY.md`, `ROADMAP.md`, and `MIGRATION_PLAN.md` now describe Event as removed, `completed` as approved-for-removal, and `is_active` as approved-for-supersession-by-`lifecycle_state` (`tasks` only, Phase 1) — each clearly marked as **approved target architecture, not yet implemented**, per the same current-vs-target discipline established for the Start/End regression. The live database and app code are unchanged; `task_type = 'Event'`, `tasks.completed`, and `tasks.is_active` all still exist and function exactly as before until the corresponding `MIGRATION_PLAN.md` phases are actually executed. `Reminder` remains untouched everywhere, including as a live `task_type`, since ADR-001 has not been approved.
 
