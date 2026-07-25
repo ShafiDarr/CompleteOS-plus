@@ -6,7 +6,7 @@ This document is the canonical, implementation-grounded source for CompleteOS+'s
 
 It exists to freeze the domain model so implementation can proceed phase by phase (see `MIGRATION_PLAN.md`) without re-deriving or re-litigating these definitions per task.
 
-**Status: Frozen and approved by the Product Architect, 2026-07-24.** Changing an entity, field, state, or relationship defined here requires the same sign-off as any other architecture change (BUILD_RULES.md's Change Process) — not a silent edit during implementation.
+**Status: Frozen and approved by the Product Architect, 2026-07-24; amended 2026-07-25 to incorporate ADR-002 (Event removed), ADR-003 (`lifecycle_state` supersedes `is_active` on `tasks`), and ADR-004 (`completed` approved for removal) from `ARCHITECTURE_DECISIONS.md` — all three Approved.** Changing an entity, field, state, or relationship defined here requires the same sign-off as any other architecture change (BUILD_RULES.md's Change Process) — not a silent edit during implementation. **ADR-001 (Reminder as a capability) remains Proposed and is deliberately NOT reflected here yet** — Reminder stays a `task_type` in this document until that ADR is approved. Every field marked "approved for removal/supersession" below describes **target architecture only** — the live database and app code are unmigrated until the corresponding `MIGRATION_PLAN.md` phase is actually implemented; do not assume otherwise.
 
 ### Relationship to other documents
 
@@ -64,11 +64,11 @@ Every entity and field below is marked:
 
 ## Task — IN V1 (the universal execution object)
 
-**Definition:** The single execution object for all real-world commitments. Per SYSTEM_PRINCIPLES.md P009 and P022, and DATABASE.md's "Universal Task Model": Habit, Routine, Bill, Appointment, Event, and Reminder are **not separate tables** — they are rows in `tasks`, differentiated by `task_type`. This is implemented, not aspirational; verified in the live schema and live data.
+**Definition:** The single execution object for all real-world commitments. Per SYSTEM_PRINCIPLES.md P009 and P022, and DATABASE.md's "Universal Task Model": Habit, Routine, Bill, Appointment, and Reminder are **not separate tables** — they are rows in `tasks`, differentiated by `task_type`. This is implemented, not aspirational; verified in the live schema and live data.
 
 **Owned by:** Area and/or Project (both optional).
 
-**The seven Commitment Types (`task_type` values), per V1_PRODUCT.md — all seven equally in scope, none is a milestone to build toward the others:**
+**The six Commitment Types (`task_type` values), per V1_PRODUCT.md as amended by ARCHITECTURE_DECISIONS.md ADR-002 (Approved 2026-07-25):**
 
 | `task_type` | Meaning | Type-specific fields (IN V1) |
 |---|---|---|
@@ -76,11 +76,12 @@ Every entity and field below is marked:
 | `Habit` | Repeated behavior tracked for consistency | `target_value`, `unit`, `frequency`, `tracking_type` |
 | `Routine` | Reusable ordered sequence of steps | steps live in `routine_steps`, keyed by `task_id` |
 | `Bill` | Recurring or one-time payment obligation | `amount`, `payee`, `login_url` |
-| `Appointment` | Scheduled meeting/commitment, often at a place | `start_at`, `end_at`, `location` |
-| `Event` | Scheduled occurrence, similar to Appointment | `start_at`, `end_at`, `location` |
-| `Reminder` | Surfaced at the right time rather than executed as work | **OPEN QUESTION** — see below |
+| `Appointment` | A commitment involving another party or an external obligation — not merely "anything scheduled" (sharpened by ADR-002; previously defined only by its fields) | `start_at`, `end_at`, `location` |
+| `Reminder` | Surfaced at the right time rather than executed as work | **OPEN QUESTION** — see below; also the subject of ADR-001 (Proposed, not yet approved), which would remove this as a `task_type` in favor of a universal capability |
 
-**Verified live (2026-07-24):** of 24 real rows, only `Task` (16), `Reminder` (4), `Habit` (2), and `Routine` (2) actually exist — **zero `Bill`, `Appointment`, or `Event` rows exist in production**, despite Appointment/Event having working `start_at`/`end_at` wiring already (per PROJECT_STATUS.md). This does not change scope (all seven remain IN V1 per V1_PRODUCT.md) but it does mean Bill/Appointment/Event have never been exercised with real data — migration and testing plans should not assume any real-world data exists for those three types.
+**`Event` is removed** as a commitment identity — ADR-002 (Approved 2026-07-25): Event had no unique lifecycle distinct from a plain scheduled Task, unlike Appointment, which does (accountability to another party). No merge target; anything previously modeled as Event is simply a `Task` (or another type) using the universal Start/End scheduling fields. **Approved target architecture, not yet implemented** — `task_type = 'Event'` remains a valid, unmigrated live value until the `MIGRATION_PLAN.md` Phase 2 item executes; zero live rows exist, so this carries no data-migration risk when it does.
+
+**Verified live (2026-07-24):** of 24 real rows, only `Task` (16), `Reminder` (4), `Habit` (2), and `Routine` (2) actually exist — **zero `Bill`, `Appointment`, or `Event` rows exist in production**, despite Appointment/Event having working `start_at`/`end_at` wiring at the time of that audit (since regressed — see Scheduling Model below). This means Bill and Appointment have never been exercised with real data — migration and testing plans should not assume any real-world data exists for either.
 
 ### Universal fields (apply to every `task_type`)
 
@@ -96,8 +97,8 @@ Every entity and field below is marked:
 | `due_at` | timestamptz | IN V1 target architecture, repurposed to Deadline — **but currently the sole production scheduling field** | Target: becomes the optional **Deadline** field once Start/End is implemented. **Current implementation baseline (corrected 2026-07-25): `due_at` is the only scheduling field wired end-to-end today, for every `task_type`.** See Scheduling Model below for the current-vs-target split. |
 | `start_at`, `end_at` | timestamptz | IN V1 target architecture; **not currently implemented for any task_type** | Target: the primary scheduling fields, universal across all types. **Current implementation baseline (corrected 2026-07-25): zero wiring exists.** These were wired for Appointment/Event as of commit `1c08b68` (verified 2026-07-21), but that wiring was subsequently removed during unrelated EditorHost debugging and never restored — only the Due Date implementation was restored afterward. 0 of 24 live rows have either set. Do not assume any code path (TaskForm, EditorHost, Current Action, `current_action_candidates`) can read or write these fields until this is rebuilt and re-verified. |
 | `completed_at` | timestamptz | IN V1 | completion timestamp |
-| `completed` | boolean | **DEPRECATED — do not use** | Redundant with `status`. Live data confirms it has already drifted: 12 of 24 rows have `completed = false` while `status = 'Completed'`. Not read anywhere in application code (verified: only the generated Supabase accessor references it). `status` is the single source of truth going forward, per SYSTEM_PRINCIPLES.md P007. Resolution is a migration item, not a documentation-only note — see MIGRATION_PLAN.md Phase 2. |
-| `is_active` | boolean | IN V1 | universal; for Habit/Routine it means "is the recurring definition still enabled"; for other types it defaults `true` and carries no meaning yet |
+| `completed` | boolean | **APPROVED FOR REMOVAL (ADR-004, Approved 2026-07-25) — not yet migrated** | Redundant with `status`. Live data confirms it had already drifted: 12 of 24 rows have `completed = false` while `status = 'Completed'`. Not read anywhere in application code (verified: only the generated Supabase accessor references it). `status` is the single source of truth going forward, per SYSTEM_PRINCIPLES.md P007. **The column still exists live and in the app's generated code** until the `MIGRATION_PLAN.md` Phase 2 migration (`ALTER TABLE tasks DROP COLUMN completed`) is actually executed. |
+| `is_active` | boolean | **APPROVED FOR SUPERSESSION by `lifecycle_state` (ADR-003, Approved 2026-07-25, Phase 1 = `tasks` only) — not yet migrated** | Current: universal boolean; for Habit/Routine it means "is the recurring definition still enabled"; for other types it defaults `true` and carries no meaning yet. **Target:** `lifecycle_state` (`Active`/`Paused`/`Archived`) supersedes this through migration, on `tasks` only for Phase 1 — `projects.is_active`/`day_blocks.is_active` are unaffected and stay boolean unless a later phase extends the model to them. **The `is_active` column and its current boolean semantics remain live and unchanged** until the corresponding migration executes; see ARCHITECTURE_DECISIONS.md ADR-003 for full rationale. |
 | `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced` | — | **OUT OF V1 SCOPE (undecided)** | An entire calendar-sync subsystem implied by the schema. Confirmed 100% unused in application code. Not mentioned anywhere in V1_PRODUCT.md — not deferred, simply never scoped in. Do not build against these without a Product Architect decision to bring calendar sync into V1. |
 | `requires_verification`, `verification_status` | — | OPEN QUESTION | V1_PRODUCT.md explicitly asks whether this is a personal completion-honesty feature or vestigial multi-person-accountability scope that doesn't belong in V1 at all |
 | `reminder_level`, `acknowledged_at` | — | OPEN QUESTION | V1_PRODUCT.md explicitly asks what these should do for the Reminder Commitment Type. **Note:** 10 of 24 live rows have `reminder_level` set despite zero application code ever writing it — this is very likely seed/test data inserted directly, not evidence of real usage; do not treat it as a signal that this field is already working. |
@@ -149,11 +150,11 @@ Per ARCHITECTURE.md's Confirmed Architecture Decision: the system runs internall
 | Entity | Definition | Canonical fields | Live status |
 |---|---|---|---|
 | **Day Block** | A reusable time-block template (Morning, Work, Recovery, ...) | `id`, `user_id`, `name`, `is_active`, `start_time`, `end_time`, `sort_order` | 0 rows; RLS has zero policies |
-| **Block Item** | An item placed inside a Day Block, referencing a Task of any `task_type` | `id`, `user_id`, `day_block_id`, `task_id`, `item_type`, `title`, `target_amount`, `unit`, `target_time`, `deadline_time`, `sort_order`, `is_required` | 0 rows; RLS has zero policies; `item_type` currently only documents Task/Habit/Routine — whether Bill/Appointment/Event/Reminder are schedulable into a block is unresolved, same open-question status as the Recurring Template question above |
+| **Block Item** | An item placed inside a Day Block, referencing a Task of any `task_type` | `id`, `user_id`, `day_block_id`, `task_id`, `item_type`, `title`, `target_amount`, `unit`, `target_time`, `deadline_time`, `sort_order`, `is_required` | 0 rows; RLS has zero policies; `item_type` currently only documents Task/Habit/Routine — whether Bill/Appointment/Reminder are schedulable into a block is unresolved, same open-question status as the Recurring Template question above |
 | **Daily Plan** | A generated or manual execution plan for one specific day | `id`, `user_id`, `plan_date`, `template_id`, `plan_type`, `status`, `source` | 0 rows; RLS has zero policies; `user_id` has no FK defined |
 | **Daily Plan Block** | A runtime instance of a Day Block inside a Daily Plan — today's actual schedule | `id`, `daily_plan_id`, `user_id`, `area_id`, `block_name`, `start_time`, `end_time`, `sort_order`, `status`, `source_day_block_id` | 0 rows; RLS has zero policies; `daily_plan_id`/`user_id`/`area_id` have no FKs defined |
 
-**Sequencing:** per ARCHITECTURE.md and ROADMAP.md, this entity group is built *after* the Universal Task Model (all seven Commitment Types) is functionally complete — not in parallel. Projects CRUD is the sole documented exception to "finish the Task Model first."
+**Sequencing:** per ARCHITECTURE.md and ROADMAP.md, this entity group is built *after* the Universal Task Model (all Commitment Types — six per ADR-002, or five if ADR-001 is later approved) is functionally complete — not in parallel. Projects CRUD is the sole documented exception to "finish the Task Model first."
 
 ---
 
@@ -220,13 +221,17 @@ Pending → In Progress → Completed
 
 No `Skipped`/`Postponed` values exist in the UI or should be written by any new code. The Action Option Sheet's Skip/Postpone buttons are known to be designed around the old 5-value model and need a product rethink, not a direct restore — see MIGRATION_PLAN.md.
 
-## `task_type` (frozen, 7 values)
+## `task_type` (target: 6 values; live/unmigrated: 7 values)
 
-`Task`, `Habit`, `Routine`, `Bill`, `Appointment`, `Event`, `Reminder` — see the Task entity table above for what's live vs. built.
+**Target (ADR-002, Approved 2026-07-25):** `Task`, `Habit`, `Routine`, `Bill`, `Appointment`, `Reminder` — see the Task entity table above for what's live vs. built. `Reminder` stays a `task_type` for now only because ADR-001 (removing it in favor of a universal capability) is still Proposed, not because it's settled.
 
-## `is_active` (frozen, universal boolean)
+**Live/unmigrated:** the database still accepts `Event` as a 7th value until the `MIGRATION_PLAN.md` Phase 2 migration drops it from the check constraint. Zero live rows use it, so this is a documentation-vs-schema gap, not a data risk.
 
-Independent of `status`. For Habit/Routine: whether the recurring definition is enabled. For all other types: defaults `true`, no defined meaning yet.
+## `is_active` → `lifecycle_state` (target, `tasks` only; live/unmigrated: boolean, universal)
+
+**Target (ADR-003, Approved 2026-07-25, Phase 1 = `tasks` only):** `lifecycle_state` (`Active` / `Paused` / `Archived`) supersedes `is_active` on `tasks` through migration. `projects`/`day_blocks`/`recurring_templates` are out of Phase 1's scope and keep their boolean `is_active`/`active` for now.
+
+**Live/unmigrated:** `tasks.is_active` is still a plain boolean today, independent of `status`. For Habit/Routine: whether the recurring definition is enabled. For all other types: defaults `true`, no defined meaning yet. This remains accurate until the Phase 1 lifecycle migration executes.
 
 ---
 

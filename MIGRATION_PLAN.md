@@ -6,7 +6,9 @@ This is the phased plan for closing the gap between the frozen domain model (`DO
 
 **Status:** Planning complete, approved to exist as a plan. Individual phases below are gated per their own approval requirement — this document does not itself authorize any schema change, destructive migration, or security change. Do not begin implementation from this document alone; get the specific phase's sign-off first where one is marked required.
 
-**Ground truth this plan is built on:** `PROJECT_STATUS.md`'s Audit Record and Blockers section (2026-07-24 entries), and `DOMAIN_MODEL.md`.
+**Updated 2026-07-25:** Phase 2 restructured following ADR review — ADR-002, ADR-003, and ADR-004 are Approved (now Phase 2A, ready to implement, no further decision needed) and ADR-001 remains Proposed (Phase 2B.1, still blocking). Phase 4.1 also corrected the same day to reflect a Start/End implementation regression reported by the Product Architect — see that section for detail. **None of Phase 2A has been implemented yet** — "Approved" describes the decision, not the live schema.
+
+**Ground truth this plan is built on:** `PROJECT_STATUS.md`'s Audit Record and Blockers section (2026-07-24 entries), `DOMAIN_MODEL.md`, and `ARCHITECTURE_DECISIONS.md` (ADR statuses as of 2026-07-25).
 
 ---
 
@@ -41,7 +43,7 @@ Phase 1 (RLS + FKs + schema.sql + linter fixes)
    │        └──► Phase 6 (Schedules: Day Blocks / Daily Plans)
    │
    └──► Phase 2 (Domain data-integrity decisions)             [independent of Phase 4/5/6 timing,
-            │                                                   but Phase 2.3 blocks part of Phase 6]
+            │                                                   Phase 2A ready to implement now; Phase 2B.3 blocks part of Phase 6]
             └──► (implementation of whichever decisions land)
 
 Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phase 1
@@ -111,43 +113,91 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 ---
 
-## Phase 2 — Domain Data-Integrity Decisions
+## Phase 2 — Domain Data-Integrity Changes
 
-**These are decision requests, not ready-to-implement work.** Nothing in this phase should be implemented until the Product Architect decides — implementing any of them ahead of a decision would be exactly the "guess instead of ask" failure mode SYSTEM_PRINCIPLES.md P021 exists to prevent.
+**Updated 2026-07-25.** This phase now splits into 2A (three items Approved via `ARCHITECTURE_DECISIONS.md` — ready to implement, no further decision needed) and 2B (items still awaiting a Product Architect decision — do not implement). None of 2A has been implemented yet; "Approved" describes the decision, not the live schema, which is unchanged until each migration actually runs.
 
-### 2.1 `tasks.completed` vs `tasks.status`
+### Phase 2A — Approved, Ready to Implement
 
-**What:** Decide how to resolve the redundant/drifted `completed` boolean: drop the column, or keep it and stop writing/reading it (formally deprecate in place), or add a generated-column/trigger to keep it derived from `status` automatically.
+#### 2A.1 `tasks.completed` removal (ADR-004, Approved 2026-07-25)
 
-**Why:** Verified live 2026-07-24 — 12 of 24 rows already disagree (`completed = false` while `status = 'Completed'`). Confirmed via code search that `completed` is never read or written outside the generated Supabase accessor, so **dropping it carries zero application-code risk** — the only real question is whether any external consumer (a report, a future integration) might expect it to exist.
+**What:** Drop the `completed` column. `status = 'Completed'` becomes the sole source of truth.
 
-**Risk:** Medium — low code risk (verified above), but it's a genuine schema change and a "which field is authoritative" decision, not just cleanup.
+**Why:** Verified live 2026-07-24 — 12 of 24 rows already disagreed (`completed = false` while `status = 'Completed'`). Confirmed via code search that `completed` is never read or written outside the generated Supabase accessor — dropping it carries zero application-code risk.
 
-**Depends on:** nothing technically, but should land before Phase 4 work touches task completion logic, to avoid building new code against a field about to be removed.
+**Risk:** Medium — schema change (column drop, irreversible without backup), but zero verified code dependency and no information loss (`status` already captures completion correctly for all 24 live rows).
 
-**Affected files:** Supabase migration (if dropping/deprecating), `DATABASE.md`, `DOMAIN_MODEL.md` (already marks it deprecated, would need updating once resolved).
+**Depends on:** nothing technically; should land before Phase 4 work touches task completion logic, to avoid building new code against a field about to disappear.
 
-**Approval:** 🔴 Required, blocking.
+**Affected files:** Supabase migration (`ALTER TABLE tasks DROP COLUMN completed`), `schema.sql` refresh, `DATABASE.md`/`DOMAIN_MODEL.md` (already updated to "approved for removal," need a final "removed" pass once implemented).
 
-### 2.2 Vestigial verification/calendar-sync/reminder column set
+**Approval:** 🟢 Decision already made (ADR-004) — implementation itself still needs a normal review/merge, not a fresh architecture sign-off.
 
-**What:** Decide the fate of `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced` (out-of-scope, undecided) and `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` (open questions per V1_PRODUCT.md) — remove, or define real V1 behavior and build against them.
+#### 2A.2 Event removed from `task_type` (ADR-002, Approved 2026-07-25)
+
+**What:** Drop `'Event'` from the `tasks.task_type` check constraint/enum. No merge target and no data reassignment — anything scheduled that isn't a genuine Appointment (another party/external obligation) is simply a `Task` (or another type) using the universal scheduling fields.
+
+**Why:** Event had no unique lifecycle distinct from a plain scheduled Task; Appointment was kept because it does have one (external accountability). See ARCHITECTURE_DECISIONS.md ADR-002 for full reasoning.
+
+**Risk:** Low — **zero live data** (0 of 24 tasks use `task_type = 'Event'`), so this is the lowest-risk item in the whole plan.
+
+**Depends on:** nothing technically. Should land before/alongside Phase 4.1's type-selector work, so that work isn't built to include a branch that's about to be removed.
+
+**Affected files:** Supabase migration (check constraint), `lib/` (remove the `Event` branch from the type selector and any per-type list filters — no distinct Event-only code path exists to rewire), `DATABASE.md`/`DOMAIN_MODEL.md`/`GLOSSARY.md`/`V1_PRODUCT.md`/`ROADMAP.md` (already updated to reflect target architecture; need a final pass removing the "live/unmigrated" caveats once implemented).
+
+**Approval:** 🟢 Decision already made (ADR-002).
+
+#### 2A.3 `tasks.lifecycle_state` supersedes `tasks.is_active` (ADR-003, Approved 2026-07-25, with modification)
+
+**What:** Add `tasks.lifecycle_state` (`Active` / `Paused` / `Archived`), backfill all existing rows (`is_active = true` → `lifecycle_state = 'Active'`), then supersede `is_active` on `tasks` through this migration. **Phase 1 of Lifecycle adoption is scoped to `tasks` only** — `projects.is_active`/`day_blocks.is_active` are unaffected and stay boolean; other entities may adopt Lifecycle in a later phase if a real need is demonstrated, per the ADR's approved modification.
+
+**Why:** A boolean can't distinguish "temporarily paused" from "permanently archived" for Habit/Routine definitions. See ARCHITECTURE_DECISIONS.md ADR-003.
+
+**Risk:** Low-Medium — schema change plus a full inventory of `lib/` call sites reading/writing `tasks.is_active` (not yet enumerated; first implementation step). Zero live rows are currently `is_active = false`, so there's no "off" data to reconcile, but all 24 `true` rows need an unambiguous backfill.
+
+**Depends on:** nothing technically; independent of the other 2A items, though bundling into the same migration pass as 2A.1/2A.2 is reasonable since all three touch `tasks`.
+
+**Affected files:** Supabase migration (new column + backfill), `lib/` (inventory + update every `tasks.is_active` call site), `DATABASE.md`/`DOMAIN_MODEL.md` (already updated to "approved for supersession," need a final pass once implemented).
+
+**Approval:** 🟢 Decision already made (ADR-003) — note the approved modification (Phase 1 = `tasks` only; "supersedes through migration," not an instant swap) if implementation ever drifts toward a broader or instantaneous version.
+
+### Phase 2B — Still Open, Decision Required
+
+**Nothing in this section should be implemented until the Product Architect decides.** Implementing ahead of a decision here is exactly the "guess instead of ask" failure mode SYSTEM_PRINCIPLES.md P021 exists to prevent.
+
+#### 2B.1 Reminder as a capability (ADR-001, Proposed — not yet approved)
+
+**What:** Remove `Reminder` from `task_type` in favor of a universal capability (working shape: an `is_remindable` flag plus the existing `reminder_level`/`acknowledged_at` fields, usable on any type) — see ARCHITECTURE_DECISIONS.md ADR-001 for the full proposal and its Migration Impact section.
+
+**Why still open:** direction agreed by the Product Architect, but the actual behavior/mechanism for Reminder (what `reminder_level` means, what "acknowledging" does) has not been designed yet — approving the structural shape without that design would be building against an undefined feature.
+
+**Risk:** Medium — 4 live rows (`task_type = 'Reminder'`) would need migrating once approved, unlike Event's zero-row case.
+
+**Depends on:** nothing technically; blocks Phase 4.4's Reminder-specific work either way.
+
+**Affected files:** none until approved.
+
+**Approval:** 🔴 Required, blocking — this is the one remaining ADR still Proposed.
+
+#### 2B.2 Vestigial verification/calendar-sync/reminder column set
+
+**What:** Decide the fate of `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced` (out-of-scope, undecided) and `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` (open questions per V1_PRODUCT.md) — remove, or define real V1 behavior and build against them. **Overlaps with 2B.1** for `reminder_level`/`acknowledged_at` specifically — those two fields' fate is really the same decision as Reminder's capability design, not a separate one.
 
 **Why:** Confirmed 100% unused in application code. `reminder_level` has live data on 10 of 24 rows despite that, which looks like seed data rather than evidence of real usage — do not treat it as a reason to assume the field already works.
 
-**Risk:** High if columns are dropped and any of them turn out to matter for a decision not yet made (e.g., if Reminder's V1 behavior turns out to need `reminder_level`). Low if the decision is "keep the columns, just don't build on them yet."
+**Risk:** High if columns are dropped and any of them turn out to matter for a decision not yet made. Low if the decision is "keep the columns, don't build on them yet."
 
-**Depends on:** nothing technically; this *is* V1_PRODUCT.md's own open question, carried through unchanged.
+**Depends on:** nothing technically for the calendar-sync half; the reminder-field half is effectively gated on 2B.1.
 
 **Affected files:** none until decided; then a Supabase migration and `tasks.dart`/related Dart if columns are wired or removed.
 
 **Approval:** 🔴 Required, blocking — explicitly named in V1_PRODUCT.md as a Product Architect decision, not an implementation one.
 
-### 2.3 Recurring Templates scope
+#### 2B.3 Recurring Templates scope
 
 **What:** Decide whether V1 needs the full Recurring Templates engine (the `recurring_templates` table as currently designed — schedule types, week patterns, day-of-month rules) or a simpler frequency-based repeat on Habit/Routine/Bill, and whether a minimal recurring-instance-generation mechanism is required V1 infrastructure either way.
 
-**Why:** V1_PRODUCT.md's own open question. Verified live 2026-07-24 that the table is not dead data — 46 real rows exist, and 10 live tasks reference one — but none of it is reachable by the app regardless of this decision, since it's also one of the 11 tables blocked in Phase 1.
+**Why:** V1_PRODUCT.md's own open question — and, as of the Product Architect's own note, **the only remaining product decision considered legitimately open** at the same review that approved ADR-002/003/004. Verified live 2026-07-24 that the table is not dead data — 46 real rows exist, and 10 live tasks reference one — but none of it is reachable by the app regardless of this decision, since it's also one of the 11 tables blocked in Phase 1.
 
 **Risk:** Medium — the table already has real data; a decision to simplify or repurpose it needs a data-migration sub-plan of its own once made, not just a schema change.
 
@@ -215,9 +265,9 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **What:** Type-specific fields and flows for Bill and Reminder.
 
-**Depends on:** Phase 2.2 for Reminder specifically (`reminder_level`/`acknowledged_at` are open questions — do not wire fields whose behavior isn't decided). Bill has no such blocker.
+**Depends on:** Phase 2B.1/2B.2 for Reminder specifically (`reminder_level`/`acknowledged_at`, and Reminder's very existence as a `task_type`, are open questions — do not wire fields whose behavior isn't decided). Bill has no such blocker.
 
-**Risk:** Low. **Approval:** 🟢 Not required for Bill; Reminder is blocked on 2.2's decision, not an approval gate of its own.
+**Risk:** Low. **Approval:** 🟢 Not required for Bill; Reminder is blocked on 2B.1/2B.2's decisions, not an approval gate of its own.
 
 ---
 
@@ -235,7 +285,7 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **What:** Full UI for the block-first internal / calendar-first user-facing scheduling system.
 
-**Depends on:** Phase 1 (all four schedule tables need RLS/FKs) and Phase 4 (per ARCHITECTURE.md/ROADMAP.md's explicit sequencing — this starts only after the Universal Task Model is functionally complete). Daily Plan generation logic additionally depends on Phase 2.3's Recurring Templates decision if generation is meant to read from templates.
+**Depends on:** Phase 1 (all four schedule tables need RLS/FKs) and Phase 4 (per ARCHITECTURE.md/ROADMAP.md's explicit sequencing — this starts only after the Universal Task Model is functionally complete). Daily Plan generation logic additionally depends on Phase 2B.3's Recurring Templates decision if generation is meant to read from templates.
 
 **Risk:** Medium — the largest remaining greenfield UI surface. **Approval:** 🟢 Not required for direction (already-confirmed architecture); the implementation plan itself should get a lightweight review when it's actually scoped, same as any other sprint kickoff.
 
@@ -249,12 +299,15 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 | 1.2 | Missing FKs | 🟡 Required | Bundled with 1.1 |
 | 1.3 | `schema.sql` refresh | 🟢 None | No |
 | 1.4 | Linter/auth security fixes | 🟡 Required | No |
-| 2.1 | `completed`/`status` consolidation | 🔴 Required | Blocks nothing else directly, but should precede Phase 4 completion-logic work |
-| 2.2 | Vestigial column set | 🔴 Required | Blocks Reminder in Phase 4.4 |
-| 2.3 | Recurring Templates scope | 🔴 Required | Blocks part of Phase 6 |
+| 2A.1 | `completed`/`status` consolidation (ADR-004) | 🟢 Decision made — ready to implement | No |
+| 2A.2 | Event removed from `task_type` (ADR-002) | 🟢 Decision made — ready to implement | No — sequence before/alongside Phase 4.1's type selector work |
+| 2A.3 | `lifecycle_state` supersedes `is_active` on `tasks` (ADR-003) | 🟢 Decision made — ready to implement | No |
+| 2B.1 | Reminder as a capability (ADR-001) | 🔴 Required — the only ADR still open | Blocks Reminder in Phase 4.4 |
+| 2B.2 | Vestigial column set | 🔴 Required | Blocks Reminder in Phase 4.4 (overlaps with 2B.1 for `reminder_level`/`acknowledged_at`) |
+| 2B.3 | Recurring Templates scope | 🔴 Required | Blocks part of Phase 6 |
 | 3.1 | Scoped UNIQUE constraints | 🟡 Required | No |
 | 4.1–4.3 | Start/End (restore + generalize, see 2026-07-25 correction), Habit, Routine | 🟢 None (direction already approved) | Each gated on Phase 1 landing |
-| 4.4 | Bill / Reminder | 🟢 / blocked on 2.2 | Reminder blocked, Bill not |
+| 4.4 | Bill / Reminder | 🟢 Bill / 🔴 Reminder blocked on 2B.1+2B.2 | Reminder blocked, Bill not |
 | 5 | Projects CRUD | 🟢 None | Gated on 1.1's `projects` policy only |
 | 6 | Schedules | 🟢 None (direction already approved) | Gated on Phase 1 + Phase 4 |
 

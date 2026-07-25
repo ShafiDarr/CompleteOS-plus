@@ -19,6 +19,7 @@ It complements:
 - DOMAIN_MODEL.md (The frozen, live-verified, V1-scoped domain language — canonical for entity/field/state definitions)
 - DATABASE.md (How domain data is stored)
 - MIGRATION_PLAN.md (The phased plan for closing the gap between this architecture and the live database/app code)
+- ARCHITECTURE_DECISIONS.md (ADR log for architecture changes proposed/approved after the initial freeze — e.g. Event removal, `lifecycle_state`)
 
 ---
 
@@ -95,7 +96,7 @@ These decisions are authoritative for CompleteOS+'s architecture going forward, 
 
 ## Universal Task Model Is The Foundation
 
-The Universal Task Model (see DOMAIN_ARCHITECTURE.md's Task section and DATABASE.md's "Universal Task Model") is the foundation of CompleteOS+. It must be finished — all seven `task_type` values genuinely supported end to end — before other systems are expanded. Projects CRUD is treated as independent of this rule: it does not touch task scheduling and may proceed in parallel.
+The Universal Task Model (see DOMAIN_ARCHITECTURE.md's Task section and DATABASE.md's "Universal Task Model") is the foundation of CompleteOS+. It must be finished — every `task_type` value genuinely supported end to end — before other systems are expanded. Projects CRUD is treated as independent of this rule: it does not touch task scheduling and may proceed in parallel. **As of ARCHITECTURE_DECISIONS.md ADR-002 (Approved 2026-07-25), the target count is six types (Event removed); Reminder's status as a seventh type-or-capability is still open pending ADR-001. See DOMAIN_MODEL.md for the current authoritative list and the live-vs-target distinction.**
 
 ## Task Scheduling Model: Start/End, Not Due Date
 

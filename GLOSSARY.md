@@ -68,11 +68,11 @@ Whenever possible, work should begin as a Task.
 
 ## Commitment Type
 
-A category of real-world commitment CompleteOS+ manages — Task, Habit, Routine, Bill, Appointment, Event, or Reminder in V1.
+A category of real-world commitment CompleteOS+ manages — Task, Habit, Routine, Bill, Appointment, or Reminder in V1 (six types; reduced from seven — Event removed 2026-07-25, see ARCHITECTURE_DECISIONS.md ADR-002).
 
-All Commitment Types are implemented as `task_type` values within the Universal Task Model, not as separate systems.
+All Commitment Types are implemented as `task_type` values within the Universal Task Model, not as separate systems. **Approved target architecture, not yet implemented:** the live database still accepts `task_type = 'Event'` until the corresponding migration executes.
 
-See V1_PRODUCT.md.
+See V1_PRODUCT.md; see DOMAIN_MODEL.md for the detailed, live-verified definition of each.
 
 ---
 
@@ -84,13 +84,7 @@ A Commitment Type representing a payment obligation, recurring or one-time.
 
 ## Appointment
 
-A Commitment Type representing a scheduled meeting or commitment at a specific time, often at a specific place.
-
----
-
-## Event
-
-A Commitment Type representing a scheduled occurrence, similar to an Appointment.
+A Commitment Type representing a commitment involving another party or an external obligation, typically at a specific time and often a specific place. (Definition sharpened by ADR-002, which removed the now-defunct Event type that previously shared only its fields, not its meaning.)
 
 ---
 

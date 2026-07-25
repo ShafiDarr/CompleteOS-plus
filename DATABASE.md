@@ -4,9 +4,11 @@
 
 This document describes the current Supabase/PostgreSQL database for CompleteOS+.
 
-See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Event, Reminder) that this schema implements, and **DOMAIN_MODEL.md for the canonical, live-verified domain language** — where this document and DOMAIN_MODEL.md ever disagree, DOMAIN_MODEL.md's live-verified facts win until this document is corrected to match. See MIGRATION_PLAN.md for the phased plan closing the gaps this document flags below.
+See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Reminder) that this schema implements, and **DOMAIN_MODEL.md for the canonical, live-verified domain language** — where this document and DOMAIN_MODEL.md ever disagree, DOMAIN_MODEL.md's live-verified facts win until this document is corrected to match. See MIGRATION_PLAN.md for the phased plan closing the gaps this document flags below, and **ARCHITECTURE_DECISIONS.md for approved-but-unimplemented target-architecture changes (Event removal, `lifecycle_state`, `completed` removal) — this document marks each one where it applies, distinguishing current live schema from approved target.**
 
 **Live-verified 2026-07-24:** several facts below were confirmed directly against the live Supabase project for the first time. Where a fact here was previously a recommendation or an assumption, it is now marked live-confirmed or live-contradicted.
+
+**Updated 2026-07-25:** ADR-002, ADR-003, and ADR-004 are Approved. None are implemented yet — the live schema is unchanged. Each affected fact below is marked "approved for [change] — not yet migrated."
 
 The database currently contains **13 public tables**.
 
@@ -23,7 +25,7 @@ The database should support:
 - Personal execution
 - Areas of life
 - Projects
-- Tasks (including Habits, Routines, Bills, Appointments, Events, and Reminders as specialized task types — see V1_PRODUCT.md for the full definition of these as V1 Commitment Types)
+- Tasks (including Habits, Routines, Bills, Appointments, and Reminders as specialized task types — see V1_PRODUCT.md for the full definition of these as V1 Commitment Types)
 - Day blocks
 - Daily plans
 - Daily status
@@ -41,20 +43,24 @@ Habits and Routines are **not** separate tables. They are represented as rows in
 
 This directly implements SYSTEM_PRINCIPLES.md's P009 ("Tasks Are The Universal Execution Object") and DOMAIN_ARCHITECTURE.md's Task section.
 
-`task_type` values in use or planned (these are CompleteOS+ V1's Commitment Types — see V1_PRODUCT.md):
+`task_type` values, target vs. live (these are CompleteOS+ V1's Commitment Types — see V1_PRODUCT.md):
 
 - `Task` — default, ordinary actionable work
 - `Habit` — repeated behavior, uses `target_value`, `unit`, `frequency`, `tracking_type`
 - `Routine` — multi-step workflow, whose steps live in `routine_steps` referencing `tasks.id`
 - `Bill` — uses `amount`, `payee`, `login_url`
-- `Appointment`/`Event` — uses `start_at`, `end_at`, `location`
-- `Reminder` — surfaced at the right time rather than executed as work; exact field usage is an open question, see V1_PRODUCT.md's Open Questions
+- `Appointment` — uses `start_at`, `end_at`, `location`; represents a commitment involving another party or an external obligation, not merely "anything scheduled" (definition sharpened by ADR-002)
+- `Reminder` — surfaced at the right time rather than executed as work; exact field usage is an open question, see V1_PRODUCT.md's Open Questions. Also the subject of ADR-001 (Proposed, not approved) — see ARCHITECTURE_DECISIONS.md.
+
+**`Event` — approved for removal (ADR-002, Approved 2026-07-25), not yet migrated.** Event had no unique lifecycle distinct from a plain scheduled Task; Appointment was kept instead because it does have one. `task_type = 'Event'` remains a valid, functioning value in the live database and check constraint until the migration executes — zero live rows use it, so there is no data risk when it does.
 
 Fields not relevant to a given `task_type` are simply left null on that row.
 
 `status` is **frozen at three values**: `Pending` / `In Progress` / `Completed`. `Skipped`/`Postponed` were removed from the UI and confirmed intentional by the Product Architect — this is no longer an open question about the `status` field itself. How "skip" and "postpone" should work as *actions* (not status values) is a separate, still-open UI question — see PROJECT_STATUS.md's Action Option Sheet note. See DOMAIN_MODEL.md for the frozen state machine.
 
-`completed` (boolean) is **deprecated** — redundant with `status`, and live data confirms active drift: 12 of 24 rows have `completed = false` while `status = 'Completed'` (verified 2026-07-24). It is never read outside the generated Supabase accessor. Its removal/deprecation is a pending decision — see MIGRATION_PLAN.md Phase 2.1. Do not write new code against it.
+`completed` (boolean) is **approved for removal (ADR-004, Approved 2026-07-25), not yet migrated** — redundant with `status`, and live data confirms active drift: 12 of 24 rows have `completed = false` while `status = 'Completed'` (verified 2026-07-24). It is never read outside the generated Supabase accessor. The column still exists live until the `MIGRATION_PLAN.md` Phase 2 migration (`ALTER TABLE tasks DROP COLUMN completed`) is actually executed. Do not write new code against it in the meantime.
+
+`is_active` (on `tasks`) is **approved for supersession by a `lifecycle_state` field (ADR-003, Approved 2026-07-25), Phase 1 scoped to `tasks` only, not yet migrated.** Target states: `Active` / `Paused` / `Archived`. `projects.is_active`/`day_blocks.is_active` are unaffected by this phase and remain plain booleans. Until the migration executes, `tasks.is_active` continues to function exactly as documented below.
 
 `priority_rank` (smallint) exists live and drives Current Action ordering. It was confirmed live 2026-07-24 and was previously missing from this document and from `schema.sql`.
 
@@ -212,7 +218,7 @@ UNIQUE (user_id, lower(name))
 
 Represents actionable work.
 
-Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, Appointment, Event, and Reminder is a row in this table, differentiated by `task_type`.
+Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, Appointment, and Reminder is a row in this table, differentiated by `task_type`. (`Event` is approved for removal per ADR-002 but remains a live, unmigrated value — see "Universal Task Model" above.)
 
 ## Key Columns
 
@@ -232,9 +238,9 @@ Tasks are the **universal execution object** of CompleteOS+ — see "Universal T
 | `priority_rank` | smallint | Drives Current Action ordering; live-confirmed 2026-07-24, missing from `schema.sql` until refreshed (MIGRATION_PLAN.md 1.3) |
 | `due_at` | timestamptz | Deadline (optional, secondary) — repurposed from "the" scheduling field; see Scheduling Model in DOMAIN_MODEL.md |
 | `completed_at` | timestamptz | Completion timestamp |
-| `completed` | boolean | **Deprecated.** Redundant with `status`, confirmed drifted in live data (12/24 rows disagree). Pending removal/deprecation decision — MIGRATION_PLAN.md 2.1 |
-| `task_type` | text | Task / Habit / Routine / Bill / Appointment / Event / Reminder |
-| `is_active` | boolean | Whether this record is enabled (mainly meaningful for Habit/Routine) |
+| `completed` | boolean | **Approved for removal (ADR-004, Approved 2026-07-25), not yet migrated.** Redundant with `status`, confirmed drifted in live data (12/24 rows disagree). Still live until MIGRATION_PLAN.md Phase 2 executes `ALTER TABLE tasks DROP COLUMN completed` |
+| `task_type` | text | **Live:** Task / Habit / Routine / Bill / Appointment / Event / Reminder. **Target (ADR-002, Approved):** Event removed — Task / Habit / Routine / Bill / Appointment / Reminder |
+| `is_active` | boolean | **Live:** whether this record is enabled (mainly meaningful for Habit/Routine). **Target (ADR-003, Approved, Phase 1 = `tasks` only):** superseded by `lifecycle_state` (`Active`/`Paused`/`Archived`) through migration — not yet implemented |
 | `calendar_sync` | boolean | Whether to sync to calendar |
 | `requires_verification` | boolean | Whether completion needs confirmation |
 | `verification_status` | text | Verification state |
@@ -253,13 +259,15 @@ Tasks are the **universal execution object** of CompleteOS+ — see "Universal T
 | `frequency` | text | How often the habit repeats |
 | `tracking_type` | text | Boolean or numeric tracking |
 
-### Appointment/Event-specific (`task_type = 'Appointment'`/`'Event'`)
+### Appointment-specific (`task_type = 'Appointment'`)
 
 | Column | Type | Purpose |
 |---|---|---|
 | `start_at` | timestamptz | Start time |
 | `end_at` | timestamptz | End time |
 | `location` | text | Location |
+
+**Live/unmigrated note:** these columns are also still used by `task_type = 'Event'` rows today (pre-ADR-002 schema) — the check constraint hasn't been narrowed yet. Zero live rows of either type currently populate them (see Live Reality notes elsewhere in this document).
 
 ### Bill-specific (`task_type = 'Bill'`)
 
@@ -446,7 +454,7 @@ A block item references a task — since Habits and Routines are task types, thi
 | `id` | uuid | Primary key |
 | `user_id` | uuid | Owner user |
 | `day_block_id` | uuid | Parent day block |
-| `item_type` | text | Task / Habit / Routine (documented scope predates V1_PRODUCT.md's full seven Commitment Types — whether Bill/Appointment/Event/Reminder also need to be schedulable into a day block is unresolved, see V1_PRODUCT.md) |
+| `item_type` | text | Task / Habit / Routine (documented scope predates V1_PRODUCT.md's full Commitment Type list — whether Bill/Appointment/Reminder also need to be schedulable into a day block is unresolved, see V1_PRODUCT.md) |
 | `task_id` | uuid | Referenced task (of any task_type) |
 | `title` | text | Display title |
 | `target_amount` | numeric | Optional target amount |
@@ -731,7 +739,7 @@ auth.users
 ├── projects
 │   └── tasks
 │
-├── tasks (task_type: Task / Habit / Routine / Bill / Appointment / Event / Reminder)
+├── tasks (task_type, live: Task / Habit / Routine / Bill / Appointment / Event / Reminder — target per ADR-002: Event removed)
 │   ├── block_items
 │   ├── habit_logs        (task_type = 'Habit')
 │   └── routine_steps     (task_type = 'Routine')

@@ -33,7 +33,7 @@ V1_PRODUCT.md defines Reminder by *when it surfaces*, not *what kind of thing it
 
 Remove `Reminder` from the `task_type` enum. Add a universal capability (working name: `is_remindable`, boolean) alongside the existing `reminder_level`/`acknowledged_at` fields, made meaningful on **any** `task_type` rather than gated behind one. Any task — regardless of its type — can carry a reminder.
 
-*This ADR proposes the structural change only. It does not resolve what `reminder_level`/`acknowledged_at` should actually do — that remains a separate open question (see `V1_PRODUCT.md` Open Questions and `MIGRATION_PLAN.md` Phase 2.2), unchanged by this ADR.*
+*This ADR proposes the structural change only. It does not resolve what `reminder_level`/`acknowledged_at` should actually do — that remains a separate open question (see `V1_PRODUCT.md` Open Questions and `MIGRATION_PLAN.md` Phase 2B.2), unchanged by this ADR.*
 
 ### Benefits
 
@@ -54,15 +54,15 @@ Remove `Reminder` from the `task_type` enum. Add a universal capability (working
 - Add `tasks.is_remindable` (or equivalent) boolean column.
 - Data migration: the 4 live `task_type = 'Reminder'` rows → `task_type = 'Task'`, `is_remindable = true`.
 - `lib/`: every place `task_type` values are enumerated or branched on (task type selector, per-type list filters, `task_type_section_widget.dart`) needs the `Reminder` branch removed and a capability-based UI element added instead — not yet scoped in detail, since no such UI exists to modify today.
-- Docs once Approved: `DOMAIN_MODEL.md` (Task entity, Commitment Type table), `DATABASE.md` (`task_type` field, Universal fields table), `GLOSSARY.md` (Reminder, Commitment Type entries), `V1_PRODUCT.md` ("seven Commitment Types" becomes six — see ADR-002 for the further reduction to five).
+- Docs to update once Approved: `DOMAIN_MODEL.md` (Task entity, Commitment Type table), `DATABASE.md` (`task_type` field, Universal fields table), `GLOSSARY.md` (Reminder, Commitment Type entries), `V1_PRODUCT.md` — Commitment Types would go from six (current, after ADR-002's approval) to five if this ADR is also approved.
 
 ---
 
 ## ADR-002: Removal of Event as a Commitment Identity
 
-**Status: Proposed**
+**Status: Approved (2026-07-25)**
 
-**Revised 2026-07-25:** the original version of this ADR proposed merging Event into Appointment. That proposal is withdrawn — Appointment and Event are not equivalent, and folding one into the other would have diluted Appointment's actual meaning. The revision below reflects the corrected reasoning: Event is removed because it has no unique lifecycle, not because it's a duplicate of Appointment.
+**Revised, then approved, 2026-07-25:** the original version of this ADR proposed merging Event into Appointment. That proposal was withdrawn — Appointment and Event are not equivalent, and folding one into the other would have diluted Appointment's actual meaning. The revision below (Event removed for lacking a unique lifecycle; Appointment kept as a distinct type representing commitments involving another party or external obligation) is the version that was approved.
 
 ### Current Implementation
 
@@ -89,14 +89,14 @@ Remove `Event` from the `task_type` enum, with **no merge target**. Scheduled wo
 
 - No obvious catch-all label remains for "something scheduled" in the type selector — a user who thinks "I have an event" now needs to recognize that's a `Task` (or another type) with a start/end time, or an `Appointment` if another party is genuinely involved. This is a real UX/labeling design question for whoever builds the type-selection UI, not resolved by this ADR.
 - Appointment's defining criterion ("involves another party or external obligation") is a judgment call at data-entry time — the schema cannot structurally enforce or validate it, so mis-categorization is possible and not preventable at the database level.
-- Every place V1_PRODUCT.md, DOMAIN_MODEL.md, DATABASE.md, and GLOSSARY.md state "seven Commitment Types" needs updating once this and ADR-001 are both decided.
+- **Resolved by this ADR's approval:** V1_PRODUCT.md, DOMAIN_MODEL.md, DATABASE.md, and GLOSSARY.md now state six Commitment Types (updated 2026-07-25). They would drop to five if ADR-001 is also approved.
 
 ### Migration Impact
 
 - `tasks.task_type` check constraint/enum: drop `'Event'`. No data reassignment to Appointment or anywhere else — no data migration required at all (0 live rows).
 - `Appointment`'s field set (`start_at`/`end_at`/`location`) is unchanged structurally; only its documented definition sharpens to "involves another party or external obligation."
 - `lib/`: remove the `Event` branch from the type selector and any per-type list filters; no distinct Event-only code path exists to rewire, per the current audit.
-- Docs once Approved: `DOMAIN_MODEL.md`/`DATABASE.md`/`GLOSSARY.md`/`V1_PRODUCT.md` need Event removed (no merge note) and Appointment's definition sharpened to its distinguishing trait, not just its field set.
+- Docs updated 2026-07-25 now that this ADR is Approved: `DOMAIN_MODEL.md`, `DATABASE.md`, `GLOSSARY.md`, `V1_PRODUCT.md`, `ARCHITECTURE.md`, `ROADMAP.md` — Event removed (no merge note), Appointment's definition sharpened to its distinguishing trait. **The live database and app code are not yet migrated** — `task_type = 'Event'` remains a valid live value until the Supabase migration and `lib/` type-selector change described above are actually implemented; canonical docs now describe target architecture, with implementation tracked separately in `MIGRATION_PLAN.md`.
 
 ---
 
@@ -180,12 +180,12 @@ Drop the `completed` column. `status = 'Completed'` becomes the sole source of t
 
 ## Review and Next Steps
 
-**Review round 1 (2026-07-25):** ADR-003 and ADR-004 are Approved (ADR-003 with the modifications noted in its entry). ADR-001 remains Proposed pending a Reminder-behavior design. ADR-002 was substantively revised (no merge into Appointment; Event removed for lacking a unique lifecycle, Appointment kept for representing another-party/external-obligation commitments) and remains Proposed pending review of that revision.
+**Review round 1 (2026-07-25):** ADR-002, ADR-003, and ADR-004 are **Approved** (ADR-002 and ADR-003 each with the revisions/modifications noted in their entries). **ADR-001 remains Proposed** pending a Reminder-behavior design — this is the only ADR still open.
 
-**None of the four ADRs are reflected in `DOMAIN_MODEL.md`, `DATABASE.md`, or `MIGRATION_PLAN.md` yet — including the two now Approved.** Per explicit instruction, canonical-document updates are held until *all four* ADRs reach a final status (Approved/Rejected), not applied piecemeal as each one clears review. Those documents still describe the currently-approved architecture (`Reminder`/`Event` as live `task_type` values, `is_active` as a boolean, `completed` as deprecated-but-present) and remain authoritative until this document says otherwise.
+**Canonical docs updated 2026-07-25 to match the three Approved ADRs:** `DOMAIN_MODEL.md`, `DATABASE.md`, `ARCHITECTURE.md`, `V1_PRODUCT.md`, `GLOSSARY.md`, `ROADMAP.md`, and `MIGRATION_PLAN.md` now describe Event as removed, `completed` as approved-for-removal, and `is_active` as approved-for-supersession-by-`lifecycle_state` (`tasks` only, Phase 1) — each clearly marked as **approved target architecture, not yet implemented**, per the same current-vs-target discipline established for the Start/End regression. The live database and app code are unchanged; `task_type = 'Event'`, `tasks.completed`, and `tasks.is_active` all still exist and function exactly as before until the corresponding `MIGRATION_PLAN.md` phases are actually executed. `Reminder` remains untouched everywhere, including as a live `task_type`, since ADR-001 has not been approved.
 
-For each remaining ADR, review and choose: **Approve as proposed**, **approve with changes** (note the change directly in this document, updating the relevant section), or **reject**. Once all four ADRs have a final status:
+Once ADR-001 also reaches a final status:
 
-1. `DOMAIN_MODEL.md` and `DATABASE.md` get updated to match every Approved ADR in one pass, each with a note pointing back to its ADR.
-2. The corresponding items in `MIGRATION_PLAN.md`'s Phase 2 (Domain Data-Integrity Decisions) move out of "decision required" and into scoped implementation phases, using each ADR's Migration Impact section as the starting checklist. Any Rejected ADR's item is removed from Phase 2 instead.
-3. Implementation proceeds per the normal phase-by-phase approval process already in place.
+1. Any remaining canonical-doc gap closes in the same pass (primarily: the Commitment Type count, currently six, and the Reminder entity's shape).
+2. Its Migration Impact section becomes a scoped `MIGRATION_PLAN.md` implementation phase, same as the other three.
+3. Implementation proceeds per the normal phase-by-phase approval process already in place — the summary of what's still open versus ready to implement is maintained in `MIGRATION_PLAN.md`.

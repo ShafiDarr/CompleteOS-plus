@@ -58,11 +58,11 @@ Prefer completing one workflow end-to-end before beginning another.
 
 CompleteOS+ V1's mission, Commitment Types, and five-stage lifecycle (Capture → Organize → Plan Today → Execute → Review) are defined canonically in **V1_PRODUCT.md**. This roadmap tracks sequencing and status against that definition; it does not redefine it.
 
-Each lifecycle stage applies to every V1 Commitment Type (Task, Habit, Routine, Bill, Appointment, Event, Reminder) — a stage is not complete when it only works for Tasks.
+Each lifecycle stage applies to every V1 Commitment Type (Task, Habit, Routine, Bill, Appointment, Reminder — six types, reduced from seven; Event removed 2026-07-25 per ARCHITECTURE_DECISIONS.md ADR-002) — a stage is not complete when it only works for Tasks.
 
 ## Milestone 1 — Capture
 
-See V1_PRODUCT.md for the full definition. Current status: strong for the base Task object and Areas; incomplete for Habit, Routine, Bill, Appointment, Event, and Reminder-specific fields, and for Projects.
+See V1_PRODUCT.md for the full definition. Current status: strong for the base Task object and Areas; incomplete for Habit, Routine, Bill, Appointment, and Reminder-specific fields, and for Projects.
 
 ## Milestone 2 — Organize
 
@@ -156,7 +156,7 @@ Never sacrifice architectural consistency for development speed.
 
 # Current Focus
 
-The current objective is to complete Milestone 1 (Capture) across all seven V1 Commitment Types defined in V1_PRODUCT.md, not just Tasks.
+The current objective is to complete Milestone 1 (Capture) across all V1 Commitment Types defined in V1_PRODUCT.md (six, as of ADR-002), not just Tasks.
 
 Do not begin Milestone 2 in earnest until Milestone 1 is functionally complete for every Commitment Type.
 
