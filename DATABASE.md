@@ -4,11 +4,11 @@
 
 This document describes the current Supabase/PostgreSQL database for CompleteOS+.
 
-See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment, Reminder) that this schema implements, and **DOMAIN_MODEL.md for the canonical, live-verified domain language** — where this document and DOMAIN_MODEL.md ever disagree, DOMAIN_MODEL.md's live-verified facts win until this document is corrected to match. See MIGRATION_PLAN.md for the phased plan closing the gaps this document flags below, and **ARCHITECTURE_DECISIONS.md for approved-but-unimplemented target-architecture changes (Event removal, `lifecycle_state`, `completed` removal) — this document marks each one where it applies, distinguishing current live schema from approved target.**
+See V1_PRODUCT.md for the product-level definition of CompleteOS+ V1's Commitment Types (Task, Habit, Routine, Bill, Appointment) that this schema implements, and **DOMAIN_MODEL.md for the canonical, live-verified domain language** — where this document and DOMAIN_MODEL.md ever disagree, DOMAIN_MODEL.md's live-verified facts win until this document is corrected to match. See MIGRATION_PLAN.md for the phased plan closing the gaps this document flags below, and **ARCHITECTURE_DECISIONS.md for approved-but-unimplemented target-architecture changes (Event removal, `lifecycle_state`, `completed` removal, Reminder-as-capability) — this document marks each one where it applies, distinguishing current live schema from approved target.**
 
 **Live-verified 2026-07-24:** several facts below were confirmed directly against the live Supabase project for the first time. Where a fact here was previously a recommendation or an assumption, it is now marked live-confirmed or live-contradicted.
 
-**Updated 2026-07-25:** ADR-002, ADR-003, and ADR-004 are Approved. None are implemented yet — the live schema is unchanged. Each affected fact below is marked "approved for [change] — not yet migrated."
+**Updated 2026-07-25:** ADR-001, ADR-002, ADR-003, and ADR-004 are all Approved. None are implemented yet — the live schema is unchanged. Each affected fact below is marked "approved for [change] — not yet migrated."
 
 The database currently contains **13 public tables**.
 
@@ -25,7 +25,7 @@ The database should support:
 - Personal execution
 - Areas of life
 - Projects
-- Tasks (including Habits, Routines, Bills, Appointments, and Reminders as specialized task types — see V1_PRODUCT.md for the full definition of these as V1 Commitment Types)
+- Tasks (including Habits, Routines, Bills, and Appointments as specialized task types, plus a universal Reminder capability any of them can carry — see V1_PRODUCT.md for the full definition of these as V1 Commitment Types)
 - Day blocks
 - Daily plans
 - Daily status
@@ -50,9 +50,10 @@ This directly implements SYSTEM_PRINCIPLES.md's P009 ("Tasks Are The Universal E
 - `Routine` — multi-step workflow, whose steps live in `routine_steps` referencing `tasks.id`
 - `Bill` — uses `amount`, `payee`, `login_url`
 - `Appointment` — uses `start_at`, `end_at`, `location`; represents a commitment involving another party or an external obligation, not merely "anything scheduled" (definition sharpened by ADR-002)
-- `Reminder` — surfaced at the right time rather than executed as work; exact field usage is an open question, see V1_PRODUCT.md's Open Questions. Also the subject of ADR-001 (Proposed, not approved) — see ARCHITECTURE_DECISIONS.md.
 
 **`Event` — approved for removal (ADR-002, Approved 2026-07-25), not yet migrated.** Event had no unique lifecycle distinct from a plain scheduled Task; Appointment was kept instead because it does have one. `task_type = 'Event'` remains a valid, functioning value in the live database and check constraint until the migration executes — zero live rows use it, so there is no data risk when it does.
+
+**`Reminder` — approved for removal as a `task_type` (ADR-001, Approved 2026-07-25), not yet migrated.** Reminder is replaced by a universal boolean capability, `reminder_enabled`, on `tasks` — any `task_type` can carry it, not just a dedicated Reminder row. `task_type = 'Reminder'` remains a valid, functioning value in the live database and check constraint until the Phase 2B.1 migration executes; 4 live rows use it and must be migrated (`task_type` → `Task`, `reminder_enabled` → `true`) as part of that phase. See the `reminder_enabled` row in the `tasks` table's Universal Columns below for the full field definition.
 
 Fields not relevant to a given `task_type` are simply left null on that row.
 
@@ -218,7 +219,7 @@ UNIQUE (user_id, lower(name))
 
 Represents actionable work.
 
-Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, Appointment, and Reminder is a row in this table, differentiated by `task_type`. (`Event` is approved for removal per ADR-002 but remains a live, unmigrated value — see "Universal Task Model" above.)
+Tasks are the **universal execution object** of CompleteOS+ — see "Universal Task Model" above. Every Task, Habit, Routine, Bill, and Appointment is a row in this table, differentiated by `task_type`. (`Event` is approved for removal per ADR-002, and `Reminder` is approved for removal per ADR-001 in favor of the universal `reminder_enabled` capability, but both remain live, unmigrated `task_type` values — see "Universal Task Model" above.)
 
 ## Key Columns
 
@@ -239,13 +240,14 @@ Tasks are the **universal execution object** of CompleteOS+ — see "Universal T
 | `due_at` | timestamptz | Deadline (optional, secondary) — repurposed from "the" scheduling field; see Scheduling Model in DOMAIN_MODEL.md |
 | `completed_at` | timestamptz | Completion timestamp |
 | `completed` | boolean | **Approved for removal (ADR-004, Approved 2026-07-25), not yet migrated.** Redundant with `status`, confirmed drifted in live data (12/24 rows disagree). Still live until MIGRATION_PLAN.md Phase 2 executes `ALTER TABLE tasks DROP COLUMN completed` |
-| `task_type` | text | **Live:** Task / Habit / Routine / Bill / Appointment / Event / Reminder. **Target (ADR-002, Approved):** Event removed — Task / Habit / Routine / Bill / Appointment / Reminder |
+| `task_type` | text | **Live:** Task / Habit / Routine / Bill / Appointment / Event / Reminder. **Target (ADR-002 and ADR-001, both Approved):** Event and Reminder removed — Task / Habit / Routine / Bill / Appointment |
 | `is_active` | boolean | **Live:** whether this record is enabled (mainly meaningful for Habit/Routine). **Target (ADR-003, Approved, Phase 1 = `tasks` only):** superseded by `lifecycle_state` (`Active`/`Paused`/`Archived`) through migration — not yet implemented |
+| `reminder_enabled` | boolean | **Approved, target architecture (ADR-001, Approved 2026-07-25), not yet migrated.** Universal reminder capability, usable on any `task_type`. Default `false`. Anchors to the commitment's primary scheduling field (`due_at` today; `start_at` once Start/End is restored). Does not affect Current Action ordering; surfaces as a secondary bell badge alongside the type icon, not a replacement for it. **Column does not exist live yet** — added by the Phase 2B.1 migration. |
 | `calendar_sync` | boolean | Whether to sync to calendar |
 | `requires_verification` | boolean | Whether completion needs confirmation |
 | `verification_status` | text | Verification state |
-| `reminder_level` | text | Reminder intensity |
-| `acknowledged_at` | timestamptz | When a reminder/verification was acknowledged |
+| `reminder_level` | text | **Approved for removal (ADR-001, Approved 2026-07-25), not yet migrated.** Reminder intensity — never referenced by application code; superseded by `reminder_enabled`. Still live until MIGRATION_PLAN.md Phase 2B.1 executes `ALTER TABLE tasks DROP COLUMN reminder_level` |
+| `acknowledged_at` | timestamptz | **Approved for removal (ADR-001, Approved 2026-07-25), not yet migrated.** Was intended to record reminder acknowledgment; removed outright rather than folded into `status`, since `status` (progress) and acknowledgment (notification interaction) are deliberately kept separate, and V1 has no notification-delivery mechanism to acknowledge anything from. Still live until MIGRATION_PLAN.md Phase 2B.1 executes `ALTER TABLE tasks DROP COLUMN acknowledged_at` |
 | `completion_synced` | boolean | Whether completion has synced externally |
 | `calendar_event_id` | text | External calendar event reference |
 | `calendar_synced_at` | timestamptz | Last calendar sync timestamp |
@@ -454,7 +456,7 @@ A block item references a task — since Habits and Routines are task types, thi
 | `id` | uuid | Primary key |
 | `user_id` | uuid | Owner user |
 | `day_block_id` | uuid | Parent day block |
-| `item_type` | text | Task / Habit / Routine (documented scope predates V1_PRODUCT.md's full Commitment Type list — whether Bill/Appointment/Reminder also need to be schedulable into a day block is unresolved, see V1_PRODUCT.md) |
+| `item_type` | text | Task / Habit / Routine (documented scope predates V1_PRODUCT.md's full Commitment Type list — whether Bill/Appointment also need to be schedulable into a day block is unresolved, see V1_PRODUCT.md; Reminder is no longer a distinct `task_type` to consider here, per ADR-001 — a remindable Bill/Appointment/etc. is just that type with `reminder_enabled = true`) |
 | `task_id` | uuid | Referenced task (of any task_type) |
 | `title` | text | Display title |
 | `target_amount` | numeric | Optional target amount |
@@ -739,7 +741,7 @@ auth.users
 ├── projects
 │   └── tasks
 │
-├── tasks (task_type, live: Task / Habit / Routine / Bill / Appointment / Event / Reminder — target per ADR-002: Event removed)
+├── tasks (task_type, live: Task / Habit / Routine / Bill / Appointment / Event / Reminder — target per ADR-002 + ADR-001: Event and Reminder removed, replaced on Reminder's side by a universal `reminder_enabled` capability)
 │   ├── block_items
 │   ├── habit_logs        (task_type = 'Habit')
 │   └── routine_steps     (task_type = 'Routine')

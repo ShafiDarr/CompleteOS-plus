@@ -31,18 +31,21 @@ Every implementation decision in V1 should be evaluated against one question: **
 
 A **Commitment Type** is a category of real-world commitment that must be captured, organized, planned, executed, and reviewed as part of daily life.
 
-CompleteOS+ V1 manages six Commitment Types (reduced from seven — **Event removed 2026-07-25, ARCHITECTURE_DECISIONS.md ADR-002, Approved**: Event had no unique lifecycle distinct from a plain scheduled Task, unlike Appointment, which represents a genuine external commitment):
+CompleteOS+ V1 manages five Commitment Types (reduced from seven — **Event removed 2026-07-25, ARCHITECTURE_DECISIONS.md ADR-002, Approved**: Event had no unique lifecycle distinct from a plain scheduled Task, unlike Appointment, which represents a genuine external commitment; **Reminder removed 2026-07-25, ARCHITECTURE_DECISIONS.md ADR-001, Approved**: Reminder was a timing concern, not a distinct kind of work — see "The Reminder Capability" below):
 
 - **Task** — a piece of actionable work with no fixed occurrence pattern.
 - **Habit** — a repeated behavior tracked for consistency rather than one-time completion.
 - **Routine** — a reusable, ordered sequence of steps performed together.
 - **Bill** — a recurring or one-time payment obligation.
 - **Appointment** — a commitment involving another party or an external obligation, typically at a specific time and often a specific place. (Definition sharpened by ADR-002 — previously defined only by its scheduling fields, which it shared with the now-removed Event.)
-- **Reminder** — a commitment whose primary purpose is to be surfaced at the right time, rather than executed as work. **Under review:** ARCHITECTURE_DECISIONS.md ADR-001 proposes removing this as a `task_type` in favor of a universal capability available to any commitment. Status: Proposed, not yet approved — Reminder remains a Commitment Type until it is.
 
-**These are commitment types, not milestones.** They are not phases of work and not a list to build one at a time. All six are implemented as `task_type` values within the Universal Task Model (see DATABASE.md) — they are the same underlying object, differentiated by type, not separate systems (see SYSTEM_PRINCIPLES.md P009 and P022). **Approved target architecture, not yet implemented:** the live database and app still accept `task_type = 'Event'` as a 7th value until the corresponding MIGRATION_PLAN.md phase executes; zero live rows use it.
+**These are commitment types, not milestones.** They are not phases of work and not a list to build one at a time. All five are implemented as `task_type` values within the Universal Task Model (see DATABASE.md) — they are the same underlying object, differentiated by type, not separate systems (see SYSTEM_PRINCIPLES.md P009 and P022). **Approved target architecture, not yet implemented:** the live database and app still accept `task_type = 'Event'` and `task_type = 'Reminder'` as two additional values (seven total) until the corresponding MIGRATION_PLAN.md phases execute; zero live rows use `Event`, 4 live rows use `Reminder` (see "The Reminder Capability" below).
 
-Every Commitment Type moves through the same five-stage lifecycle below. None is more or less "V1" than another — a feature that serves only Tasks while leaving Bills, Appointments, Reminders, Habits, or Routines behind is incomplete, not done.
+### The Reminder Capability
+
+Reminder is not a Commitment Type — it's a cross-cutting capability (`reminder_enabled`) any of the five types above can carry, approved via ARCHITECTURE_DECISIONS.md ADR-001 (2026-07-25). A task flagged this way is one whose main risk is being *forgotten*, not executed wrong — it needs proactive surfacing through the existing Current Action / Plan Today mechanisms, not a separate lifecycle of its own. It anchors to whichever scheduling field is currently the commitment's primary one (`due_at` today; `start_at` once Start/End scheduling is restored, with no domain-model change required at that point), does not affect Current Action's prioritization, and appears as a secondary bell-badge indicator alongside — never replacing — the commitment's own type icon. V1 supports one reminder per commitment; no child reminder table, no relative/offset timing, and no notification-delivery mechanism (none exists in this codebase). See ADR-001 in ARCHITECTURE_DECISIONS.md for the full design and rationale.
+
+Every Commitment Type moves through the same five-stage lifecycle below. None is more or less "V1" than another — a feature that serves only Tasks while leaving Bills, Appointments, Habits, or Routines behind is incomplete, not done, and this applies equally to any of them when the Reminder capability is enabled.
 
 ---
 
@@ -62,7 +65,7 @@ Every Commitment Type must be quickly and reliably capturable — its defining f
 
 **Goal:** Everything has a home, regardless of commitment type.
 
-**Success criterion:** The owner can quickly understand where any commitment belongs and find it again in seconds — whether it's a Task, Habit, Routine, Bill, Appointment, or Reminder.
+**Success criterion:** The owner can quickly understand where any commitment belongs and find it again in seconds — whether it's a Task, Habit, Routine, Bill, or Appointment, and regardless of whether the Reminder capability is enabled on it.
 
 ### Milestone 3 — Plan Today
 
@@ -74,7 +77,7 @@ Every Commitment Type must be quickly and reliably capturable — its defining f
 
 **Goal:** Stay in execution mode, regardless of commitment type.
 
-Executing a commitment means something different per type — completing a Task, paying a Bill, attending an Appointment, following a Routine's steps, completing a Habit's check-in, acting on a Reminder — but moving through the day should feel the same regardless of which type is currently in front of the owner.
+Executing a commitment means something different per type — completing a Task, paying a Bill, attending an Appointment, following a Routine's steps, completing a Habit's check-in — but moving through the day should feel the same regardless of which type is currently in front of the owner, whether or not it's flagged with the Reminder capability.
 
 **Success criterion:** The owner spends the day doing the work instead of repeatedly deciding what to do, for every commitment type.
 
@@ -101,12 +104,13 @@ This is a judgment distinction, not a final ruling. If either belongs in V1 afte
 
 The following are intentionally left undecided rather than assumed:
 
-- What should `reminder_level` and `acknowledged_at` actually do for the Reminder commitment type in daily personal use?
 - Is `requires_verification` / `verification_status` a personal completion-honesty feature, or vestigial multi-person-accountability scope that doesn't belong in V1 at all?
 - Does V1 need the fully configurable Recurring Templates engine (multiple schedule types, week patterns, day-of-month rules), or does a simple frequency-based repeat on Habit/Routine/Bill satisfy "Repeat" for V1?
 - Whether a minimal recurring-instance-generation mechanism (see "Automation" above) is itself V1-required infrastructure, or part of the Recurring Templates question above.
 
 These should be resolved by the Product Architect before the corresponding implementation work begins, not assumed by whoever implements it.
+
+**Resolved:** what `reminder_level`/`acknowledged_at` should do for Reminder — settled by ARCHITECTURE_DECISIONS.md ADR-001 (Approved 2026-07-25): both removed, replaced by the universal `reminder_enabled` capability (see "The Reminder Capability" above). No longer an open question.
 
 ---
 
@@ -118,5 +122,5 @@ These should be resolved by the Product Architect before the corresponding imple
 - **DOMAIN_MODEL.md** is the frozen, live-verified implementation of this document's scope decisions — the canonical entity/field/state definitions, including which of DOMAIN_ARCHITECTURE.md's long-term concepts are actually in V1.
 - **ARCHITECTURE.md** defines the Start/End/Deadline scheduling model and block-first/calendar-first architecture that apply across every Commitment Type.
 - **MIGRATION_PLAN.md** sequences the work to close the gap between this scope and the live database/app code, and identifies which changes need Product Architect approval before implementation.
-- **ARCHITECTURE_DECISIONS.md** is the ADR log for changes to this scope proposed/decided after the initial freeze (e.g. Event's removal as a Commitment Type) — this document reflects only Approved ADRs; Proposed ones (like Reminder-as-capability) are deliberately not yet incorporated here.
+- **ARCHITECTURE_DECISIONS.md** is the ADR log for changes to this scope proposed/decided after the initial freeze (e.g. Event's and Reminder's removal as Commitment Types) — this document reflects only Approved ADRs; any future Proposed ADR is deliberately not yet incorporated here until approved.
 - **PROJECT_STATUS.md** and **V1_CHECKLIST.md** track actual implementation progress against this definition.

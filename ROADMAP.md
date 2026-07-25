@@ -58,11 +58,11 @@ Prefer completing one workflow end-to-end before beginning another.
 
 CompleteOS+ V1's mission, Commitment Types, and five-stage lifecycle (Capture → Organize → Plan Today → Execute → Review) are defined canonically in **V1_PRODUCT.md**. This roadmap tracks sequencing and status against that definition; it does not redefine it.
 
-Each lifecycle stage applies to every V1 Commitment Type (Task, Habit, Routine, Bill, Appointment, Reminder — six types, reduced from seven; Event removed 2026-07-25 per ARCHITECTURE_DECISIONS.md ADR-002) — a stage is not complete when it only works for Tasks.
+Each lifecycle stage applies to every V1 Commitment Type (Task, Habit, Routine, Bill, Appointment — five types, reduced from seven; Event removed and Reminder replaced by a universal `reminder_enabled` capability, both 2026-07-25 per ARCHITECTURE_DECISIONS.md ADR-002 and ADR-001) — a stage is not complete when it only works for Tasks.
 
 ## Milestone 1 — Capture
 
-See V1_PRODUCT.md for the full definition. Current status: strong for the base Task object and Areas; incomplete for Habit, Routine, Bill, Appointment, and Reminder-specific fields, and for Projects.
+See V1_PRODUCT.md for the full definition. Current status: strong for the base Task object and Areas; incomplete for Habit, Routine, Bill, Appointment-specific fields, the Reminder capability, and for Projects.
 
 ## Milestone 2 — Organize
 
@@ -74,7 +74,7 @@ See V1_PRODUCT.md for the full definition. Current status: Current Action's prio
 
 ## Milestone 4 — Execute
 
-See V1_PRODUCT.md for the full definition. Current status: the Execution page and Current Action's core loop work; per-commitment-type execution behavior (habit check-ins, routine steps, bill payment, appointment attendance, reminder acknowledgment, skip/postpone) is largely unbuilt.
+See V1_PRODUCT.md for the full definition. Current status: the Execution page and Current Action's core loop work; per-commitment-type execution behavior (habit check-ins, routine steps, bill payment, appointment attendance, skip/postpone) is largely unbuilt, as is the Reminder capability's UI (the "Remind me" toggle and Current Action bell badge — see ARCHITECTURE_DECISIONS.md ADR-001).
 
 ## Milestone 5 — Review
 

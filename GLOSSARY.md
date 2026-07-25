@@ -68,9 +68,9 @@ Whenever possible, work should begin as a Task.
 
 ## Commitment Type
 
-A category of real-world commitment CompleteOS+ manages — Task, Habit, Routine, Bill, Appointment, or Reminder in V1 (six types; reduced from seven — Event removed 2026-07-25, see ARCHITECTURE_DECISIONS.md ADR-002).
+A category of real-world commitment CompleteOS+ manages — Task, Habit, Routine, Bill, or Appointment in V1 (five types; reduced from seven — Event removed 2026-07-25 per ADR-002, Reminder removed 2026-07-25 per ADR-001, both see ARCHITECTURE_DECISIONS.md).
 
-All Commitment Types are implemented as `task_type` values within the Universal Task Model, not as separate systems. **Approved target architecture, not yet implemented:** the live database still accepts `task_type = 'Event'` until the corresponding migration executes.
+All Commitment Types are implemented as `task_type` values within the Universal Task Model, not as separate systems. **Approved target architecture, not yet implemented:** the live database still accepts `task_type = 'Event'` and `task_type = 'Reminder'` until the corresponding migrations execute.
 
 See V1_PRODUCT.md; see DOMAIN_MODEL.md for the detailed, live-verified definition of each.
 
@@ -90,7 +90,7 @@ A Commitment Type representing a commitment involving another party or an extern
 
 ## Reminder
 
-A Commitment Type whose primary purpose is to be surfaced at the right time, rather than executed as work.
+**Not a Commitment Type** as of ADR-001 (Approved 2026-07-25, see ARCHITECTURE_DECISIONS.md) — previously one, now a universal capability (`reminder_enabled`, a boolean on `tasks`) that any Commitment Type can carry. A task with the Reminder capability enabled is flagged as needing to be surfaced proactively, anchored to whichever scheduling field is currently the commitment's primary one (`due_at` today; extends to `start_at` automatically once Start/End scheduling is restored). It does not affect Current Action's prioritization/ordering, and it does not replace the commitment's type icon — it shows as a secondary bell-badge indicator alongside it. **Approved target architecture, not yet implemented:** the live database still accepts `task_type = 'Reminder'` as a distinct type until the Phase 2B.1 migration executes.
 
 ---
 

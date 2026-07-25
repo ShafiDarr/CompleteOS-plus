@@ -96,7 +96,7 @@ These decisions are authoritative for CompleteOS+'s architecture going forward, 
 
 ## Universal Task Model Is The Foundation
 
-The Universal Task Model (see DOMAIN_ARCHITECTURE.md's Task section and DATABASE.md's "Universal Task Model") is the foundation of CompleteOS+. It must be finished — every `task_type` value genuinely supported end to end — before other systems are expanded. Projects CRUD is treated as independent of this rule: it does not touch task scheduling and may proceed in parallel. **As of ARCHITECTURE_DECISIONS.md ADR-002 (Approved 2026-07-25), the target count is six types (Event removed); Reminder's status as a seventh type-or-capability is still open pending ADR-001. See DOMAIN_MODEL.md for the current authoritative list and the live-vs-target distinction.**
+The Universal Task Model (see DOMAIN_ARCHITECTURE.md's Task section and DATABASE.md's "Universal Task Model") is the foundation of CompleteOS+. It must be finished — every `task_type` value genuinely supported end to end — before other systems are expanded. Projects CRUD is treated as independent of this rule: it does not touch task scheduling and may proceed in parallel. **As of ARCHITECTURE_DECISIONS.md ADR-002 and ADR-001 (both Approved 2026-07-25), the target count is five `task_type` values (Event removed; Reminder removed in favor of a universal `reminder_enabled` capability any type can carry). See DOMAIN_MODEL.md for the current authoritative list and the live-vs-target distinction.**
 
 ## Task Scheduling Model: Start/End, Not Due Date
 

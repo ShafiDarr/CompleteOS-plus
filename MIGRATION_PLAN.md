@@ -6,7 +6,7 @@ This is the phased plan for closing the gap between the frozen domain model (`DO
 
 **Status:** Planning complete, approved to exist as a plan. Individual phases below are gated per their own approval requirement — this document does not itself authorize any schema change, destructive migration, or security change. Do not begin implementation from this document alone; get the specific phase's sign-off first where one is marked required.
 
-**Updated 2026-07-25:** Phase 2 restructured following ADR review — ADR-002, ADR-003, and ADR-004 are Approved (now Phase 2A, ready to implement, no further decision needed) and ADR-001 remains Proposed (Phase 2B.1, still blocking). Phase 4.1 also corrected the same day to reflect a Start/End implementation regression reported by the Product Architect — see that section for detail. **None of Phase 2A has been implemented yet** — "Approved" describes the decision, not the live schema.
+**Updated 2026-07-25:** Phase 2 restructured following ADR review — ADR-002, ADR-003, ADR-004, and (as of a second review pass the same day) ADR-001 are all Approved (Phase 2A, ready to implement, no further decision needed). Reminder's fields (`reminder_level`/`acknowledged_at`) are resolved by ADR-001 and no longer part of Phase 2B's vestigial-column question, which now covers only the calendar-sync/verification columns (Phase 2B.1) and Recurring Templates scope (Phase 2B.2). Phase 4.1 also corrected the same day to reflect a Start/End implementation regression reported by the Product Architect — see that section for detail. **None of Phase 2A has been implemented yet** — "Approved" describes the decision, not the live schema.
 
 **Ground truth this plan is built on:** `PROJECT_STATUS.md`'s Audit Record and Blockers section (2026-07-24 entries), `DOMAIN_MODEL.md`, and `ARCHITECTURE_DECISIONS.md` (ADR statuses as of 2026-07-25).
 
@@ -43,7 +43,7 @@ Phase 1 (RLS + FKs + schema.sql + linter fixes)
    │        └──► Phase 6 (Schedules: Day Blocks / Daily Plans)
    │
    └──► Phase 2 (Domain data-integrity decisions)             [independent of Phase 4/5/6 timing,
-            │                                                   Phase 2A ready to implement now; Phase 2B.3 blocks part of Phase 6]
+            │                                                   Phase 2A ready to implement now; Phase 2B.2 blocks part of Phase 6]
             └──► (implementation of whichever decisions land)
 
 Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phase 1
@@ -115,7 +115,7 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 ## Phase 2 — Domain Data-Integrity Changes
 
-**Updated 2026-07-25.** This phase now splits into 2A (three items Approved via `ARCHITECTURE_DECISIONS.md` — ready to implement, no further decision needed) and 2B (items still awaiting a Product Architect decision — do not implement). None of 2A has been implemented yet; "Approved" describes the decision, not the live schema, which is unchanged until each migration actually runs.
+**Updated 2026-07-25.** This phase now splits into 2A (four items Approved via `ARCHITECTURE_DECISIONS.md` — ready to implement, no further decision needed) and 2B (items still awaiting a Product Architect decision — do not implement). None of 2A has been implemented yet; "Approved" describes the decision, not the live schema, which is unchanged until each migration actually runs.
 
 ### Phase 2A — Approved, Ready to Implement
 
@@ -161,39 +161,39 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **Approval:** 🟢 Decision already made (ADR-003) — note the approved modification (Phase 1 = `tasks` only; "supersedes through migration," not an instant swap) if implementation ever drifts toward a broader or instantaneous version.
 
+#### 2A.4 Reminder as a capability (ADR-001, Approved 2026-07-25)
+
+**What:** Remove `Reminder` from `task_type`. Add `tasks.reminder_enabled` (boolean, default `false`) as a universal capability usable on any `task_type`. Drop `reminder_level` and `acknowledged_at` entirely — both are superseded, not renamed or repurposed. Migrate the 4 live `task_type = 'Reminder'` rows to `task_type = 'Task'`, `reminder_enabled = true` (their `due_at`/`status`/`priority` carry over unchanged; `reminder_level`/`acknowledged_at` are already `NULL` on all 4, so nothing is lost). See ARCHITECTURE_DECISIONS.md ADR-001 for the full approved design, including its final revisions: Reminder anchors to the commitment's *primary scheduling field* (`due_at` today; extends to `start_at` automatically once Start/End scheduling is restored, no further domain-model change needed), and `acknowledged_at` is removed outright rather than folded into `status` (progress and acknowledgment are kept as separate concepts).
+
+**Why:** Reminder was defined by *when it surfaces*, not *what kind of thing it is* — a cross-cutting timing concern, not a distinct kind of work. Modeling it as a 7th mutually-exclusive `task_type` blocked any other type (e.g. a Bill) from also being remindable, conflicting with SYSTEM_PRINCIPLES.md P022. `reminder_level` and `acknowledged_at` were both confirmed unused by application code, and the one real usage of the feature (4 live rows, all one recurring real-world commitment) never populated either field.
+
+**Risk:** Medium — 4 live rows (`task_type = 'Reminder'`) need migrating, unlike Event's zero-row case, but the migration itself is unambiguous (single UPDATE, no data loss, confirmed by live-data audit).
+
+**Depends on:** nothing technically; can be sequenced together with 2A.2's `task_type` migration since both touch the same check constraint. Blocks Phase 4.4's Reminder-specific UI work (the "Remind me" toggle, Current Action bell badge, Systems Control Panel filter) until it lands.
+
+**Affected files:** Supabase migration (add `reminder_enabled`; 4-row `UPDATE`; drop `'Reminder'` from the `task_type` check constraint; drop `reminder_level`/`acknowledged_at` columns), `schema.sql` refresh, `lib/` (TaskForm type selector — remove `Reminder`, add a "Remind me" toggle near the Deadline field; Systems Control Panel's "Reminders" list filter — `task_type = 'Reminder'` → `reminder_enabled = true`; Current Action's icon condition — `task_type == 'Reminder'` → a secondary bell badge shown alongside the type icon when `reminder_enabled == true`, never replacing it), `DATABASE.md`/`DOMAIN_MODEL.md`/`GLOSSARY.md`/`V1_PRODUCT.md` (already updated to reflect target architecture; need a final pass removing the "live/unmigrated" caveats once implemented).
+
+**Approval:** 🟢 Decision already made (ADR-001) — final design terms: field name `reminder_enabled` (not `is_remindable`); Current Action keeps the commitment-type icon as primary, with the bell as a secondary badge only; no ordering boost for `reminder_enabled = true` (Current Action ordering is unchanged by this ADR); `reminder_level`/`acknowledged_at` both removed via migration, not deprecated in place.
+
 ### Phase 2B — Still Open, Decision Required
 
 **Nothing in this section should be implemented until the Product Architect decides.** Implementing ahead of a decision here is exactly the "guess instead of ask" failure mode SYSTEM_PRINCIPLES.md P021 exists to prevent.
 
-#### 2B.1 Reminder as a capability (ADR-001, Proposed — not yet approved)
+#### 2B.1 Vestigial verification/calendar-sync column set
 
-**What:** Remove `Reminder` from `task_type` in favor of a universal capability (working shape: an `is_remindable` flag plus the existing `reminder_level`/`acknowledged_at` fields, usable on any type) — see ARCHITECTURE_DECISIONS.md ADR-001 for the full proposal and its Migration Impact section.
+**What:** Decide the fate of `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced` (out-of-scope, undecided) and `requires_verification`, `verification_status` (open questions per V1_PRODUCT.md) — remove, or define real V1 behavior and build against them. **No longer overlaps with Reminder** — `reminder_level`/`acknowledged_at` were resolved by ADR-001 and moved to Phase 2A.4; this bucket now covers only the calendar-sync/verification columns listed here.
 
-**Why still open:** direction agreed by the Product Architect, but the actual behavior/mechanism for Reminder (what `reminder_level` means, what "acknowledging" does) has not been designed yet — approving the structural shape without that design would be building against an undefined feature.
-
-**Risk:** Medium — 4 live rows (`task_type = 'Reminder'`) would need migrating once approved, unlike Event's zero-row case.
-
-**Depends on:** nothing technically; blocks Phase 4.4's Reminder-specific work either way.
-
-**Affected files:** none until approved.
-
-**Approval:** 🔴 Required, blocking — this is the one remaining ADR still Proposed.
-
-#### 2B.2 Vestigial verification/calendar-sync/reminder column set
-
-**What:** Decide the fate of `calendar_sync`, `calendar_event_id`, `calendar_synced_at`, `completion_synced` (out-of-scope, undecided) and `requires_verification`, `verification_status`, `reminder_level`, `acknowledged_at` (open questions per V1_PRODUCT.md) — remove, or define real V1 behavior and build against them. **Overlaps with 2B.1** for `reminder_level`/`acknowledged_at` specifically — those two fields' fate is really the same decision as Reminder's capability design, not a separate one.
-
-**Why:** Confirmed 100% unused in application code. `reminder_level` has live data on 10 of 24 rows despite that, which looks like seed data rather than evidence of real usage — do not treat it as a reason to assume the field already works.
+**Why:** Confirmed 100% unused in application code.
 
 **Risk:** High if columns are dropped and any of them turn out to matter for a decision not yet made. Low if the decision is "keep the columns, don't build on them yet."
 
-**Depends on:** nothing technically for the calendar-sync half; the reminder-field half is effectively gated on 2B.1.
+**Depends on:** nothing technically.
 
 **Affected files:** none until decided; then a Supabase migration and `tasks.dart`/related Dart if columns are wired or removed.
 
 **Approval:** 🔴 Required, blocking — explicitly named in V1_PRODUCT.md as a Product Architect decision, not an implementation one.
 
-#### 2B.3 Recurring Templates scope
+#### 2B.2 Recurring Templates scope
 
 **What:** Decide whether V1 needs the full Recurring Templates engine (the `recurring_templates` table as currently designed — schedule types, week patterns, day-of-month rules) or a simpler frequency-based repeat on Habit/Routine/Bill, and whether a minimal recurring-instance-generation mechanism is required V1 infrastructure either way.
 
@@ -261,13 +261,13 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **Risk:** Low-Medium (largest remaining chunk of Phase 4, per PROJECT_STATUS.md). **Approval:** 🟢 Not required.
 
-### 4.4 Bill / Reminder fields
+### 4.4 Bill fields / Reminder capability
 
-**What:** Type-specific fields and flows for Bill and Reminder.
+**What:** Type-specific fields and flow for Bill (`amount`/`payee`/`login_url`), plus the universal Reminder capability UI: a "Remind me" toggle in TaskForm (near the Deadline field, available on every `task_type`), the Systems Control Panel "Reminders" list filtered on `reminder_enabled = true`, and Current Action's secondary bell badge shown alongside the type icon when `reminder_enabled = true`.
 
-**Depends on:** Phase 2B.1/2B.2 for Reminder specifically (`reminder_level`/`acknowledged_at`, and Reminder's very existence as a `task_type`, are open questions — do not wire fields whose behavior isn't decided). Bill has no such blocker.
+**Depends on:** Phase 2A.4 (ADR-001, Approved) must land first — `reminder_enabled` needs to exist and the 4 live `Reminder` rows need to be migrated before this UI work is wired against it. Bill has no such blocker.
 
-**Risk:** Low. **Approval:** 🟢 Not required for Bill; Reminder is blocked on 2B.1/2B.2's decisions, not an approval gate of its own.
+**Risk:** Low. **Approval:** 🟢 Not required for Bill or Reminder — both now have an approved design (ADR-001 for Reminder); this is implementation work, not a fresh decision.
 
 ---
 
@@ -285,7 +285,7 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 
 **What:** Full UI for the block-first internal / calendar-first user-facing scheduling system.
 
-**Depends on:** Phase 1 (all four schedule tables need RLS/FKs) and Phase 4 (per ARCHITECTURE.md/ROADMAP.md's explicit sequencing — this starts only after the Universal Task Model is functionally complete). Daily Plan generation logic additionally depends on Phase 2B.3's Recurring Templates decision if generation is meant to read from templates.
+**Depends on:** Phase 1 (all four schedule tables need RLS/FKs) and Phase 4 (per ARCHITECTURE.md/ROADMAP.md's explicit sequencing — this starts only after the Universal Task Model is functionally complete). Daily Plan generation logic additionally depends on Phase 2B.2's Recurring Templates decision if generation is meant to read from templates.
 
 **Risk:** Medium — the largest remaining greenfield UI surface. **Approval:** 🟢 Not required for direction (already-confirmed architecture); the implementation plan itself should get a lightweight review when it's actually scoped, same as any other sprint kickoff.
 
@@ -302,12 +302,12 @@ Phase 3 (scoped UNIQUE constraints) — independent, can run any time after Phas
 | 2A.1 | `completed`/`status` consolidation (ADR-004) | 🟢 Decision made — ready to implement | No |
 | 2A.2 | Event removed from `task_type` (ADR-002) | 🟢 Decision made — ready to implement | No — sequence before/alongside Phase 4.1's type selector work |
 | 2A.3 | `lifecycle_state` supersedes `is_active` on `tasks` (ADR-003) | 🟢 Decision made — ready to implement | No |
-| 2B.1 | Reminder as a capability (ADR-001) | 🔴 Required — the only ADR still open | Blocks Reminder in Phase 4.4 |
-| 2B.2 | Vestigial column set | 🔴 Required | Blocks Reminder in Phase 4.4 (overlaps with 2B.1 for `reminder_level`/`acknowledged_at`) |
-| 2B.3 | Recurring Templates scope | 🔴 Required | Blocks part of Phase 6 |
+| 2A.4 | Reminder as a capability (ADR-001) | 🟢 Decision made — ready to implement | No — sequence before/alongside Phase 4.4's Reminder UI work |
+| 2B.1 | Vestigial calendar-sync/verification column set | 🔴 Required | No longer blocks Reminder (resolved by ADR-001/2A.4) |
+| 2B.2 | Recurring Templates scope | 🔴 Required | Blocks part of Phase 6 |
 | 3.1 | Scoped UNIQUE constraints | 🟡 Required | No |
 | 4.1–4.3 | Start/End (restore + generalize, see 2026-07-25 correction), Habit, Routine | 🟢 None (direction already approved) | Each gated on Phase 1 landing |
-| 4.4 | Bill / Reminder | 🟢 Bill / 🔴 Reminder blocked on 2B.1+2B.2 | Reminder blocked, Bill not |
+| 4.4 | Bill fields / Reminder capability UI | 🟢 None (both approved) | Reminder gated on 2A.4 landing, Bill not |
 | 5 | Projects CRUD | 🟢 None | Gated on 1.1's `projects` policy only |
 | 6 | Schedules | 🟢 None (direction already approved) | Gated on Phase 1 + Phase 4 |
 
